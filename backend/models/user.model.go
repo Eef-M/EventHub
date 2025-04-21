@@ -19,7 +19,7 @@ type User struct {
 	ID        uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
 	Username  string    `gorm:"type:varchar(255);unique;not null" json:"username"`
 	Email     string    `gorm:"type:varchar(255);unique;not null" json:"email"`
-	Password  string    `gorm:"type:varchar(255);not null" json:"-"`
+	Password  string    `gorm:"type:varchar(255);not null" json:"password"`
 	FirstName string    `gorm:"type:varchar(255);not null" json:"first_name"`
 	LastName  string    `gorm:"type:varchar(255);not null" json:"last_name"`
 	Role      Roles     `gorm:"type:user_role;default:'user'" json:"role"`
