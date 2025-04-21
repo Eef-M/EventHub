@@ -11,6 +11,7 @@ func InitRoute(app *gin.Engine) {
 
 	api := router.Group("/api/v1")
 	{
-		api.GET("/testing", controllers.Testing)
+		// Auth
+		api.POST("auth/register", controllers.Register)
 	}
 }
