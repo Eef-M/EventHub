@@ -23,8 +23,8 @@ type User struct {
 	FirstName string    `gorm:"type:varchar(255);not null" json:"first_name"`
 	LastName  string    `gorm:"type:varchar(255);not null" json:"last_name"`
 	Role      Roles     `gorm:"type:user_role;default:'user'" json:"role"`
-	CreatedAt time.Time `gorm:"default:now()" json:"created_at"`
-	UpdatedAT time.Time `gorm:"default:now()" json:"updated_now()"`
+	CreatedAt time.Time `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAT time.Time `gorm:"autoUpdateTime" json:"updated_at"`
 }
 
 func (User) TableName() string {
