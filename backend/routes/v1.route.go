@@ -13,8 +13,15 @@ func InitRoute(app *gin.Engine) {
 	api := router.Group("/api/v1")
 	{
 		// Auth
-		api.POST("auth/register", controllers.Register)
-		api.POST("auth/login", controllers.Login)
+		api.POST("/auth/register", controllers.Register)
+		api.POST("/auth/login", controllers.Login)
+
+		// Event
+		api.GET("/events", middleware.RequireAuth, controllers.GetEvents)
+		api.GET("/events/:id", middleware.RequireAuth, controllers.GetEvent)
+		api.POST("/events", middleware.RequireAuth, controllers.CreateEvent)
+		api.PUT("/events/:id", middleware.RequireAuth, controllers.UpdateEvent)
+		api.DELETE("/events/:id", middleware.RequireAuth, controllers.DeleteEvent)
 
 		// Valdate auth (for testing)
 		api.GET("testing", middleware.RequireAuth, controllers.ValidateTesting)
