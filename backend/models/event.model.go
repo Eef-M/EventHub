@@ -10,13 +10,13 @@ import (
 type Event struct {
 	ID          uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
 	OrganizerID uuid.UUID `gorm:"type:uuid;not null" json:"organizer_id"`
-	Organizer   User      `gorm:"foreignKey:OrganizerID;references:ID" json:"organizer"`
+	Organizer   User      `gorm:"foreignKey:OrganizerID;references:ID" json:"-"`
 	Title       string    `gorm:"type:varchar(255);not null" json:"title"`
 	Description string    `gorm:"type:text;not null" json:"description"`
 	Location    string    `gorm:"type:varchar(255);not null" json:"location"`
 	Category    string    `gorm:"type:varchar(255);not null" json:"category"`
 	Date        time.Time `gorm:"type:date" json:"date"`
-	Time        string    `gorm:"type:time" json:"time"`
+	Time        time.Time `gorm:"type:time" json:"time"`
 	IsPublic    bool      `gorm:"default:true" json:"is_public"`
 	BannerURL   string    `gorm:"type:text" json:"banner_url"`
 	CreatedAt   time.Time `gorm:"autoCreateTime" json:"created_at"`
