@@ -28,4 +28,14 @@ func InitRoute(app *gin.Engine) {
 		events.DELETE("/:id", middleware.RequireAuth, controllers.DeleteEvent)
 
 	}
+
+	// Ticket Group
+	ticket := api.Group("/tickets")
+	{
+		ticket.GET("", middleware.RequireAuth, controllers.GetTickets)
+		ticket.GET("/:id", middleware.RequireAuth, controllers.GetTicket)
+		ticket.POST("", middleware.RequireAuth, controllers.CreateTicket)
+		ticket.PUT("/:id", middleware.RequireAuth, controllers.UpdateTicket)
+		ticket.DELETE("/:id", middleware.RequireAuth, controllers.DeleteTicket)
+	}
 }
