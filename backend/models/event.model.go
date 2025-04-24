@@ -20,7 +20,7 @@ type Event struct {
 	IsPublic    bool      `gorm:"default:true" json:"is_public"`
 	BannerURL   string    `gorm:"type:text" json:"banner_url"`
 	CreatedAt   time.Time `gorm:"autoCreateTime" json:"created_at"`
-	UpdatedAT   time.Time `gorm:"autoUpdateTime" json:"update_at"`
+	UpdatedAT   time.Time `gorm:"autoUpdateTime" json:"updated_at"`
 }
 
 func (Event) TableName() string {
