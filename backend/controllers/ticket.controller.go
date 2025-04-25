@@ -3,8 +3,8 @@ package controllers
 import (
 	"event-management-system/backend/initializers"
 	"event-management-system/backend/models"
+	"event-management-system/backend/utils"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -56,32 +56,21 @@ func CreateTicket(c *gin.Context) {
 		return
 	}
 
-	name := c.PostForm("name")
-	if name == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Name is required",
-		})
+	name, ok := utils.RequireStringField(c, "name")
+	if !ok {
 		return
 	}
 
 	// Description is optional
 	description := c.PostForm("description")
 
-	priceStr := c.PostForm("price")
-	price, err := strconv.ParseFloat(priceStr, 64)
-	if err != nil || price < 0 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid price",
-		})
+	price, ok := utils.RequireFloatField(c, "price")
+	if !ok {
 		return
 	}
 
-	quotaStr := c.PostForm("quota")
-	quota, err := strconv.Atoi(quotaStr)
-	if err != nil || quota < 0 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid quota",
-		})
+	quota, ok := utils.RequireIntegerField(c, "quota")
+	if !ok {
 		return
 	}
 
@@ -124,31 +113,20 @@ func UpdateTicket(c *gin.Context) {
 		return
 	}
 
-	name := c.PostForm("name")
-	if name == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Name is required",
-		})
+	name, ok := utils.RequireStringField(c, "name")
+	if !ok {
 		return
 	}
 
 	description := c.PostForm("description")
 
-	priceStr := c.PostForm("price")
-	price, err := strconv.ParseFloat(priceStr, 64)
-	if err != nil || price < 0 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid price",
-		})
+	price, ok := utils.RequireFloatField(c, "price")
+	if !ok {
 		return
 	}
 
-	quotaStr := c.PostForm("quota")
-	quota, err := strconv.Atoi(quotaStr)
-	if err != nil || quota < 0 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid quota",
-		})
+	quota, ok := utils.RequireIntegerField(c, "quota")
+	if !ok {
 		return
 	}
 
