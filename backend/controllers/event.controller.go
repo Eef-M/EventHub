@@ -4,6 +4,7 @@ import (
 	"event-management-system/backend/handlers"
 	"event-management-system/backend/initializers"
 	"event-management-system/backend/models"
+	"event-management-system/backend/utils"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -65,19 +66,23 @@ func GetEvent(c *gin.Context) {
 }
 
 func CreateEvent(c *gin.Context) {
-	file, err := c.FormFile("banner_image")
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+	title, ok := utils.RequireStringField(c, "title")
+	if !ok {
 		return
 	}
 
-	filename, err := handlers.SaveImage(c, file)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+	description, ok := utils.RequireStringField(c, "description")
+	if !ok {
+		return
+	}
+
+	location, ok := utils.RequireStringField(c, "location")
+	if !ok {
+		return
+	}
+
+	category, ok := utils.RequireStringField(c, "category")
+	if !ok {
 		return
 	}
 
@@ -115,12 +120,28 @@ func CreateEvent(c *gin.Context) {
 		return
 	}
 
+	file, err := c.FormFile("banner_image")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	filename, err := handlers.SaveImage(c, file)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
 	event := models.Event{
 		OrganizerID: user.ID,
-		Title:       c.PostForm("title"),
-		Description: c.PostForm("description"),
-		Location:    c.PostForm("location"),
-		Category:    c.PostForm("category"),
+		Title:       title,
+		Description: description,
+		Location:    location,
+		Category:    category,
 		Date:        parseDate,
 		Time:        parseTime,
 		BannerURL:   "uploads/" + filename,
@@ -157,6 +178,26 @@ func UpdateEvent(c *gin.Context) {
 		return
 	}
 
+	title, ok := utils.RequireStringField(c, "title")
+	if !ok {
+		return
+	}
+
+	description, ok := utils.RequireStringField(c, "description")
+	if !ok {
+		return
+	}
+
+	location, ok := utils.RequireStringField(c, "location")
+	if !ok {
+		return
+	}
+
+	category, ok := utils.RequireStringField(c, "category")
+	if !ok {
+		return
+	}
+
 	dateStr := c.PostForm("date")
 	parseDate, err := time.Parse("2006-01-02", dateStr)
 	if err != nil {
@@ -175,10 +216,10 @@ func UpdateEvent(c *gin.Context) {
 		return
 	}
 
-	event.Title = c.PostForm("title")
-	event.Description = c.PostForm("description")
-	event.Location = c.PostForm("location")
-	event.Category = c.PostForm("category")
+	event.Title = title
+	event.Description = description
+	event.Location = location
+	event.Category = category
 	event.Date = parseDate
 	event.Time = parseTime
 

@@ -35,7 +35,7 @@ func RequireIntegerField(c *gin.Context, field string) (int, bool) {
 	num, err := strconv.Atoi(value)
 	if err != nil || num < 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid" + field,
+			"error": "Invalid " + field,
 		})
 		return 0, false
 	}
