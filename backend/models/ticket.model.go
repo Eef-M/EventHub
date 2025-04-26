@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type Ticket struct {
@@ -20,4 +21,11 @@ type Ticket struct {
 
 func (Ticket) TableName() string {
 	return "tickets"
+}
+
+func (u *Ticket) BeforeCreate(tx *gorm.DB) (err error) {
+	if u.ID == uuid.Nil {
+		u.ID = uuid.New()
+	}
+	return
 }
