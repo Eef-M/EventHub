@@ -8,5 +8,6 @@ func SyncDB() {
 		&models.Event{},
 		&models.Ticket{},
 		&models.EventRegistration{},
+		&models.EventFeedback{},
 	)
 }
