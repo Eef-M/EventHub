@@ -31,6 +31,9 @@ func InitRoute(app *gin.Engine) {
 		events.GET("/my-registrations", middleware.RequireAuth, controllers.MyRegistrations)
 		events.GET("/:id/attendees", middleware.RequireAuth, controllers.EventAttendees)
 		events.PUT("/:id/cancel", middleware.RequireAuth, controllers.CancelRegistration)
+
+		events.POST("/:id/feedback", middleware.RequireAuth, controllers.SendFeedback)
+		events.GET("/:id/feedback", middleware.RequireAuth, controllers.GetFeedbacks)
 	}
 
 	// Ticket Group
