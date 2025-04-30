@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import Home from './pages/Home.vue';
 
 
 </script>
 
 <template>
-  <Home />
+  <div id="app" class="min-h-screen bg-gray-50">
+    <RouterView />
+  </div>
 </template>
 
 <style scoped></style>
