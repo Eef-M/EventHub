@@ -16,6 +16,7 @@ func InitRoute(app *gin.Engine) {
 	{
 		auth.POST("/register", controllers.Register)
 		auth.POST("/login", controllers.Login)
+		auth.POST("/logout", middleware.RequireAuth, controllers.Logout)
 	}
 
 	// Events Group
