@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-gray-100">
     <div class="bg-white shadow-md rounded-lg p-8 w-full max-w-md">
-      <h2 class="text-3xl font-semibold text-center text-indigo-800 mb-6">Login</h2>
+      <h2 class="text-3xl font-semibold text-center text-purple-800 mb-6">Login</h2>
 
       <form>
         <div class="mb-4">
@@ -18,14 +18,15 @@
             placeholder="********" />
         </div>
 
-        <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-blue-700 transition">
+        <button type="submit"
+          class="w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700 transition cursor-pointer">
           Login
         </button>
       </form>
 
       <p class="mt-6 text-sm text-center text-gray-600">
         Don't have an account yet?
-        <RouterLink to="/register" class="text-indigo-600 hover:underline">Register</RouterLink>
+        <RouterLink to="/register" class="text-purple-600 hover:underline">Register</RouterLink>
       </p>
     </div>
   </div>

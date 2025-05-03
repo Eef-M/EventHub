@@ -1,16 +1,25 @@
 <template>
   <DefaultLayout>
-    <section class="py-20">
-      <div class="max-w-7xl mx-auto px-4 text-center">
-        <h1 class="text-5xl font-bold text-gray-900 mb-4">Discover Exciting Events</h1>
-        <p class="text-lg text-gray-600 mb-8">
-          Explore and manage event easily.
-        </p>
-        <div class="flex justify-center gap-4">
-          <RouterLink to="/events"
-            class="px-6 py-3 bg-blue-600 text-white rounded-xl shadow hover:bg-blue-700 transition">
+    <section class="bg-zinc-100 py-12 px-4 md:px-8">
+      <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between">
+        <div class="text-left mb-8 md:mb-0 md:w-1/2">
+          <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-purple-900 mb-4">Discover Exciting Events</h1>
+          <p class="text-base text-gray-600 mb-6">
+            Explore and manage events easily. Find events that match your interests and register in just a few clicks.
+          </p>
+          <button
+            class="px-6 py-3 bg-purple-600 text-white rounded-md shadow hover:bg-purple-700 transition cursor-pointer">
             Browse Events
-          </RouterLink>
+          </button>
+        </div>
+
+        <div class="md:w-1/2 relative">
+          <div
+            class="bg-purple-100 rounded-full w-64 h-64 md:w-80 md:h-80 mx-auto relative flex items-center justify-center">
+            <img
+              src="https://images.pexels.com/photos/2952834/pexels-photo-2952834.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+              alt="Person using smartphone" class="w-48 h-48 md:w-64 md:h-64 object-cover rounded-full" />
+          </div>
         </div>
       </div>
     </section>
