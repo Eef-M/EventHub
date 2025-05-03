@@ -34,13 +34,15 @@
             <h3 class="text-lg font-bold">General Admission</h3>
             <p class="text-gray-600">Price: Rp 150.000</p>
             <p class="text-sm text-gray-500">Available: 100</p>
-            <button class="mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl">Buy Ticket</button>
+            <button class="mt-3 w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-xl cursor-pointer">Buy
+              Ticket</button>
           </div>
           <div class="border p-4 rounded-xl shadow-sm">
             <h3 class="text-lg font-bold">VIP</h3>
             <p class="text-gray-600">Price: Rp 350.000</p>
             <p class="text-sm text-gray-500">Available: 25</p>
-            <button class="mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl">Buy Ticket</button>
+            <button class="mt-3 w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-xl cursor-pointer">Buy
+              Ticket</button>
           </div>
         </div>
       </div>
