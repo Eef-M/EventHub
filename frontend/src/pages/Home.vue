@@ -40,6 +40,98 @@
         </div>
       </div>
     </section>
+
+    <section class="bg-gray-100 py-16">
+      <div class="max-w-7xl mx-auto px-4 text-center">
+        <h2 class="text-3xl font-semibold mb-8">Popular Categories</h2>
+        <div class="grid md:grid-cols-4 gap-6">
+          <div class="bg-white p-6 rounded shadow">🎓 Workshop</div>
+          <div class="bg-white p-6 rounded shadow">💼 Seminar</div>
+          <div class="bg-white p-6 rounded shadow">🎤 Conference</div>
+          <div class="bg-white p-6 rounded shadow">🤝 Meetup</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-white py-16">
+      <div class="max-w-5xl mx-auto px-4 text-center">
+        <h2 class="text-3xl font-semibold mb-10">How It Works</h2>
+        <div class="grid md:grid-cols-3 gap-8">
+          <div>
+            <div class="text-5xl mb-4">🔍</div>
+            <h3 class="font-bold text-xl mb-2">Find Events</h3>
+            <p class="text-gray-600">Browse curated events that match your interests and location.</p>
+          </div>
+          <div>
+            <div class="text-5xl mb-4">📝</div>
+            <h3 class="font-bold text-xl mb-2">Register Easily</h3>
+            <p class="text-gray-600">Register with just a few clicks and get reminders via email.</p>
+          </div>
+          <div>
+            <div class="text-5xl mb-4">🎉</div>
+            <h3 class="font-bold text-xl mb-2">Join & Enjoy</h3>
+            <p class="text-gray-600">Attend events and make meaningful connections.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-purple-600 py-16 text-white text-center">
+      <div class="max-w-4xl mx-auto px-4">
+        <h2 class="text-3xl font-bold mb-4">Ready to Host Your Event?</h2>
+        <p class="mb-6">Join EventHub and start managing your own events today!</p>
+        <button class="bg-white text-purple-600 font-semibold px-6 py-3 rounded-md hover:bg-gray-100 transition">
+          Create an Event
+        </button>
+      </div>
+    </section>
+
+    <section class="bg-white py-16">
+      <div class="max-w-6xl mx-auto px-4 text-center">
+        <h2 class="text-3xl font-semibold mb-12">What Our Users Say</h2>
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="bg-gray-100 p-6 rounded-lg shadow">
+            <p class="text-gray-700 italic">"EventHub made it so easy to find tech meetups near me. The registration was
+              seamless!"</p>
+            <h4 class="font-semibold mt-4">– Sarah, Developer</h4>
+          </div>
+          <div class="bg-gray-100 p-6 rounded-lg shadow">
+            <p class="text-gray-700 italic">"I hosted a small workshop and found more attendees than expected thanks to
+              EventHub!"</p>
+            <h4 class="font-semibold mt-4">– James, Organizer</h4>
+          </div>
+          <div class="bg-gray-100 p-6 rounded-lg shadow">
+            <p class="text-gray-700 italic">"Nice UI, good experience. Definitely using it again for future events."</p>
+            <h4 class="font-semibold mt-4">– Lina, Freelancer</h4>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-gray-50 py-16">
+      <div class="max-w-6xl mx-auto px-4 text-center">
+        <h2 class="text-3xl font-semibold mb-12">Our Impact So Far</h2>
+        <div class="grid md:grid-cols-4 gap-6 text-purple-700 font-bold text-2xl">
+          <div>
+            <p>1,200+</p>
+            <span class="block text-sm text-gray-500 font-normal mt-2">Registered Users</span>
+          </div>
+          <div>
+            <p>450+</p>
+            <span class="block text-sm text-gray-500 font-normal mt-2">Events Listed</span>
+          </div>
+          <div>
+            <p>90+</p>
+            <span class="block text-sm text-gray-500 font-normal mt-2">Cities Covered</span>
+          </div>
+          <div>
+            <p>98%</p>
+            <span class="block text-sm text-gray-500 font-normal mt-2">Positive Feedback</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </DefaultLayout>
 </template>
 
