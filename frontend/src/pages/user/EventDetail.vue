@@ -1,5 +1,5 @@
 <template>
-  <DefaultLayout>
+  <UserLayout>
     <section class="py-8 max-w-7xl mx-auto">
       <!-- Event Banner -->
       <div class="rounded-2xl overflow-hidden shadow-md mb-8">
@@ -53,10 +53,10 @@
         <p class="text-gray-500 italic">No feedback yet.</p>
       </div>
     </section>
-  </DefaultLayout>
+  </UserLayout>
 </template>
 
 <script lang="ts" setup>
-import DefaultLayout from '../layouts/DefaultLayout.vue';
+import UserLayout from '../../layouts/UserLayout.vue';
 
 </script>

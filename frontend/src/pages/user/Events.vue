@@ -1,5 +1,5 @@
 <template>
-  <DefaultLayout>
+  <UserLayout>
     <section class="py-10">
       <div class="max-w-7xl mx-auto px-4">
         <h2 class="text-3xl font-semibold text-center mb-10">News Events</h2>
@@ -16,12 +16,12 @@
         </div>
       </div>
     </section>
-  </DefaultLayout>
+  </UserLayout>
 </template>
 
 <script lang="ts" setup>
 import { RouterLink } from 'vue-router';
-import DefaultLayout from '../layouts/DefaultLayout.vue';
-import EventCard from '../components/EventCard.vue';
+import UserLayout from '../../layouts/UserLayout.vue';
+import EventCard from '../../components/user/EventCard.vue';
 
 </script>

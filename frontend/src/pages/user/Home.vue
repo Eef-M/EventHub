@@ -1,5 +1,5 @@
 <template>
-  <DefaultLayout>
+  <UserLayout>
     <section class="bg-zinc-100 py-12 px-4 md:px-8">
       <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between">
         <div class="text-left mb-8 md:mb-0 md:w-1/2">
@@ -132,11 +132,10 @@
       </div>
     </section>
 
-  </DefaultLayout>
+  </UserLayout>
 </template>
 
 <script setup lang="ts">
-import EventCard from '../components/EventCard.vue';
-import DefaultLayout from '../layouts/DefaultLayout.vue';
-
+import EventCard from '../../components/user/EventCard.vue';
+import UserLayout from '../../layouts/UserLayout.vue';
 </script>
