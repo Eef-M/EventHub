@@ -1,19 +1,35 @@
 <template>
   <aside class="w-64 bg-white shadow h-full">
-    <div class="p-4 font-bold text-lg border-b">EventHub</div>
+    <div class="p-4 font-bold text-lg border-b">
+      <RouterLink to="/admin/dashboard">
+        <span class="text-purple-600">Event</span>Hub
+      </RouterLink>
+    </div>
     <nav class="mt-4">
       <ul>
-        <li class="px-4 py-2 hover:bg-gray-200">
-          <RouterLink to="/admin">Dashboard</RouterLink>
+        <li class="px-4 py-4 hover:shadow-md hover:text-purple-800">
+          <RouterLink to="/admin/dashboard">
+            <v-icon name="md-dashboard" scale="1.3" />
+            Dashboard
+          </RouterLink>
         </li>
-        <li class="px-4 py-2 hover:bg-gray-200">
-          <RouterLink to="/admin/events">Manage Events</RouterLink>
+        <li class="px-4 py-4 hover:shadow-md hover:text-purple-800">
+          <RouterLink to="/admin/manage-events">
+            <v-icon name="md-displaysettings-sharp" scale="1.3" />
+            Manage Events
+          </RouterLink>
         </li>
-        <li class="px-4 py-2 hover:bg-gray-200">
-          <RouterLink to="/admin/registrations">Registrations</RouterLink>
+        <li class="px-4 py-4 hover:shadow-md hover:text-purple-800">
+          <RouterLink to="/admin/registrations">
+            <v-icon name="fa-clipboard-list" scale="1.3" />
+            Registrations
+          </RouterLink>
         </li>
-        <li class="px-4 py-2 hover:bg-gray-200">
-          <RouterLink to="/admin/feedbacks">Feedback</RouterLink>
+        <li class="px-4 py-4 hover:shadow-md hover:text-purple-800">
+          <RouterLink to="/admin/feedback">
+            <v-icon name="la-comment" scale="1.3" />
+            Feedback
+          </RouterLink>
         </li>
       </ul>
     </nav>

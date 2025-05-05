@@ -5,6 +5,9 @@ import Register from "../pages/auth/Register.vue";
 import Events from "../pages/user/Events.vue";
 import EventDetail from "../pages/user/EventDetail.vue";
 import Dashboard from "../pages/admin/Dashboard.vue";
+import ManageEvents from "../pages/admin/ManageEvents.vue";
+import Registrations from "../pages/admin/Registrations.vue";
+import Feedback from "../pages/admin/Feedback.vue";
 
 const routes = [
   // user
@@ -16,6 +19,9 @@ const routes = [
 
   // admin
   { path: '/admin/dashboard', component: Dashboard },
+  { path: '/admin/manage-events', component: ManageEvents },
+  { path: '/admin/registrations', component: Registrations },
+  { path: '/admin/feedback', component: Feedback },
 ]
 
 const router = createRouter({
