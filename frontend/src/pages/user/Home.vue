@@ -27,15 +27,19 @@
     <section class="bg-white py-16">
       <div class="max-w-7xl mx-auto px-4">
         <h2 class="text-3xl font-semibold text-center mb-10">News Events</h2>
-        <div class="grid md:grid-cols-3 gap-6">
-          <RouterLink to="/events/id/detail">
-            <EventCard />
+
+        <div class="grid md:grid-cols-3 gap-6 mb-10">
+          <RouterLink v-for="event in eventsData" :key="event.id" :to="`/events/${event.id}/detail`">
+            <EventCard :event="event" />
           </RouterLink>
-          <RouterLink to="/events/id/detail">
-            <EventCard />
-          </RouterLink>
-          <RouterLink to="/events/id/detail">
-            <EventCard />
+        </div>
+
+        <div class="text-center">
+          <RouterLink to="/events">
+            <button
+              class="px-6 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition shadow cursor-pointer">
+              See more
+            </button>
           </RouterLink>
         </div>
       </div>
@@ -136,6 +140,10 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import EventCard from '../../components/user/EventCard.vue';
 import UserLayout from '../../layouts/UserLayout.vue';
+import { dummyEvents } from '../../data/events';
+
+const eventsData = computed(() => dummyEvents.slice(0, 3));
 </script>

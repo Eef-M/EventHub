@@ -15,7 +15,7 @@ const routes = [
   { path: '/login', component: Login },
   { path: '/register', component: Register },
   { path: '/events', component: Events },
-  { path: '/events/id/detail', component: EventDetail },
+  { path: '/events/:id/detail', component: EventDetail },
 
   // admin
   { path: '/admin/dashboard', component: Dashboard },

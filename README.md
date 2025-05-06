@@ -1,4 +1,4 @@
-# 🎉 Event Management System
+# 🎉 EventHub
 
 A full-stack web application for managing and registering to events. Built with Vue 3 (frontend), Go (backend), and PostgreSQL (database).
 
