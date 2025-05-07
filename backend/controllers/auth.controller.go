@@ -19,6 +19,7 @@ func Register(c *gin.Context) {
 		FirstName string `json:"first_name"`
 		LastName  string `json:"last_name"`
 		Email     string `json:"email"`
+		Role      string `json:"role"`
 		Password  string `json:"password"`
 	}
 
@@ -43,7 +44,7 @@ func Register(c *gin.Context) {
 		FirstName: body.FirstName,
 		LastName:  body.LastName,
 		Email:     body.Email,
-		Role:      "user",
+		Role:      models.Roles(body.Role),
 		Password:  string(hash),
 	}
 

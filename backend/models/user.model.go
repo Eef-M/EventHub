@@ -11,8 +11,8 @@ import (
 type Roles string
 
 const (
-	IsUser  Roles = "user"
-	IsAdmin Roles = "admin"
+	IsUser  Roles = "participant"
+	IsAdmin Roles = "organizer"
 )
 
 type User struct {
@@ -22,7 +22,7 @@ type User struct {
 	Password  string    `gorm:"type:varchar(255);not null" json:"password"`
 	FirstName string    `gorm:"type:varchar(255);not null" json:"first_name"`
 	LastName  string    `gorm:"type:varchar(255);not null" json:"last_name"`
-	Role      Roles     `gorm:"type:user_role;default:'user'" json:"role"`
+	Role      Roles     `gorm:"type:user_role;default:'participant'" json:"role"`
 	CreatedAt time.Time `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAT time.Time `gorm:"autoUpdateTime" json:"updated_at"`
 }
