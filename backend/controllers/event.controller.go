@@ -1,16 +1,16 @@
 package controllers
 
 import (
-	"event-management-system/backend/handlers"
-	"event-management-system/backend/initializers"
-	"event-management-system/backend/models"
-	"event-management-system/backend/utils"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
 	"time"
 
+	"github.com/Eef-M/EventHub/backend/handlers"
+	"github.com/Eef-M/EventHub/backend/initializers"
+	"github.com/Eef-M/EventHub/backend/models"
+	"github.com/Eef-M/EventHub/backend/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )

@@ -1,9 +1,8 @@
 package routes
 
 import (
-	"event-management-system/backend/controllers"
-	"event-management-system/backend/middleware"
-
+	"github.com/Eef-M/EventHub/backend/controllers"
+	"github.com/Eef-M/EventHub/backend/middleware"
 	"github.com/gin-gonic/gin"
 )
 

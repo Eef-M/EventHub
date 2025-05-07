@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"event-management-system/backend/initializers"
-	"event-management-system/backend/models"
 	"net/http"
 
+	"github.com/Eef-M/EventHub/backend/initializers"
+	"github.com/Eef-M/EventHub/backend/models"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
