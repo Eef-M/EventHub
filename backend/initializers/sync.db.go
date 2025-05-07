@@ -1,6 +1,6 @@
 package initializers
 
-import "event-management-system/backend/models"
+import "github.com/Eef-M/EventHub/backend/models"
 
 func SyncDB() {
 	DB.AutoMigrate(

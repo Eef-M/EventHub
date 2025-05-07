@@ -1,13 +1,13 @@
 package middleware
 
 import (
-	"event-management-system/backend/initializers"
-	"event-management-system/backend/models"
 	"fmt"
 	"net/http"
 	"os"
 	"time"
 
+	"github.com/Eef-M/EventHub/backend/initializers"
+	"github.com/Eef-M/EventHub/backend/models"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"

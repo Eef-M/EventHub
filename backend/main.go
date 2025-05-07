@@ -1,9 +1,8 @@
 package main
 
 import (
-	"event-management-system/backend/initializers"
-	"event-management-system/backend/routes"
-
+	"github.com/Eef-M/EventHub/backend/initializers"
+	"github.com/Eef-M/EventHub/backend/routes"
 	"github.com/gin-gonic/gin"
 )
 
