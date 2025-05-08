@@ -1,6 +1,6 @@
 <template>
   <div class="bg-white rounded-2xl shadow p-5 hover:shadow-lg transition">
-    <img class="w-full h-48 object-cover rounded-lg mb-4" :src="event.bannerURL || defaultImage"
+    <img class="w-full h-48 object-cover rounded-lg mb-4" :src="event.banner_url || defaultImage"
       alt="Event Thumbnail" />
 
     <h2 class="text-xl font-semibold text-gray-800 mb-2">
@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Event } from '../../data/events';
+import type { Event } from '../../stores/eventStore'
 
 defineProps<{
   event: Event

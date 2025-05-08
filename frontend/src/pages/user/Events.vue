@@ -2,12 +2,11 @@
   <UserLayout>
     <section class="py-10">
       <div class="max-w-7xl mx-auto px-4">
-        <!-- <h2 class="text-3xl font-semibold text-center mb-10">Events</h2> -->
         <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
-          <input type="text" v-model="searchQuery" placeholder="Search by title or location..."
+          <input v-model="search" type="text" placeholder="Search by title or location..."
             class="w-full md:w-1/3 px-4 py-2 border rounded-lg" />
 
-          <select v-model="selectedCategory" class="px-4 py-2 border rounded-lg">
+          <select v-model="category" class="px-4 py-2 border rounded-lg">
             <option value="">All Categories</option>
             <option value="Webinar">Webinar</option>
             <option value="Workshop">Workshop</option>
@@ -25,49 +24,52 @@
             <EventCard :event="event" />
           </RouterLink>
         </div>
-
-        <div v-if="filteredEvents.length === 0" class="text-center mt-10 text-gray-500">
-          No events found.
-        </div>
       </div>
     </section>
   </UserLayout>
 </template>
 
-
 <script lang="ts" setup>
-import { RouterLink } from 'vue-router';
+import { ref, computed, onMounted } from 'vue';
 import UserLayout from '../../layouts/UserLayout.vue';
+import { useEventStore } from '../../stores/eventStore';
+import { RouterLink } from 'vue-router';
 import EventCard from '../../components/user/EventCard.vue';
-import { computed, ref } from 'vue';
-import { dummyEvents } from '../../data/events';
 
-const searchQuery = ref('')
-const selectedCategory = ref('')
-const sortOrder = ref<'asc' | 'desc'>('asc')
+const eventStore = useEventStore()
+
+const search = ref('');
+const category = ref('');
+const sortOrder = ref('asc');
+
+onMounted(() => {
+  eventStore.fetchEvents()
+});
 
 const filteredEvents = computed(() => {
-  let filtered = [...dummyEvents]
+  let events = eventStore.events;
 
-  const query = searchQuery.value.toLowerCase()
-  if (query) {
-    filtered = filtered.filter(
+  if (search.value) {
+    const keyword = search.value.toLowerCase();
+    events = events.filter(
       e =>
-        e.title.toLowerCase().includes(query) ||
-        e.location.toLowerCase().includes(query)
-    )
+        e.title.toLowerCase().includes(keyword) ||
+        e.location.toLowerCase().includes(keyword)
+    );
   }
 
-  if (selectedCategory.value) {
-    filtered = filtered.filter(e => e.category === selectedCategory.value)
+  if (category.value) {
+    events = events.filter(e => e.category === category.value);
   }
 
-  filtered.sort((a, b) => {
-    const dateA = new Date(a.date).getTime()
-    const dateB = new Date(b.date).getTime()
-    return sortOrder.value === 'asc' ? dateA - dateB : dateB - dateA
-  })
+  events = events.slice().sort((a, b) => {
+    if (sortOrder.value === 'asc') {
+      return new Date(a.date).getTime() - new Date(b.date).getTime();
+    } else {
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    }
+  });
 
-  return filtered
-})
+  return events;
+});
 </script>
