@@ -5,16 +5,14 @@ import (
 
 	"github.com/Eef-M/EventHub/backend/initializers"
 	"github.com/Eef-M/EventHub/backend/models"
+	"github.com/google/uuid"
 )
 
-func SeedEvents(organizer []models.User) {
-	if len(organizer) == 0 {
-		return
-	}
-
+func SeedEvents(user []models.User) []models.Event {
 	events := []models.Event{
 		{
-			OrganizerID: organizer[0].ID,
+			ID:          uuid.New(),
+			OrganizerID: user[0].ID,
 			Title:       "Vue Conference 2025",
 			Location:    "Jakarta",
 			Date:        time.Date(2025, 6, 10, 0, 0, 0, 0, time.UTC),
@@ -23,7 +21,8 @@ func SeedEvents(organizer []models.User) {
 			BannerURL:   "https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg",
 		},
 		{
-			OrganizerID: organizer[0].ID,
+			ID:          uuid.New(),
+			OrganizerID: user[0].ID,
 			Title:       "Tech Music Fest",
 			Location:    "Bandung",
 			Date:        time.Date(2025, 5, 12, 0, 0, 0, 0, time.UTC),
@@ -32,7 +31,8 @@ func SeedEvents(organizer []models.User) {
 			BannerURL:   "https://images.pexels.com/photos/167636/pexels-photo-167636.jpeg",
 		},
 		{
-			OrganizerID: organizer[0].ID,
+			ID:          uuid.New(),
+			OrganizerID: user[0].ID,
 			Title:       "Startup Workshop",
 			Location:    "Surabaya",
 			Date:        time.Date(2025, 7, 1, 0, 0, 0, 0, time.UTC),
@@ -41,7 +41,8 @@ func SeedEvents(organizer []models.User) {
 			BannerURL:   "https://images.pexels.com/photos/3183197/pexels-photo-3183197.jpeg",
 		},
 		{
-			OrganizerID: organizer[1].ID,
+			ID:          uuid.New(),
+			OrganizerID: user[1].ID,
 			Title:       "Data Science Summit",
 			Location:    "Yogyakarta",
 			Date:        time.Date(2025, 8, 15, 0, 0, 0, 0, time.UTC),
@@ -50,7 +51,8 @@ func SeedEvents(organizer []models.User) {
 			BannerURL:   "https://images.pexels.com/photos/2004161/pexels-photo-2004161.jpeg",
 		},
 		{
-			OrganizerID: organizer[1].ID,
+			ID:          uuid.New(),
+			OrganizerID: user[1].ID,
 			Title:       "Mobile App Development Bootcamp",
 			Location:    "Bali",
 			Date:        time.Date(2025, 9, 5, 0, 0, 0, 0, time.UTC),
@@ -59,7 +61,8 @@ func SeedEvents(organizer []models.User) {
 			BannerURL:   "https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg",
 		},
 		{
-			OrganizerID: organizer[1].ID,
+			ID:          uuid.New(),
+			OrganizerID: user[1].ID,
 			Title:       "Gaming Industry Expo",
 			Location:    "Jakarta",
 			Date:        time.Date(2025, 10, 20, 0, 0, 0, 0, time.UTC),
@@ -72,4 +75,6 @@ func SeedEvents(organizer []models.User) {
 	for _, event := range events {
 		initializers.DB.Create(&event)
 	}
+
+	return events
 }

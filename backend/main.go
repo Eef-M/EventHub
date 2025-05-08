@@ -33,7 +33,10 @@ func main() {
 func runSeeder() {
 	fmt.Println("Running database seeder...")
 	users := seeders.SeedUsers()
-	seeders.SeedEvents(users)
+	events := seeders.SeedEvents(users)
+	tickets := seeders.SeedTickets(events)
+	seeders.SeedEventRegistrations(users, events, tickets)
+	seeders.SeedEventFeedbacks(users, events)
 	fmt.Println("Seeding completed!")
 }
 
