@@ -26,8 +26,8 @@ export const useEventStore = defineStore('event', {
       this.error = null
 
       try {
-        const response = await axios.get<Event[]>('http://localhost:8000/api/v1/events')
-        this.events = response.data
+        const response = await axios.get<{data: Event[]}>('http://localhost:8000/api/v1/events')
+        this.events = response.data.data
       } catch (err: any) {
         this.error = err.message || 'Failed to fetch events'
       } finally {

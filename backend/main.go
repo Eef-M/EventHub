@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/Eef-M/EventHub/backend/initializers"
+	"github.com/Eef-M/EventHub/backend/middleware"
 	"github.com/Eef-M/EventHub/backend/routes"
 	"github.com/Eef-M/EventHub/backend/seeders"
 	"github.com/gin-gonic/gin"
@@ -42,6 +43,7 @@ func runSeeder() {
 
 func runServer() {
 	app := gin.Default()
+	app.Use(middleware.CORSMiddleware())
 	routes.InitRoute(app)
 	app.Run()
 }
