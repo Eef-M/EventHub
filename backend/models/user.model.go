@@ -11,8 +11,8 @@ import (
 type Roles string
 
 const (
-	IsUser  Roles = "participant"
-	IsAdmin Roles = "organizer"
+	IsParticipant Roles = "participant"
+	IsOrganizer   Roles = "organizer"
 )
 
 type User struct {
@@ -40,8 +40,8 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 
 func (u *User) BeforeSave(tx *gorm.DB) (err error) {
 	validRoles := map[Roles]bool{
-		IsUser:  true,
-		IsAdmin: true,
+		IsParticipant: true,
+		IsOrganizer:   true,
 	}
 
 	if _, exists := validRoles[u.Role]; !exists {
