@@ -29,7 +29,7 @@
         <h2 class="text-3xl font-semibold text-center mb-10">News Events</h2>
 
         <div class="grid md:grid-cols-3 gap-6 mb-10">
-          <RouterLink v-for="event in eventsData" :key="event.id" :to="`/events/${event.id}/detail`">
+          <RouterLink v-for="event in topEvents" :key="event.id" :to="`/events/${event.id}/detail`">
             <EventCard :event="event" />
           </RouterLink>
         </div>
@@ -140,10 +140,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import EventCard from '../../components/user/EventCard.vue';
 import UserLayout from '../../layouts/UserLayout.vue';
-import { dummyEvents } from '../../data/events';
+import { useEventStore } from '../../stores/eventStore';
 
-const eventsData = computed(() => dummyEvents.slice(0, 3));
+const eventStore = useEventStore()
+
+onMounted(() => {
+  eventStore.fetchEvents()
+})
+
+const topEvents = computed(() => eventStore.events.slice(0, 3))
 </script>
