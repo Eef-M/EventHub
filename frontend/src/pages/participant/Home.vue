@@ -1,5 +1,5 @@
 <template>
-  <UserLayout>
+  <ParticipantLayout>
     <section class="bg-zinc-100 py-12 px-4 md:px-8">
       <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between">
         <div class="text-left mb-8 md:mb-0 md:w-1/2">
@@ -136,14 +136,14 @@
       </div>
     </section>
 
-  </UserLayout>
+  </ParticipantLayout>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue';
-import EventCard from '../../components/user/EventCard.vue';
-import UserLayout from '../../layouts/UserLayout.vue';
+import EventCard from '../../components/participant/EventCard.vue';
 import { useEventStore } from '../../stores/eventStore';
+import ParticipantLayout from '../../layouts/ParticipantLayout.vue';
 
 const eventStore = useEventStore()
 

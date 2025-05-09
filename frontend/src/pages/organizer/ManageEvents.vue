@@ -1,5 +1,5 @@
 <template>
-  <AdminLayout>
+  <OrganizerLayout>
     <div class="p-6">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-semibold">Manage Events</h2>
@@ -34,12 +34,12 @@
         </tbody>
       </table>
     </div>
-  </AdminLayout>
+  </OrganizerLayout>
 </template>
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import AdminLayout from '../../layouts/AdminLayout.vue'
+import OrganizerLayout from '../../layouts/OrganizerLayout.vue'
 
 const events = ref([
   {

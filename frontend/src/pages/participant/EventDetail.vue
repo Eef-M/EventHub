@@ -1,5 +1,5 @@
 <template>
-  <UserLayout>
+  <ParticipantLayout>
     <section class="py-8 max-w-7xl mx-auto">
       <div class="rounded-2xl overflow-hidden shadow-md mb-8">
         <img :src="event?.bannerURL" alt="Event Banner" class="w-full h-64 object-cover" />
@@ -45,14 +45,14 @@
         <p class="text-gray-500 italic">No feedback yet.</p>
       </div>
     </section>
-  </UserLayout>
+  </ParticipantLayout>
 </template>
 
 <script lang="ts" setup>
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
-import UserLayout from '../../layouts/UserLayout.vue';
 import { dummyEvents } from '../../data/events';
+import ParticipantLayout from '../../layouts/ParticipantLayout.vue';
 
 const route = useRoute();
 const eventId = route.params.id as string;
