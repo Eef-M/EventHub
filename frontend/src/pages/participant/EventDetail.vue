@@ -2,15 +2,15 @@
   <ParticipantLayout>
     <section class="py-8 max-w-7xl mx-auto">
       <div class="rounded-2xl overflow-hidden shadow-md mb-8">
-        <img :src="event?.bannerURL" alt="Event Banner" class="w-full h-64 object-cover" />
+        <img :src="event?.banner_url" alt="Event Banner" class="w-full h-64 object-cover" />
       </div>
 
-      <div class="space-y-4 mb-10">
-        <h1 class="text-3xl font-bold text-gray-900">{{ event?.title }}</h1>
-        <p class="text-gray-600">Category: <span class="font-medium">{{ event?.category }}</span></p>
-        <p class="text-gray-600">Location: <span class="font-medium">{{ event?.location }}</span></p>
-        <p class="text-gray-600">Date: <span class="font-medium">{{ event?.date }}</span></p>
-        <p class="text-gray-600">Time: <span class="font-medium">14:00 - 17:00</span></p>
+      <div v-if="event" class="space-y-4 mb-10">
+        <h1 class="text-3xl font-bold text-gray-900">{{ event.title }}</h1>
+        <p class="text-gray-600">Category: <span class="font-medium">{{ event.category }}</span></p>
+        <p class="text-gray-600">Location: <span class="font-medium">{{ event.location }}</span></p>
+        <p class="text-gray-600">Date: <span class="font-medium">{{ formatDate(event.date) }}</span></p>
+        <p class="text-gray-600">Time: <span class="font-medium">{{ formatTime(event.time) }}</span></p>
       </div>
 
       <div class="mb-10">
@@ -48,13 +48,41 @@
   </ParticipantLayout>
 </template>
 
-<script lang="ts" setup>
-import { computed } from 'vue';
-import { useRoute } from 'vue-router';
-import { dummyEvents } from '../../data/events';
-import ParticipantLayout from '../../layouts/ParticipantLayout.vue';
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { getEventById } from '../../services/api'
+import type { Event } from '../../types/event'
+import ParticipantLayout from '../../layouts/ParticipantLayout.vue'
 
-const route = useRoute();
-const eventId = route.params.id as string;
-const event = computed(() => dummyEvents.find(e => e.id === eventId));
+const route = useRoute()
+const eventId = route.params.id as string
+
+const event = ref<Event | null>(null)
+
+onMounted(async () => {
+  try {
+    event.value = await getEventById(eventId)
+  } catch (err) {
+    console.error('Failed to load event:', err)
+  }
+})
+
+function formatDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
+
+function formatTime(timeStr: string): string {
+  const time = new Date(timeStr)
+  if (time.getFullYear() === 1) return 'N/A'
+  return time.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  })
+}
 </script>

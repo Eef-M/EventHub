@@ -43,7 +43,7 @@ const category = ref('');
 const sortOrder = ref('asc');
 
 onMounted(() => {
-  eventStore.fetchEvents()
+  eventStore.getEvents()
 });
 
 const filteredEvents = computed(() => {
