@@ -1,5 +1,5 @@
 <template>
-  <AdminLayout>
+  <OrganizerLayout>
     <section class="p-6">
       <h1 class="text-2xl font-semibold mb-4">Dashboard</h1>
 
@@ -40,10 +40,11 @@
         </ul>
       </div>
     </section>
-  </AdminLayout>
+  </OrganizerLayout>
 </template>
 
 <script setup lang="ts">
-import AdminLayout from '../../layouts/AdminLayout.vue';
+import OrganizerLayout from '../../layouts/OrganizerLayout.vue';
+
 
 </script>

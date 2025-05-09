@@ -12,8 +12,8 @@
 </template>
 
 <script lang="ts" setup>
-import Footer from '../components/admin/Footer.vue';
-import Navbar from '../components/admin/Navbar.vue';
-import Sidebar from '../components/admin/Sidebar.vue';
+import Footer from '../components/organizer/Footer.vue';
+import Navbar from '../components/organizer/Navbar.vue';
+import Sidebar from '../components/organizer/Sidebar.vue';
 
 </script>

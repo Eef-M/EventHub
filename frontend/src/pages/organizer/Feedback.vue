@@ -1,5 +1,5 @@
 <template>
-  <AdminLayout>
+  <OrganizerLayout>
     <div class="p-6">
       <h2 class="text-2xl font-semibold mb-4">Event Feedback</h2>
 
@@ -9,12 +9,12 @@
         <p>{{ fb.message }}</p>
       </div>
     </div>
-  </AdminLayout>
+  </OrganizerLayout>
 </template>
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import AdminLayout from '../../layouts/AdminLayout.vue';
+import OrganizerLayout from '../../layouts/OrganizerLayout.vue';
 
 const feedbacks = ref([
   {

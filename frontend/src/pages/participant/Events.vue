@@ -1,5 +1,5 @@
 <template>
-  <UserLayout>
+  <ParticipantLayout>
     <section class="py-10">
       <div class="max-w-7xl mx-auto px-4">
         <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
@@ -26,15 +26,15 @@
         </div>
       </div>
     </section>
-  </UserLayout>
+  </ParticipantLayout>
 </template>
 
 <script lang="ts" setup>
 import { ref, computed, onMounted } from 'vue';
-import UserLayout from '../../layouts/UserLayout.vue';
 import { useEventStore } from '../../stores/eventStore';
 import { RouterLink } from 'vue-router';
-import EventCard from '../../components/user/EventCard.vue';
+import EventCard from '../../components/participant/EventCard.vue';
+import ParticipantLayout from '../../layouts/ParticipantLayout.vue';
 
 const eventStore = useEventStore()
 
