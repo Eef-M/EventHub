@@ -22,7 +22,7 @@ func InitRoute(app *gin.Engine) {
 	events := api.Group("/events")
 	{
 		events.GET("", controllers.GetEvents)
-		events.GET("/:id", middleware.RequireAuth, controllers.GetEvent)
+		events.GET("/:id", controllers.GetEvent)
 		events.POST("", middleware.RequireAuth, controllers.CreateEvent)
 		events.PUT("/:id", middleware.RequireAuth, controllers.UpdateEvent)
 		events.DELETE("/:id", middleware.RequireAuth, controllers.DeleteEvent)

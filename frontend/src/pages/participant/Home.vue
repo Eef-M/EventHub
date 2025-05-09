@@ -148,7 +148,7 @@ import ParticipantLayout from '../../layouts/ParticipantLayout.vue';
 const eventStore = useEventStore()
 
 onMounted(() => {
-  eventStore.fetchEvents()
+  eventStore.getEvents()
 })
 
 const topEvents = computed(() => eventStore.events.slice(0, 3))
