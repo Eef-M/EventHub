@@ -1,4 +1,4 @@
-package handlers
+package utils
 
 import (
 	"mime/multipart"
@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/Eef-M/EventHub/backend/initializers"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,5 +23,6 @@ func SaveImage(c *gin.Context, file *multipart.FileHeader) (string, error) {
 		return "", err
 	}
 
-	return filename, nil
+	fullURL := initializers.BaseURL + "/" + dst
+	return fullURL, nil
 }
