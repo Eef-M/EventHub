@@ -5,9 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"time"
 
-	"github.com/Eef-M/EventHub/backend/handlers"
 	"github.com/Eef-M/EventHub/backend/initializers"
 	"github.com/Eef-M/EventHub/backend/models"
 	"github.com/Eef-M/EventHub/backend/utils"
@@ -103,7 +101,7 @@ func CreateEvent(c *gin.Context) {
 	}
 
 	dateStr := c.PostForm("date")
-	parseDate, err := time.Parse("2006-01-02", dateStr)
+	parseDate, err := utils.ParseDate(dateStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid date format. use YYYY-MM-DD",
@@ -112,7 +110,7 @@ func CreateEvent(c *gin.Context) {
 	}
 
 	timeStr := c.PostForm("time")
-	parseTime, err := time.Parse("15:04", timeStr)
+	parseTime, err := utils.ParseTime(timeStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid time format. use HH:MM (24h)",
@@ -128,7 +126,7 @@ func CreateEvent(c *gin.Context) {
 		return
 	}
 
-	filename, err := handlers.SaveImage(c, file)
+	filename, err := utils.SaveImage(c, file)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -144,7 +142,7 @@ func CreateEvent(c *gin.Context) {
 		Category:    category,
 		Date:        parseDate,
 		Time:        parseTime,
-		BannerURL:   "uploads/" + filename,
+		BannerURL:   filename,
 		IsPublic:    true,
 	}
 
@@ -199,7 +197,7 @@ func UpdateEvent(c *gin.Context) {
 	}
 
 	dateStr := c.PostForm("date")
-	parseDate, err := time.Parse("2006-01-02", dateStr)
+	parseDate, err := utils.ParseDate(dateStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid date format. use YYYY-MM-DD",
@@ -208,7 +206,7 @@ func UpdateEvent(c *gin.Context) {
 	}
 
 	timeStr := c.PostForm("time")
-	parseTime, err := time.Parse("15:04", timeStr)
+	parseTime, err := utils.ParseTime(timeStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid time format. use HH:MM (24h)",
@@ -235,14 +233,14 @@ func UpdateEvent(c *gin.Context) {
 			}
 		}
 
-		filename, err := handlers.SaveImage(c, file)
+		filename, err := utils.SaveImage(c, file)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": err.Error(),
 			})
 			return
 		}
-		event.BannerURL = "uploads/" + filename
+		event.BannerURL = filename
 	}
 
 	if err := initializers.DB.Save(&event).Error; err != nil {

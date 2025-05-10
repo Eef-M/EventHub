@@ -43,6 +43,7 @@ func runSeeder() {
 
 func runServer() {
 	app := gin.Default()
+	app.Static("/uploads", "./uploads")
 	app.Use(middleware.CORSMiddleware())
 	routes.InitRoute(app)
 	app.Run()
