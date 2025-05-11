@@ -1,46 +1,58 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4">
-    <div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-lg">
-      <h2 class="text-2xl font-bold text-purple-800 mb-6 text-center">Create an Account</h2>
+  <div class="min-h-screen flex items-center justify-center bg-slate-100 py-12 px-4">
+    <div class="max-w-lg w-full bg-white p-8 rounded-2xl shadow-lg">
+      <h1 class="text-3xl font-bold text-slate-600 mb-2 text-center"><span class="text-purple-600">Event</span>Hub</h1>
+      <hr class="text-purple-600">
+      <h2 class="text-lg text-purple-600 font-medium mb-6 mt-2 text-center">Create an Account</h2>
 
       <form>
-        <div class="mb-3">
-          <label class="block text-gray-700 mb-2" for="username">Username</label>
+        <div class="mb-4">
           <input type="text" id="username"
-            class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400"
-            placeholder="john123" />
-        </div>
-
-        <div class="mb-3">
-          <label class="block text-gray-700 mb-2" for="first_name">First Name</label>
-          <input type="text" id="first_name"
-            class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400"
-            placeholder="John" />
-        </div>
-
-        <div class="mb-3">
-          <label class="block text-gray-700 mb-2" for="last_name">Last Name</label>
-          <input type="text" id="last_name"
-            class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400"
-            placeholder="Doe" />
-        </div>
-
-        <div class="mb-3">
-          <label class="block text-gray-700 mb-2" for="email">Email</label>
-          <input type="email" id="email"
-            class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400"
-            placeholder="email@example.com" />
+            class="w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400"
+            placeholder="Username" />
         </div>
 
         <div class="mb-4">
-          <label class="block text-gray-700 mb-2" for="password">Password</label>
+          <input type="text" id="first_name"
+            class="w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400"
+            placeholder="First Name" />
+        </div>
+
+        <div class="mb-4">
+          <input type="text" id="last_name"
+            class="w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400"
+            placeholder="Last Name" />
+        </div>
+
+        <div class="mb-4">
+          <input type="email" id="email"
+            class="w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400"
+            placeholder="E-Mail" />
+        </div>
+
+        <div class="mb-4">
+          <select id="role"
+            class="w-full border rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <option value="">I'm applying as...</option>
+            <option value="organizer">Organizer</option>
+            <option value="participant">Participant</option>
+          </select>
+        </div>
+
+        <div class="mb-4">
           <input type="password" id="password"
-            class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400"
-            placeholder="********" />
+            class="w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400"
+            placeholder="Password" />
+        </div>
+
+        <div class="mb-4">
+          <input id="confirmPassword" type="password" required
+            class="w-full border rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            placeholder="Confirm Password" />
         </div>
 
         <button type="submit"
-          class="w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700 transition cursor-pointer">
+          class="w-full bg-purple-600 text-white py-3 rounded-md hover:bg-purple-700 transition cursor-pointer">
           Register
         </button>
       </form>
