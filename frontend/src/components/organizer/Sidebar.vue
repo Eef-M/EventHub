@@ -2,7 +2,7 @@
   <aside class="w-64 bg-white shadow h-full">
     <div class="p-4 font-bold text-lg border-b">
       <RouterLink to="/organizer/dashboard">
-        <span class="text-purple-600">Event</span>Hub
+        <span class="text-purple-600">Event</span><span class="text-slate-600">Hub</span>
       </RouterLink>
     </div>
     <nav class="mt-4">
