@@ -1,7 +1,12 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-slate-100 py-12 px-4">
     <div class="max-w-lg w-full bg-white p-8 rounded-2xl shadow-lg">
-      <h1 class="text-3xl font-bold text-slate-600 mb-2 text-center"><span class="text-purple-600">Event</span>Hub</h1>
+
+      <h1 class="text-3xl font-bold text-slate-600 mb-2 text-center">
+        <RouterLink to="/">
+          <span class="text-purple-600">Event</span>Hub
+        </RouterLink>
+      </h1>
       <hr class="text-purple-600">
       <h2 class="text-lg text-purple-600 font-medium mb-6 mt-2 text-center">Create an Account</h2>
 

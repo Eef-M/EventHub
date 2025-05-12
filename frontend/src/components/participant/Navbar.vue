@@ -6,7 +6,26 @@
       </RouterLink>
       <div class="flex gap-6">
         <RouterLink to="/events" class="text-gray-700 hover:text-purple-600 transition">Events</RouterLink>
-        <RouterLink to="/login" class="text-gray-700 hover:text-purple-600 transition">Login</RouterLink>
+        <template v-if="userStore.user">
+          <details class="relative">
+            <summary class="cursor-pointer text-gray-700 hover:text-purple-600 font-medium">
+              {{ userStore.user.username }}
+            </summary>
+            <ul class="absolute right-0 bg-white shadow-md rounded mt-2 w-40 z-50">
+              <li>
+                <RouterLink to="/profile" class="block px-4 py-2 hover:bg-gray-100 cursor-pointer">Profile</RouterLink>
+              </li>
+              <li>
+                <button @click="handleLogout" class="w-full text-left px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                  Logout
+                </button>
+              </li>
+            </ul>
+          </details>
+        </template>
+        <template v-else>
+          <RouterLink to="/login" class="text-gray-700 hover:text-purple-600 font-medium">Login</RouterLink>
+        </template>
       </div>
     </div>
   </nav>
@@ -14,4 +33,21 @@
 
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
+import { useUserStore } from '../../stores/userStore';
+import { onMounted } from 'vue';
+import { useAuthStore } from '../../stores/authStroe';
+import router from '../../router';
+
+const userStore = useUserStore()
+const authStore = useAuthStore()
+
+onMounted(() => {
+  userStore.getCurrentUser()
+})
+
+const handleLogout = async () => {
+  await authStore.logout()
+  router.push('/')
+  window.location.reload()
+}
 </script>

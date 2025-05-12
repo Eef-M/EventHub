@@ -2,13 +2,11 @@ import { defineStore } from "pinia"
 import * as authService from "../services/authService"
 import { ref } from "vue"
 import type { LoginPayload, RegisterPayload } from "../types/auth"
-import type { User } from "../types/user"
 
 export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref(false)
   const loading = ref(false)
   const error = ref<string | null>(null)
-  const user = ref<User | null>(null)
 
   const login = async (payload: LoginPayload) => {
     loading.value = true
@@ -35,14 +33,14 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  const getUser = async () => {
+  const logout = async () => {
     try {
-      const res = await authService.getMe()
-      user.value = res.data
-    } catch (err) {
-      console.error('Failed to fetch user')
+      await authService.logout()
+      isAuthenticated.value = false
+    } catch (err: any) {
+      error.value = err.response?.data?.error || 'Logout failed'
     }
   }
 
-  return { login, register, getUser, isAuthenticated, loading, error }
+  return { login, register, logout, isAuthenticated, loading, error }
 })
