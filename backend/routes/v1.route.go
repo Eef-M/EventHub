@@ -18,6 +18,14 @@ func InitRoute(app *gin.Engine) {
 		auth.POST("/logout", middleware.RequireAuth, controllers.Logout)
 	}
 
+	// User Group
+	user := api.Group("/user")
+	{
+		user.GET("/me", middleware.RequireAuth, controllers.GetMyProfile)
+		user.PUT("/update", middleware.RequireAuth, controllers.UpdateMyProfile)
+		user.DELETE("/delete", middleware.RequireAuth, controllers.DeleteMyAccount)
+	}
+
 	// Events Group
 	events := api.Group("/events")
 	{
