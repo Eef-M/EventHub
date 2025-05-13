@@ -8,20 +8,19 @@ import Dashboard from "../pages/organizer/Dashboard.vue";
 import ManageEvents from "../pages/organizer/ManageEvents.vue";
 import Registrations from "../pages/organizer/Registrations.vue";
 import Feedback from "../pages/organizer/Feedback.vue";
+import Profile from "../pages/participant/Profile.vue";
 
 const routes = [
-  // participant
   { path: '/', component: Home },
   { path: '/login', component: Login },
   { path: '/register', component: Register },
   { path: '/events', component: Events },
   { path: '/events/:id/detail', component: EventDetail },
-
-  // organizer
   { path: '/organizer/dashboard', component: Dashboard },
   { path: '/organizer/manage-events', component: ManageEvents },
   { path: '/organizer/registrations', component: Registrations },
   { path: '/organizer/feedback', component: Feedback },
+  { path: '/profile', component: Profile }
 ]
 
 const router = createRouter({
