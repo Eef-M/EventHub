@@ -1,6 +1,6 @@
 import { defineStore } from "pinia"
 import type { Event } from "../types/event"
-import { getEvents as getEventsAPI } from "../services/api"
+import { getEvents as getEventsAPI } from "../services/eventService"
 
 export const useEventStore = defineStore('event', {
   state: () => ({
