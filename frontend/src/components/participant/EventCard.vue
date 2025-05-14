@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-2xl shadow p-5 hover:shadow-lg transition">
+  <div class="bg-white rounded-2xl shadow p-5 hover:shadow-xl transition">
     <img class="w-full h-48 object-cover rounded-lg mb-4" :src="event.banner_url || defaultImage"
       alt="Event Thumbnail" />
 
@@ -16,13 +16,13 @@
     </p>
 
     <p class="text-gray-700 text-sm">
-      {{ event.description || 'No description available.' }}
+      {{ event.description ? event.description.slice(0, 40) + '...' : 'No description available.' }}
     </p>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { Event } from '../../stores/eventStore'
+import type { Event } from '../../types/event';
 
 defineProps<{
   event: Event
