@@ -51,7 +51,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { getEventById } from '../../services/api'
+import { getEventById } from '../../services/eventService'
 import type { Event } from '../../types/event'
 import ParticipantLayout from '../../layouts/ParticipantLayout.vue'
 
