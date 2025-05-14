@@ -79,3 +79,23 @@ func RequireAuth(c *gin.Context) {
 	c.Set("user", user)
 	c.Next()
 }
+
+func RequireRole(role string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		user, exists := c.Get("user")
+		if !exists {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			c.Abort()
+			return
+		}
+
+		currentUser := user.(models.User)
+		if string(currentUser.Role) != role {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden – You do not have access"})
+			c.Abort()
+			return
+		}
+
+		c.Next()
+	}
+}

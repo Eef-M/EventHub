@@ -31,9 +31,9 @@ func InitRoute(app *gin.Engine) {
 	{
 		events.GET("", controllers.GetEvents)
 		events.GET("/:id", controllers.GetEvent)
-		events.POST("", middleware.RequireAuth, controllers.CreateEvent)
-		events.PUT("/:id", middleware.RequireAuth, controllers.UpdateEvent)
-		events.DELETE("/:id", middleware.RequireAuth, controllers.DeleteEvent)
+		events.POST("", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.CreateEvent)
+		events.PUT("/:id", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.UpdateEvent)
+		events.DELETE("/:id", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.DeleteEvent)
 
 		events.POST("/:id/register", middleware.RequireAuth, controllers.RegisterEvent)
 		events.GET("/my-registrations", middleware.RequireAuth, controllers.MyRegistrations)
@@ -53,4 +53,7 @@ func InitRoute(app *gin.Engine) {
 		ticket.PUT("/:id", middleware.RequireAuth, controllers.UpdateTicket)
 		ticket.DELETE("/:id", middleware.RequireAuth, controllers.DeleteTicket)
 	}
+
+	// Individuals
+	api.GET("/dashboard", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.OrganizerDashboard)
 }
