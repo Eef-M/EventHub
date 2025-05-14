@@ -12,6 +12,12 @@
               {{ userStore.user.username }}
             </summary>
             <ul class="absolute right-0 bg-white shadow-md rounded mt-2 w-40 z-50">
+              <template v-if="userStore.user.role === 'organizer'">
+                <li>
+                  <RouterLink to="/organizer/dashboard" class="block px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                    Dashboard</RouterLink>
+                </li>
+              </template>
               <li>
                 <RouterLink to="/profile" class="block px-4 py-2 hover:bg-gray-100 cursor-pointer">Profile</RouterLink>
               </li>
