@@ -1,8 +1,7 @@
 <template>
-  <footer class="bg-white shadow px-6 py-3 text-center text-sm text-gray-500">
-    &copy; 2025 EventHub Admin. All rights reserved.
+  <footer class="border-t text-center text-sm py-4 text-muted-foreground bg-background">
+    &copy; 2025 EventHub. All rights reserved.
   </footer>
 </template>
 
-<script lang="ts" setup>
-</script>
+<script setup lang="ts"></script>

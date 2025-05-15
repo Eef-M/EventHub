@@ -1,40 +1,49 @@
 <template>
-  <header class="bg-white shadow py-4 px-10 flex justify-between items-center">
-    <h1 class="text-xl font-semibold">Dashboard</h1>
-    <div class="relative" ref="dropdownRef">
-      <span class="text-lg font-medium cursor-pointer hover:text-slate-500" @click="toggleDropdown">{{
-        userStore.user?.username
-      }}</span>
-      <div v-if="dropdownOpen" class="absolute right-0 mt-2 w-48 bg-white border rounded shadow-md z-50">
-        <ul>
-          <RouterLink to="/profile">
-            <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer">Profile</li>
-          </RouterLink>
-          <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer" @click="handleLogout">
-            Logout
-          </li>
-        </ul>
-      </div>
-    </div>
-  </header>
+  <nav class="border-b bg-background shadow-sm px-6 py-3 flex items-center justify-between">
+    <RouterLink to="/">
+      <span class="text-purple-600 font-bold text-xl">Event</span><span
+        class="text-slate-600 font-bold text-xl">Hub</span>
+    </RouterLink>
+    <DropdownMenu>
+      <DropdownMenuTrigger as-child>
+        <Button variant="ghost" size="icon">
+          <Avatar>
+            <AvatarImage src="/avatar.png" />
+            <AvatarFallback>A</AvatarFallback>
+          </Avatar>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <RouterLink to="/profile">
+          <DropdownMenuItem>Profile</DropdownMenuItem>
+        </RouterLink>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem @click="handleLogout">Logout</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  </nav>
 </template>
 
 <script lang="ts" setup>
-import { onClickOutside } from '@vueuse/core'
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUserStore } from '../../stores/userStore'
-import { useAuthStore } from '../../stores/authStroe'
+import { useUserStore } from '@/stores/userStore'
+import { useAuthStore } from '@/stores/authStroe'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 
-const dropdownOpen = ref(false)
-const dropdownRef = ref(null)
 const router = useRouter()
 const userStore = useUserStore()
 const authStore = useAuthStore()
-
-function toggleDropdown() {
-  dropdownOpen.value = !dropdownOpen.value
-}
 
 onMounted(() => {
   userStore.getCurrentUser()
@@ -45,8 +54,4 @@ const handleLogout = async () => {
   router.push('/')
   window.location.reload()
 }
-
-onClickOutside(dropdownRef, () => {
-  dropdownOpen.value = false
-})
 </script>
