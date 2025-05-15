@@ -6,5 +6,6 @@ export interface DashboardStats {
   recent_registrations: {
     user_name: string
     event_title: string
+    status: string
   }[]
 }

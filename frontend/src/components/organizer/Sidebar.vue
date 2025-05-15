@@ -1,42 +1,23 @@
 <template>
-  <aside class="w-64 bg-white shadow h-full">
-    <div class="p-4 font-bold text-lg border-b">
-      <RouterLink to="/organizer/dashboard">
-        <span class="text-purple-600">Event</span><span class="text-slate-600">Hub</span>
+  <aside class="hidden md:block w-64 bg-card border-r p-4">
+    <nav class="flex flex-col gap-2">
+      <RouterLink v-for="item in menu" :key="item.label" :to="item.href"
+        class="flex items-center gap-2 text-lg rounded-md px-3 py-2 hover:bg-slate-200 transition"
+        active-class="bg-slate-200 text-purple-600">
+        <component :is="item.icon" class="w-4 h-4" />
+        {{ item.label }}
       </RouterLink>
-    </div>
-    <nav class="mt-4">
-      <ul>
-        <li class="px-4 py-4 hover:shadow-md hover:text-purple-800">
-          <RouterLink to="/organizer/dashboard">
-            <v-icon name="md-dashboard" scale="1.3" />
-            Dashboard
-          </RouterLink>
-        </li>
-        <li class="px-4 py-4 hover:shadow-md hover:text-purple-800">
-          <RouterLink to="/organizer/manage-events">
-            <v-icon name="md-displaysettings-sharp" scale="1.3" />
-            Manage Events
-          </RouterLink>
-        </li>
-        <li class="px-4 py-4 hover:shadow-md hover:text-purple-800">
-          <RouterLink to="/organizer/registrations">
-            <v-icon name="fa-clipboard-list" scale="1.3" />
-            Registrations
-          </RouterLink>
-        </li>
-        <li class="px-4 py-4 hover:shadow-md hover:text-purple-800">
-          <RouterLink to="/organizer/feedback">
-            <v-icon name="la-comment" scale="1.3" />
-            Feedback
-          </RouterLink>
-        </li>
-      </ul>
     </nav>
   </aside>
 </template>
 
-<script lang="ts" setup>
-import { RouterLink } from 'vue-router';
+<script setup>
+import { Home, Calendar, Users, MessageSquare } from 'lucide-vue-next'
 
+const menu = [
+  { label: 'Dashboard', href: '/organizer/dashboard', icon: Home },
+  { label: 'Manage Events', href: '/organizer/manage-events', icon: Calendar },
+  { label: 'Registrations', href: '/organizer/registrations', icon: Users },
+  { label: 'Feedback', href: '/organizer/feedback', icon: MessageSquare },
+]
 </script>
