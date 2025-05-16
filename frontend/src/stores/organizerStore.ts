@@ -1,7 +1,7 @@
 import { defineStore } from "pinia"
-import type { DashboardStats } from "../types/dashboard"
+import type { DashboardStats } from "../types/organizer"
 import { ref } from "vue"
-import { getDashboardStats } from "../services/dashboardService"
+import { getDashboardStats } from "../services/organizerService"
 
 export const useDashboardStore = defineStore('dashboard', () => {
   const stats = ref<DashboardStats | null>(null)
