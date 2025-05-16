@@ -32,7 +32,7 @@ func OrganizerDashboard(c *gin.Context) {
 	recentRegistrations, err := repository.GetRecentRegistrationsByOrganizerID(initializers.DB, organizer.ID, 5)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to fetch recent registrations",
+			"error": "Failed to fetch recent registrations. - " + err.Error(),
 		})
 		return
 	}
