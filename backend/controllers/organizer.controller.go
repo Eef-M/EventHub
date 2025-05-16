@@ -14,7 +14,7 @@ func OrganizerDashboard(c *gin.Context) {
 	user, exists := c.Get("user")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "Unauthorizer",
+			"error": "Unauthorized",
 		})
 		return
 	}
