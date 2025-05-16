@@ -5,7 +5,9 @@ import (
 
 	"github.com/Eef-M/EventHub/backend/initializers"
 	"github.com/Eef-M/EventHub/backend/models"
+	"github.com/Eef-M/EventHub/backend/repository"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func OrganizerDashboard(c *gin.Context) {
@@ -63,5 +65,44 @@ func OrganizerDashboard(c *gin.Context) {
 		"pending_approvals":    pendingApprovals,
 		"feedback_received":    totalFeedbacks,
 		"recent_registrations": recentRegistrations,
+	})
+}
+
+func GetMyEventsHandler(c *gin.Context) {
+	userInterface, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "User not found in context",
+		})
+		return
+	}
+
+	user, ok := userInterface.(models.User)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Failed to cast user",
+		})
+		return
+	}
+
+	userID := user.ID
+	uid, err := uuid.Parse(userID.String())
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid user ID",
+		})
+		return
+	}
+
+	events, err := repository.GetEventsByOrganizerID(initializers.DB, uid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to get events",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": events,
 	})
 }

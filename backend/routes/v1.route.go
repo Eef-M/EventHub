@@ -54,6 +54,10 @@ func InitRoute(app *gin.Engine) {
 		ticket.DELETE("/:id", middleware.RequireAuth, controllers.DeleteTicket)
 	}
 
-	// Individuals
-	api.GET("/dashboard", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.OrganizerDashboard)
+	// Organizer Group
+	organizer := api.Group("/organizer")
+	{
+		organizer.GET("/dashboard", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.OrganizerDashboard)
+		organizer.GET("/events", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.GetMyEventsHandler)
+	}
 }
