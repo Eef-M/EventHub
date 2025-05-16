@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"github.com/Eef-M/EventHub/backend/dto"
 	"github.com/Eef-M/EventHub/backend/models"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -55,15 +56,19 @@ func GetDashboardStatsByOrganizerID(db *gorm.DB, organizerID uuid.UUID) (
 	return
 }
 
-func GetRecentRegistrationsByOrganizerID(db *gorm.DB, organizerID uuid.UUID, limit int) ([]models.EventRegistration, error) {
-	var regs []models.EventRegistration
+func GetRecentRegistrationsByOrganizerID(db *gorm.DB, organizerID uuid.UUID, limit int) ([]dto.RecentRegistrationDTO, error) {
+	var result []dto.RecentRegistrationDTO
+
 	err := db.
+		Table("event_registrations").
+		Select("users.username AS username, events.title AS event_title, tickets.name AS ticket_name, event_registrations.status").
 		Joins("JOIN events ON event_registrations.event_id = events.id").
+		Joins("JOIN users ON event_registrations.user_id = users.id").
+		Joins("JOIN tickets ON event_registrations.ticket_id = tickets.id").
 		Where("events.organizer_id = ?", organizerID).
-		Preload("Event").
-		Preload("User").
 		Order("event_registrations.registered_at DESC").
 		Limit(limit).
-		Find(&regs).Error
-	return regs, err
+		Scan(&result).Error
+
+	return result, err
 }
