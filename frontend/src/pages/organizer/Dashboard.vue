@@ -1,7 +1,7 @@
 <template>
   <OrganizerLayout>
     <h2 class="text-2xl font-semibold mb-4">Dashboard</h2>
-    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
       <Card v-for="stat in stats" :key="stat.label" class="shadow">
         <CardHeader>
           <CardTitle class="flex items-center justify-between">
@@ -24,6 +24,7 @@
               <TableRow>
                 <TableHead>Username</TableHead>
                 <TableHead>Event Title</TableHead>
+                <TableHead>Ticket Name</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
@@ -33,10 +34,11 @@
                 </TableCell>
               </TableRow>
               <TableRow v-for="reg in dashboardStore.stats?.recent_registrations" :key="reg.id">
-                <TableCell>{{ reg.user_name }}</TableCell>
+                <TableCell>{{ reg.username }}</TableCell>
                 <TableCell>{{ reg.event_title }}</TableCell>
+                <TableCell>{{ reg.ticket_name }}</TableCell>
                 <TableCell>
-                  <Badge :variant="reg.status === 'registered' ? 'secondary' : 'default'">
+                  <Badge class="text-sm font-bold" :class="reg.status === 'registered' ? 'bg-green-600' : 'bg-red-600'">
                     {{ reg.status }}
                   </Badge>
                 </TableCell>
@@ -54,9 +56,9 @@ import { onMounted } from 'vue'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { Calendar, Users, Clock, MessageSquare } from 'lucide-vue-next'
+import { Calendar, Users, MessageSquare, CalendarCheck, CalendarX } from 'lucide-vue-next'
 import OrganizerLayout from '@/layouts/OrganizerLayout.vue'
-import { useDashboardStore } from '@/stores/dashboardStore'
+import { useDashboardStore } from '@/stores/organizerStore'
 
 const dashboardStore = useDashboardStore()
 
@@ -67,7 +69,8 @@ onMounted(() => {
 const stats = [
   { label: 'Total Events', value: dashboardStore.stats?.total_events, icon: Calendar },
   { label: 'Registrations', value: dashboardStore.stats?.total_registrations, icon: Users },
-  { label: 'Pending Approvals', value: dashboardStore.stats?.pending_approvals, icon: Clock },
+  { label: 'Registered', value: dashboardStore.stats?.registered, icon: CalendarCheck },
+  { label: 'Cancelled', value: dashboardStore.stats?.cancelled_registrations, icon: CalendarX },
   { label: 'Feedback Received', value: dashboardStore.stats?.feedback_received, icon: MessageSquare },
 ]
 </script>
