@@ -46,7 +46,7 @@ const userStore = useUserStore()
 const authStore = useAuthStore()
 
 onMounted(() => {
-  userStore.getCurrentUser()
+  userStore.getMyProfile()
 })
 
 const handleLogout = async () => {

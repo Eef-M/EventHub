@@ -1,25 +1,26 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
 import type { User } from "../types/user";
-import * as userService from "../services/userService"
+import { fetchMyProfile } from "@/services/userService";
 
-export const useUserStore = defineStore('user', () => {
-  const user = ref<User | null>(null)
-  const loading = ref(false)
-  const error = ref<string | null>(null)
+export const useUserStore = defineStore('user', {
+  state: () => ({
+    user: null as User | null,
+    loading: false,
+    error: null as string | null,
+  }),
 
-  const getCurrentUser = async () => {
-    loading.value = true
-    error.value = null
-    try {
-      const res = await userService.getMyProfile()
-      user.value = res.data.data
-    } catch (err: any) {
-      error.value = err.response?.data?.error || 'Failed to fetch user'
-    } finally {
-      loading.value = false
+  actions: {
+    async getMyProfile() {
+      this.loading = true
+      this.error = null
+      try {
+        const data = await fetchMyProfile()
+        this.user = data
+      } catch (err: any) {
+        this.error = err?.response?.data?.error || 'Failed to get profile data'
+      } finally {
+        this.loading = false
+      }
     }
   }
-
-  return { user, getCurrentUser, loading, error }
 })
