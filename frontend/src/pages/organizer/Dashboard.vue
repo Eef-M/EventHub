@@ -29,11 +29,11 @@
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow v-if="!dashboardStore.stats?.recent_registrations?.length">
+              <TableRow v-if="!organizerStore.stats?.recent_registrations?.length">
                 <TableCell :colspan="3" class="text-center text-muted-foreground pt-5">No recent registrations found
                 </TableCell>
               </TableRow>
-              <TableRow v-for="reg in dashboardStore.stats?.recent_registrations" :key="reg.id">
+              <TableRow v-for="reg in organizerStore.stats?.recent_registrations" :key="reg.id">
                 <TableCell>{{ reg.username }}</TableCell>
                 <TableCell>{{ reg.event_title }}</TableCell>
                 <TableCell>{{ reg.ticket_name }}</TableCell>
@@ -58,19 +58,19 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@
 import { Badge } from '@/components/ui/badge'
 import { Calendar, Users, MessageSquare, CalendarCheck, CalendarX } from 'lucide-vue-next'
 import OrganizerLayout from '@/layouts/OrganizerLayout.vue'
-import { useDashboardStore } from '@/stores/organizerStore'
+import { useOrganizerStore } from '@/stores/organizerStore'
 
-const dashboardStore = useDashboardStore()
+const organizerStore = useOrganizerStore()
 
 onMounted(() => {
-  dashboardStore.getStatsDashboard()
+  organizerStore.getDashboardStats()
 })
 
 const stats = [
-  { label: 'Total Events', value: dashboardStore.stats?.total_events, icon: Calendar },
-  { label: 'Registrations', value: dashboardStore.stats?.total_registrations, icon: Users },
-  { label: 'Registered', value: dashboardStore.stats?.registered, icon: CalendarCheck },
-  { label: 'Cancelled', value: dashboardStore.stats?.cancelled_registrations, icon: CalendarX },
-  { label: 'Feedback Received', value: dashboardStore.stats?.feedback_received, icon: MessageSquare },
+  { label: 'Total Events', value: organizerStore.stats?.total_events, icon: Calendar },
+  { label: 'Registrations', value: organizerStore.stats?.total_registrations, icon: Users },
+  { label: 'Registered', value: organizerStore.stats?.registered, icon: CalendarCheck },
+  { label: 'Cancelled', value: organizerStore.stats?.cancelled_registrations, icon: CalendarX },
+  { label: 'Feedback Received', value: organizerStore.stats?.feedback_received, icon: MessageSquare },
 ]
 </script>
