@@ -1,49 +1,54 @@
 import { defineStore } from "pinia"
-import * as authService from "../services/authService"
-import { ref } from "vue"
 import type { LoginPayload, RegisterPayload } from "../types/auth"
-import { useUserStore } from "./userStore"
+import { fetchLogin, fetchLogout, fetchRegister } from "@/services/authService"
+import { useUserStore } from "@/stores/userStore"
 
-export const useAuthStore = defineStore('auth', () => {
-  const isAuthenticated = ref(false)
-  const loading = ref(false)
-  const error = ref<string | null>(null)
-  const userStore = useUserStore()
+export const useAuthStore = defineStore('auth', {
+  state: () => ({
+    isAuthenticated: false,
+    loading: false,
+    error: null as string | null,
+    userStore: useUserStore()
+  }),
 
-  const login = async (payload: LoginPayload) => {
-    loading.value = true
-    error.value = null
-    try {
-      await authService.login(payload)
-      isAuthenticated.value = true
-      await userStore.getMyProfile()
-    } catch (err: any) {
-      error.value = err.response?.data?.error || 'Login failed'
-    } finally {
-      loading.value = false
+  actions: {
+    async register(payload: RegisterPayload) {
+      this.loading = true
+      this.error = null
+      try {
+        await fetchRegister(payload)
+      } catch (err: any) {
+        this.error = err?.response?.data?.error || 'Register failed'
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async login(payload: LoginPayload) {
+      this.loading = true
+      this.error = null
+      try {
+        await fetchLogin(payload)
+        this.isAuthenticated = true
+        await this.userStore.getMyProfile()
+      } catch (err: any) {
+        this.error = err?.response?.data?.error || 'Login failed'
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async logout() {
+      this.loading = true
+      this.error = null
+      try {
+        await fetchLogout()
+        this.isAuthenticated = false
+      } catch (err: any) {
+        this.error = err?.response?.data?.error || 'Logout failed'
+      } finally {
+        this.loading = false
+      }
     }
   }
-
-  const register = async (payload: RegisterPayload) => {
-    loading.value = true
-    error.value = null
-    try {
-      await authService.register(payload)
-    } catch (err: any) {
-      error.value = err.response?.data?.error || 'Register failed'
-    } finally {
-      loading.value = false
-    }
-  }
-
-  const logout = async () => {
-    try {
-      await authService.logout()
-      isAuthenticated.value = false
-    } catch (err: any) {
-      error.value = err.response?.data?.error || 'Logout failed'
-    }
-  }
-
-  return { login, register, logout, isAuthenticated, loading, error }
 })
