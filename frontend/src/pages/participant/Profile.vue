@@ -31,6 +31,6 @@ import ParticipantLayout from '../../layouts/ParticipantLayout.vue';
 const userStore = useUserStore()
 
 onMounted(() => {
-  userStore.getCurrentUser()
+  userStore.getMyProfile()
 })
 </script>

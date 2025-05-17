@@ -16,7 +16,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       await authService.login(payload)
       isAuthenticated.value = true
-      await userStore.getCurrentUser()
+      await userStore.getMyProfile()
     } catch (err: any) {
       error.value = err.response?.data?.error || 'Login failed'
     } finally {
