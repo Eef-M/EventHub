@@ -6,7 +6,7 @@ export const initAuth = async () => {
   const userStore = useUserStore();
 
   try {
-    await userStore.getCurrentUser()
+    await userStore.getMyProfile()
     if (userStore.user) {
       authStore.isAuthenticated = true;
       console.log("User authenticated:", userStore.user.role);
