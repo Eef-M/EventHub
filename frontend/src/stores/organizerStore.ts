@@ -1,38 +1,41 @@
 import { defineStore } from "pinia"
-import type { DashboardStats } from "../types/organizer"
-import { ref } from "vue"
-import { getDashboardStats } from "../services/organizerService"
+import type { DashboardStats } from "@/types/organizer"
+import type { Event } from "@/types/event"
+import { fetchDashboardStats, fetchMyEvents } from "@/services/organizerService"
 
-export const useDashboardStore = defineStore('dashboard', () => {
-  const stats = ref<DashboardStats | null>(null)
-  const loading = ref(false)
-  const error = ref<string | null>(null)
+export const useOrganizerStore = defineStore('organizer', {
+  state: () => ({
+    stats: null as DashboardStats | null,
+    events: [] as Event[],
+    loading: false,
+    error: null as string | null,
+  }),
 
-  const getStatsDashboard = async () => {
-    loading.value = true
-    error.value = null
-    try {
-      const response = await getDashboardStats()
-
-      if (response?.data) {
-        stats.value = response.data
-      } else if (response?.data?.data) {
-        stats.value = response.data.data
-      } else {
-        throw new Error('Invalid response format')
+  actions: {
+    async getDashboardStats() {
+      this.loading = true
+      this.error = null
+      try {
+        const data = await fetchDashboardStats()
+        this.stats = data
+      } catch (err: any) {
+        this.error = err?.response?.data?.error || 'Failed to get dashboard stats'
+      } finally {
+        this.loading = false
       }
-    } catch (err: any) {
-      console.error('Dashboard error:', err)
-      error.value = err.response?.data?.message || 'Failed to fetch dashboard stats'
-    } finally {
-      loading.value = false
-    }
-  }
+    },
 
-  return {
-    stats,
-    loading,
-    error,
-    getStatsDashboard
+    async getMyEvents() {
+      this.loading = true
+      this.error = null
+      try {
+        const data = await fetchMyEvents()
+        this.events = data
+      } catch (err: any) {
+        this.error = err?.response?.data?.error || 'Failed to get Events'
+      } finally {
+        this.loading = false
+      }
+    }
   }
 })

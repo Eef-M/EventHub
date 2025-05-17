@@ -1,74 +1,96 @@
 <template>
   <OrganizerLayout>
-    <div class="p-6">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-semibold">Manage Events</h2>
-        <button class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700" @click="addEvent">
-          + Add Event
-        </button>
-      </div>
-
-      <table class="w-full table-auto border-collapse">
-        <thead>
-          <tr class="bg-gray-100 text-left">
-            <th class="px-4 py-2">Title</th>
-            <th class="px-4 py-2">Date</th>
-            <th class="px-4 py-2">Location</th>
-            <th class="px-4 py-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="event in events" :key="event.id" class="border-b hover:bg-gray-50">
-            <td class="px-4 py-2">{{ event.title }}</td>
-            <td class="px-4 py-2">{{ event.date }}</td>
-            <td class="px-4 py-2">{{ event.location }}</td>
-            <td class="px-4 py-2 space-x-2">
-              <button class="text-blue-600 hover:underline" @click="editEvent(event.id)">
-                Edit
-              </button>
-              <button class="text-red-600 hover:underline" @click="deleteEvent(event.id)">
-                Delete
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="flex items-center justify-between mb-4">
+      <h1 class="text-2xl font-semibold">Manage Events</h1>
+      <Button variant="default">
+        <Plus class="w-4 h-4 mr-2" /> Add Event
+      </Button>
     </div>
+
+    <Card>
+      <CardContent class="py-2 px-4">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Title</TableHead>
+              <TableHead>Image</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead>Location</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Time</TableHead>
+              <TableHead class="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow v-if="!organizerStore.events.length">
+              <TableCell :colspan="4" class="text-center text-muted-foreground">
+                No events found
+              </TableCell>
+            </TableRow>
+            <TableRow v-for="event in organizerStore.events" :key="event.id">
+              <TableCell>{{ event.title }}</TableCell>
+              <TableCell>
+                <img class="w-24 h-24 object-cover rounded-sm" :src="event?.banner_url" alt="Event Thumbnail" />
+              </TableCell>
+              <TableCell>{{ event.description ? event.description.slice(0, 30) + '...' : 'No description available.' }}
+              </TableCell>
+              <TableCell>{{ event.location }}</TableCell>
+              <TableCell>{{ formatDate(event.date) }}</TableCell>
+              <TableCell>{{ formatTime(event.time) }}</TableCell>
+              <TableCell class="text-right space-x-2">
+                <Button size="icon" variant="outline" @click="editEvent(event.id)">
+                  <Pencil class="w-4 h-4" />
+                </Button>
+                <Button size="icon" variant="destructive" @click="deleteEvent(event.id)">
+                  <Trash class="w-4 h-4" />
+                </Button>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   </OrganizerLayout>
 </template>
 
-<script lang="ts" setup>
-import { ref } from 'vue'
-import OrganizerLayout from '../../layouts/OrganizerLayout.vue'
+<script setup lang="ts">
+import { onMounted } from 'vue'
+import { Card, CardContent } from '@/components/ui/card'
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
+import { Pencil, Trash, Plus } from 'lucide-vue-next'
+import OrganizerLayout from '@/layouts/OrganizerLayout.vue'
+import { useOrganizerStore } from '@/stores/organizerStore'
 
-const events = ref([
-  {
-    id: 1,
-    title: 'Tech Expo 2025',
-    date: '2025-06-10',
-    location: 'Jakarta Convention Center',
-  },
-  {
-    id: 2,
-    title: 'Startup Fest',
-    date: '2025-07-15',
-    location: 'Bandung Tech Park',
-  },
-])
+const organizerStore = useOrganizerStore()
 
-function addEvent() {
-  // redirect to event creation form (optional route)
-  alert('Redirect to Add Event Form')
+onMounted(() => {
+  organizerStore.getMyEvents()
+})
+
+function formatDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
 }
 
-function editEvent(id: number) {
-  // redirect to edit page or open modal
-  alert(`Edit event with ID: ${id}`)
+function formatTime(timeStr: string): string {
+  const time = new Date(timeStr)
+  if (time.getFullYear() === 1) return 'N/A'
+  return time.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  })
 }
 
-function deleteEvent(id: number) {
-  if (confirm('Are you sure you want to delete this event?')) {
-    events.value = events.value.filter(event => event.id !== id)
-  }
+function editEvent(id: string) {
+  console.log('Edit', id)
+}
+
+function deleteEvent(id: string) {
+  console.log('Delete event', id)
 }
 </script>
