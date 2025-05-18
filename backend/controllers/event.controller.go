@@ -168,10 +168,18 @@ func UpdateEvent(c *gin.Context) {
 		return
 	}
 
+	userInterface, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	user := userInterface.(models.User)
+
 	var event models.Event
-	if err := initializers.DB.Where("id = ?", id).First(&event).Error; err != nil {
+	if err := initializers.DB.Where("id = ? AND organizer_id = ?", id, user.ID).First(&event).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
-			"error": "Record not found",
+			"error": "You are not allowed to update this event / " + err.Error(),
 		})
 		return
 	}
@@ -265,10 +273,20 @@ func DeleteEvent(c *gin.Context) {
 		return
 	}
 
+	userInterface, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Unauthorized",
+		})
+		return
+	}
+
+	user := userInterface.(models.User)
+
 	var event models.Event
-	if err := initializers.DB.Where("id = ?", id).First(&event).Error; err != nil {
+	if err := initializers.DB.Where("id = ? AND organizer_id = ?", id, user.ID).First(&event).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
-			"error": "Record not found",
+			"error": "You are not allowed to delete this event / " + err.Error(),
 		})
 		return
 	}
