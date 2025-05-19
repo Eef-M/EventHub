@@ -53,14 +53,55 @@
 
     <!-- Add Event Modal -->
     <Dialog v-model:open="showAddModal">
-      <DialogContent>
+      <DialogContent class="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Add Event</DialogTitle>
         </DialogHeader>
-        <p>Form Add Event here</p>
+
+        <div class="grid gap-4 py-4">
+          <div class="grid gap-2">
+            <Label for="title">Title</Label>
+            <Input id="title" v-model="form.title" placeholder="Event title" />
+          </div>
+
+          <div class="grid gap-2">
+            <Label for="description">Description</Label>
+            <Textarea id="description" v-model="form.description" placeholder="Event description" />
+          </div>
+
+          <div class="grid gap-2">
+            <Label for="location">Location</Label>
+            <Input id="location" v-model="form.location" placeholder="Location" />
+          </div>
+
+          <div class="grid gap-2">
+            <Label for="category">Category</Label>
+            <Input id="category" v-model="form.category" placeholder="Category" />
+          </div>
+
+          <div class="grid gap-2 md:grid-cols-2 md:grid">
+            <div class="grid gap-2">
+              <Label for="date">Date</Label>
+              <Input id="date" type="date" v-model="form.date" />
+            </div>
+
+            <div class="grid gap-2">
+              <Label for="time">Time</Label>
+              <Input id="time" type="time" v-model="form.time" />
+            </div>
+          </div>
+
+          <div class="grid gap-2">
+            <Label for="banner">Image</Label>
+            <Input id="banner" type="file" accept="image/*"
+              @change="(e: any) => form.banner_image = e.target.files[0]" />
+
+          </div>
+        </div>
+
         <DialogFooter>
           <Button variant="outline" @click="showAddModal = false">Cancel</Button>
-          <Button>Add</Button>
+          <Button :disabled="eventStore.loading" @click="handleCreateEvent">Add Event</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -98,7 +139,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { Card, CardContent } from '@/components/ui/card'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
@@ -123,8 +164,13 @@ import {
   AlertDialogAction
 } from '@/components/ui/alert-dialog'
 import type { Event } from '@/types/event'
+import { useEventStore } from '@/stores/eventStore'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { toast } from 'vue-sonner'
 
 const organizerStore = useOrganizerStore()
+const eventStore = useEventStore()
 
 const showAddModal = ref(false)
 const showEditModal = ref(false)
@@ -167,5 +213,55 @@ function openDeleteModal(id: string) {
 function confirmDeleteEvent(): void {
   console.log('Delete confirmed for event ID:', eventToDelete.value)
   showDeleteModal.value = false
+}
+
+const form = reactive({
+  title: '',
+  description: '',
+  location: '',
+  category: '',
+  date: '',
+  time: '',
+  banner_image: null as File | null,
+})
+
+function resetForm() {
+  form.title = ''
+  form.description = ''
+  form.location = ''
+  form.category = ''
+  form.date = ''
+  form.time = ''
+  form.banner_image = null
+}
+
+async function handleCreateEvent() {
+  try {
+    const payload = new FormData()
+    payload.append('title', form.title)
+    payload.append('description', form.description)
+    payload.append('location', form.location)
+    payload.append('category', form.category)
+    payload.append('date', form.date)
+    payload.append('time', form.time)
+    if (form.banner_image) {
+      payload.append('banner_image', form.banner_image)
+    }
+
+    await eventStore.createEvent(payload)
+
+    await organizerStore.getMyEvents()
+
+    toast.success('Event created successfully', {
+      description: new Date().toLocaleString(),
+    })
+    showAddModal.value = false
+    resetForm()
+  } catch (err) {
+    toast.error('Failed to create event', {
+      description: eventStore.error || 'An unexpected error occurred.',
+    })
+    console.error('Create Event Failed:', eventStore.error)
+  }
 }
 </script>
