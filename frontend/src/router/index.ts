@@ -116,7 +116,7 @@ router.beforeEach((to, _from, next) => {
     }
 
     if (to.matched.some(record => record.meta.requiresOrganizer)) {
-      if (userStore.user && userStore.user.role !== 'organizer') {
+      if (userStore.userState.data && userStore.userState.data.role !== 'organizer') {
         next({ path: '/403' });
         return;
       }

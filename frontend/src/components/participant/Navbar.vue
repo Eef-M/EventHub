@@ -6,13 +6,13 @@
       </RouterLink>
       <div class="flex gap-6">
         <RouterLink to="/events" class="text-gray-700 hover:text-purple-600 transition">Events</RouterLink>
-        <template v-if="userStore.user">
+        <template v-if="userStore.userState.data">
           <details class="relative">
             <summary class="cursor-pointer text-gray-700 hover:text-purple-600 font-medium">
-              {{ userStore.user.username }}
+              {{ userStore.userState.data.username }}
             </summary>
             <ul class="absolute right-0 bg-white shadow-md rounded mt-2 w-40 z-50">
-              <template v-if="userStore.user.role === 'organizer'">
+              <template v-if="userStore.userState.data.role === 'organizer'">
                 <li>
                   <RouterLink to="/organizer/dashboard" class="block px-4 py-2 hover:bg-gray-100 cursor-pointer">
                     Dashboard</RouterLink>

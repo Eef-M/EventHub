@@ -7,9 +7,9 @@ export const initAuth = async () => {
 
   try {
     await userStore.getMyProfile()
-    if (userStore.user) {
+    if (userStore.userState.data) {
       authStore.isAuthenticated = true;
-      console.log("User authenticated:", userStore.user.role);
+      console.log("User authenticated:", userStore.userState.data.role);
     }
   } catch (error) {
     console.error("Auth initialization failed:", error);
@@ -19,6 +19,6 @@ export const initAuth = async () => {
   return {
     isReady: true,
     isAuthenticated: authStore.isAuthenticated,
-    user: userStore.user
+    user: userStore.userState.data
   };
 }
