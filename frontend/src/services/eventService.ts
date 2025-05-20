@@ -24,10 +24,11 @@ export async function fetchCreateEvent(payload: FormData): Promise<Event> {
 export async function fetchUpdateEvent(id: string, payload: FormData): Promise<Event> {
   const response = await axios.put(`${API_BASE_URL}/events/${id}`, payload, {
     headers: { 'Content-Type': 'multipart/form-data' },
+    withCredentials: true,
   })
   return response.data.data
 }
 
 export async function fetchDeleteEvent(id: string): Promise<void> {
-  await axios.delete(`${API_BASE_URL}/events/${id}`)
+  await axios.delete(`${API_BASE_URL}/events/${id}`, { withCredentials: true })
 }

@@ -95,30 +95,86 @@
             <Label for="banner">Image</Label>
             <Input id="banner" type="file" accept="image/*"
               @change="(e: any) => form.banner_image = e.target.files[0]" />
-
+            <div v-if="form.banner_image" class="mt-2">
+              <p class="text-sm text-muted-foreground mb-1">New preview:</p>
+              <img v-if="imagePreviewUrl" :src="imagePreviewUrl" alt="New Banner Preview"
+                class="rounded-md border max-w-24 object-cover max-h-24" />
+            </div>
           </div>
         </div>
 
         <DialogFooter>
           <Button variant="outline" @click="showAddModal = false">Cancel</Button>
-          <Button :disabled="eventStore.loading" @click="handleCreateEvent">Add Event</Button>
+          <Button :disabled="eventStore.createState.loading" @click="handleCreateEvent">Add Event</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
 
     <!-- Edit Event Modal -->
     <Dialog v-model:open="showEditModal">
-      <DialogContent>
+      <DialogContent class="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Edit Event</DialogTitle>
         </DialogHeader>
-        <p>Form Edit Event: {{ selectedEvent?.title }}</p>
+
+        <div class="grid gap-4 py-4">
+          <div class="grid gap-2">
+            <Label for="title">Title</Label>
+            <Input id="title" v-model="form.title" placeholder="Event title" />
+          </div>
+
+          <div class="grid gap-2">
+            <Label for="description">Description</Label>
+            <Textarea id="description" v-model="form.description" placeholder="Event description" />
+          </div>
+
+          <div class="grid gap-2">
+            <Label for="location">Location</Label>
+            <Input id="location" v-model="form.location" placeholder="Location" />
+          </div>
+
+          <div class="grid gap-2">
+            <Label for="category">Category</Label>
+            <Input id="category" v-model="form.category" placeholder="Category" />
+          </div>
+
+          <div class="grid gap-2 md:grid-cols-2 md:grid">
+            <div class="grid gap-2">
+              <Label for="date">Date</Label>
+              <Input id="date" type="date" v-model="form.date" />
+            </div>
+
+            <div class="grid gap-2">
+              <Label for="time">Time</Label>
+              <Input id="time" type="time" v-model="form.time" />
+            </div>
+          </div>
+
+          <div class="grid gap-2">
+            <Label for="banner">Image</Label>
+            <Input id="banner" type="file" accept="image/*" @change="handleBannerChange" />
+            <div class="flex gap-6 mt-2 items-start">
+              <div v-if="selectedEvent?.banner_url" class="flex flex-col items-center gap-1">
+                <p class="text-sm text-muted-foreground">Current image:</p>
+                <img :src="selectedEvent.banner_url" alt="Current Banner"
+                  class="rounded-md border w-24 h-24 object-cover" />
+              </div>
+              <div v-if="form.banner_image" class="flex flex-col items-center gap-1">
+                <p class="text-sm text-muted-foreground">New preview:</p>
+                <img v-if="imagePreviewUrl" :src="imagePreviewUrl" alt="New Banner Preview"
+                  class="rounded-md border w-24 h-24 object-cover" />
+              </div>
+            </div>
+          </div>
+        </div>
+
         <DialogFooter>
           <Button variant="outline" @click="showEditModal = false">Cancel</Button>
-          <Button>Update</Button>
+          <Button :disabled="eventStore.updateState.loading" @click="handleUpdateEvent">Update</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
+
 
     <!-- Delete Confirm Modal -->
     <AlertDialog v-model:open="showDeleteModal">
@@ -139,7 +195,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { Card, CardContent } from '@/components/ui/card'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
@@ -202,6 +258,16 @@ function formatTime(timeStr: string): string {
 
 function openEditModal(event: Event) {
   selectedEvent.value = event
+  const isoDate = new Date(event.date)
+  const formattedDate = isoDate.toISOString().split('T')[0]
+
+  form.title = event.title
+  form.description = event.description
+  form.location = event.location
+  form.category = event.category
+  form.date = formattedDate
+  form.time = formatTime(event.time)
+  form.banner_image = null
   showEditModal.value = true
 }
 
@@ -259,9 +325,49 @@ async function handleCreateEvent() {
     resetForm()
   } catch (err) {
     toast.error('Failed to create event', {
-      description: eventStore.error || 'An unexpected error occurred.',
+      description: eventStore.createState.error || 'An unexpected error occurred.',
     })
-    console.error('Create Event Failed:', eventStore.error)
+    console.error('Create Event Failed:', eventStore.createState.error)
+  }
+}
+
+function handleBannerChange(e: Event & { target: HTMLInputElement }) {
+  form.banner_image = e.target.files?.[0] || null
+}
+
+const imagePreviewUrl = computed(() =>
+  form.banner_image ? URL.createObjectURL(form.banner_image) : null
+)
+
+
+async function handleUpdateEvent() {
+  if (!selectedEvent.value) return
+
+  try {
+    const payload = new FormData()
+    payload.append('title', form.title)
+    payload.append('description', form.description)
+    payload.append('location', form.location)
+    payload.append('category', form.category)
+    payload.append('date', form.date)
+    payload.append('time', form.time)
+    if (form.banner_image) {
+      payload.append('banner_image', form.banner_image)
+    }
+
+    await eventStore.updateEvent(selectedEvent.value.id, payload)
+
+    await organizerStore.getMyEvents()
+
+    toast.success('Event updated successfully', {
+      description: new Date().toLocaleString(),
+    })
+    showEditModal.value = false
+  } catch (err) {
+    toast.error('Failed to create event', {
+      description: eventStore.updateState.error || 'An unexpected error occurred.',
+    })
+    console.error('Update Event Failed:', eventStore.updateState.error)
   }
 }
 </script>

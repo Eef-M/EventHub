@@ -2,21 +2,38 @@
   <ParticipantLayout>
     <section class="py-8 max-w-7xl mx-auto">
       <div class="rounded-2xl overflow-hidden shadow-md mb-8">
-        <img :src="eventStore?.event?.banner_url" alt="Event Banner" class="w-full h-64 object-cover" />
+        <img :src="eventStore?.singleEventState?.data?.banner_url" alt="Event Banner"
+          class="w-full h-64 object-cover" />
       </div>
 
-      <div v-if="eventStore.event" class="space-y-4 mb-10">
-        <h1 class="text-3xl font-bold text-gray-900">{{ eventStore?.event?.title }}</h1>
-        <p class="text-gray-600">Category: <span class="font-medium">{{ eventStore?.event?.category }}</span></p>
-        <p class="text-gray-600">Location: <span class="font-medium">{{ eventStore?.event?.location }}</span></p>
-        <p class="text-gray-600">Date: <span class="font-medium">{{ formatDate(eventStore?.event?.date) }}</span></p>
-        <p class="text-gray-600">Time: <span class="font-medium">{{ formatTime(eventStore?.event?.time) }}</span></p>
+      <div v-if="eventStore.singleEventState.data" class="space-y-4 mb-10">
+        <h1 class="text-3xl font-bold text-gray-900">{{ eventStore?.singleEventState?.data?.title }}</h1>
+        <p class="text-gray-600">Category:
+          <span class="font-medium">
+            {{ eventStore?.singleEventState?.data?.category }}
+          </span>
+        </p>
+        <p class="text-gray-600">Location:
+          <span class="font-medium">
+            {{ eventStore?.singleEventState?.data?.location }}
+          </span>
+        </p>
+        <p class="text-gray-600">Date:
+          <span class="font-medium">
+            {{ formatDate(eventStore?.singleEventState?.data?.date) }}
+          </span>
+        </p>
+        <p class="text-gray-600">Time:
+          <span class="font-medium">
+            {{ formatTime(eventStore?.singleEventState?.data?.time) }}
+          </span>
+        </p>
       </div>
 
       <div class="mb-10">
         <h2 class="text-xl font-semibold mb-2">Description</h2>
         <p class="text-gray-700">
-          {{ eventStore?.event?.description || 'No description available.' }}
+          {{ eventStore?.singleEventState?.data?.description || 'No description available.' }}
         </p>
       </div>
 
