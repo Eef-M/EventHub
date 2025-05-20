@@ -151,5 +151,5 @@ onMounted(() => {
   eventStore.getEvents()
 })
 
-const topEvents = computed(() => eventStore.events.slice(0, 3))
+const topEvents = computed(() => eventStore.eventsState.data.slice(0, 3))
 </script>

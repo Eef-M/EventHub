@@ -47,7 +47,7 @@ onMounted(() => {
 });
 
 const filteredEvents = computed(() => {
-  let events = eventStore.events;
+  let events = eventStore.eventsState.data;
 
   if (search.value) {
     const keyword = search.value.toLowerCase();

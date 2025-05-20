@@ -1,55 +1,69 @@
 import { defineStore } from "pinia"
 import type { Event } from "@/types/event"
-import { fetchCreateEvent, fetchEventById, fetchEvents } from "@/services/eventService"
+import { fetchCreateEvent, fetchEventById, fetchEvents, fetchUpdateEvent } from "@/services/eventService"
 import { fetchMyEvents } from "@/services/organizerService"
+import { createAsyncState } from "@/utils/asyncState"
 
 export const useEventStore = defineStore('event', {
   state: () => ({
-    events: [] as Event[],
-    event: null as Event | null,
-    loading: false,
-    error: null as string | null,
+    eventsState: createAsyncState<Event[]>([]),
+    singleEventState: createAsyncState<Event | null>(null),
+    createState: createAsyncState(null),
+    updateState: createAsyncState(null),
   }),
   actions: {
     async getEvents() {
-      this.loading = true
-      this.error = null
-
+      this.eventsState.loading = true
+      this.eventsState.error = null
       try {
         const data = await fetchEvents()
-        this.events = data
+        this.eventsState.data = data
       } catch (err: any) {
-        this.error = err?.response?.data?.error || 'Failed to get events'
+        this.eventsState.error = err?.response?.data?.error || 'Failed to get events'
         throw err
       } finally {
-        this.loading = false
+        this.eventsState.loading = false
       }
     },
 
     async getEventById(id: string) {
-      this.loading = true
-      this.error = null
+      this.singleEventState.loading = true
+      this.singleEventState.error = null
       try {
         const data = await fetchEventById(id)
-        this.event = data
+        this.singleEventState.data = data
       } catch (err: any) {
-        this.error = err?.response?.data?.error || 'Failed to get event'
+        this.singleEventState.error = err?.response?.data?.error || 'Failed to get event'
       } finally {
-        this.loading = false
+        this.singleEventState.loading = false
       }
     },
 
     async createEvent(payload: FormData) {
-      this.loading = true
-      this.error = null
+      this.createState.loading = true
+      this.createState.error = null
       try {
         await fetchCreateEvent(payload)
         await fetchMyEvents()
       } catch (err: any) {
-        this.error = err?.response?.data?.error || 'Failed to create event'
+        this.createState.error = err?.response?.data?.error || 'Failed to create event'
         throw err
       } finally {
-        this.loading = false
+        this.createState.loading = false
+      }
+    },
+
+    async updateEvent(id: string, payload: FormData) {
+      this.updateState.loading = true
+      this.updateState.error = null
+      try {
+        await fetchUpdateEvent(id, payload)
+        await fetchMyEvents()
+      } catch (err: any) {
+        this.updateState.error = err?.response?.data?.error || 'Failed to update event'
+        throw err
+      } finally {
+        this.updateState.loading = false
       }
     }
   }
