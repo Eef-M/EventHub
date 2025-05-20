@@ -22,11 +22,11 @@
             placeholder="Password" v-model="form.password" />
         </div>
 
-        <p v-if="authStore.error" class="text-red-500 text-sm mb-4">{{ authStore.error }}</p>
+        <p v-if="authStore.loginState.error" class="text-red-500 text-sm mb-4">{{ authStore.loginState.error }}</p>
 
-        <button type="submit" :disabled="authStore.loading"
+        <button type="submit" :disabled="authStore.loginState.loading"
           class="w-full bg-purple-600 text-white py-4 rounded-md hover:bg-purple-700 transition cursor-pointer">
-          {{ authStore.loading ? 'Logging in...' : 'Login' }}
+          {{ authStore.loginState.loading ? 'Logging in...' : 'Login' }}
         </button>
       </form>
 
@@ -53,12 +53,12 @@ const form = reactive({
 
 const handleSubmit = async () => {
   if (!form.email || !form.password) {
-    authStore.error = 'field required'
+    authStore.loginState.error = 'field required'
     return
   }
 
   await authStore.login(form)
-  if (!authStore.error) {
+  if (!authStore.loginState.error) {
     router.push('/')
   }
 }

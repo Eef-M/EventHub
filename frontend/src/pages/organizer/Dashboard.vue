@@ -29,11 +29,11 @@
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow v-if="!organizerStore.stats?.recent_registrations?.length">
+              <TableRow v-if="!organizerStore.statsState.data?.recent_registrations?.length">
                 <TableCell :colspan="3" class="text-center text-muted-foreground pt-5">No recent registrations found
                 </TableCell>
               </TableRow>
-              <TableRow v-for="reg in organizerStore.stats?.recent_registrations" :key="reg.id">
+              <TableRow v-for="(reg, index) in organizerStore.statsState.data?.recent_registrations" :key="index">
                 <TableCell>{{ reg.username }}</TableCell>
                 <TableCell>{{ reg.event_title }}</TableCell>
                 <TableCell>{{ reg.ticket_name }}</TableCell>
@@ -51,7 +51,7 @@
   </OrganizerLayout>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { onMounted } from 'vue'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
@@ -67,10 +67,10 @@ onMounted(() => {
 })
 
 const stats = [
-  { label: 'Total Events', value: organizerStore.stats?.total_events, icon: Calendar },
-  { label: 'Registrations', value: organizerStore.stats?.total_registrations, icon: Users },
-  { label: 'Registered', value: organizerStore.stats?.registered, icon: CalendarCheck },
-  { label: 'Cancelled', value: organizerStore.stats?.cancelled_registrations, icon: CalendarX },
-  { label: 'Feedback Received', value: organizerStore.stats?.feedback_received, icon: MessageSquare },
+  { label: 'Total Events', value: organizerStore.statsState.data?.total_events, icon: Calendar },
+  { label: 'Registrations', value: organizerStore.statsState.data?.total_registrations, icon: Users },
+  { label: 'Registered', value: organizerStore.statsState.data?.registered, icon: CalendarCheck },
+  { label: 'Cancelled', value: organizerStore.statsState.data?.cancelled_registrations, icon: CalendarX },
+  { label: 'Feedback Received', value: organizerStore.statsState.data?.feedback_received, icon: MessageSquare },
 ]
 </script>

@@ -56,11 +56,13 @@
             placeholder="Confirm Password" v-model="form.confirmPassword" />
         </div>
 
-        <p v-if="authStore.error" class="text-red-500 text-sm mb-4">{{ authStore.error }}</p>
+        <p v-if="authStore.registerState.error" class="text-red-500 text-sm mb-4">
+          {{ authStore.registerState.error }}
+        </p>
 
-        <button type="submit" :disabled="authStore.loading"
+        <button type="submit" :disabled="authStore.registerState.loading"
           class="w-full bg-purple-600 text-white py-3 rounded-md hover:bg-purple-700 transition cursor-pointer">
-          {{ authStore.loading ? 'Registering...' : 'Register' }}
+          {{ authStore.registerState.loading ? 'Registering...' : 'Register' }}
         </button>
       </form>
 
@@ -92,12 +94,12 @@ const form = reactive({
 
 const handleSubmit = async () => {
   if (form.password !== form.confirmPassword) {
-    authStore.error = 'Passwords do not match'
+    authStore.registerState.error = 'Passwords do not match'
     return
   }
 
   await authStore.register(form)
-  if (!authStore.error) {
+  if (!authStore.registerState.error) {
     router.push('/login')
   }
 }

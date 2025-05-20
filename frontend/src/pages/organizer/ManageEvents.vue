@@ -22,12 +22,12 @@
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow v-if="!organizerStore.events.length">
+            <TableRow v-if="!organizerStore.eventsState.data.length">
               <TableCell :colspan="4" class="text-center text-muted-foreground">
                 No events found
               </TableCell>
             </TableRow>
-            <TableRow v-for="event in organizerStore.events" :key="event.id">
+            <TableRow v-for="event in organizerStore.eventsState.data" :key="event.id">
               <TableCell>{{ event.title }}</TableCell>
               <TableCell>
                 <img class="w-24 h-24 object-cover rounded-sm" :src="event?.banner_url" alt="Event Thumbnail" />
