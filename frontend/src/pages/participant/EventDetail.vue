@@ -2,21 +2,21 @@
   <ParticipantLayout>
     <section class="py-8 max-w-7xl mx-auto">
       <div class="rounded-2xl overflow-hidden shadow-md mb-8">
-        <img :src="event?.banner_url" alt="Event Banner" class="w-full h-64 object-cover" />
+        <img :src="eventStore?.event?.banner_url" alt="Event Banner" class="w-full h-64 object-cover" />
       </div>
 
-      <div v-if="event" class="space-y-4 mb-10">
-        <h1 class="text-3xl font-bold text-gray-900">{{ event.title }}</h1>
-        <p class="text-gray-600">Category: <span class="font-medium">{{ event.category }}</span></p>
-        <p class="text-gray-600">Location: <span class="font-medium">{{ event.location }}</span></p>
-        <p class="text-gray-600">Date: <span class="font-medium">{{ formatDate(event.date) }}</span></p>
-        <p class="text-gray-600">Time: <span class="font-medium">{{ formatTime(event.time) }}</span></p>
+      <div v-if="eventStore.event" class="space-y-4 mb-10">
+        <h1 class="text-3xl font-bold text-gray-900">{{ eventStore?.event?.title }}</h1>
+        <p class="text-gray-600">Category: <span class="font-medium">{{ eventStore?.event?.category }}</span></p>
+        <p class="text-gray-600">Location: <span class="font-medium">{{ eventStore?.event?.location }}</span></p>
+        <p class="text-gray-600">Date: <span class="font-medium">{{ formatDate(eventStore?.event?.date) }}</span></p>
+        <p class="text-gray-600">Time: <span class="font-medium">{{ formatTime(eventStore?.event?.time) }}</span></p>
       </div>
 
       <div class="mb-10">
         <h2 class="text-xl font-semibold mb-2">Description</h2>
         <p class="text-gray-700">
-          {{ event?.description || 'No description available.' }}
+          {{ eventStore?.event?.description || 'No description available.' }}
         </p>
       </div>
 
@@ -49,23 +49,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { fetchEventById } from '@/services/eventService'
-import type { Event } from '../../types/event'
 import ParticipantLayout from '../../layouts/ParticipantLayout.vue'
+import { useEventStore } from '@/stores/eventStore'
 
 const route = useRoute()
 const eventId = route.params.id as string
-
-const event = ref<Event | null>(null)
+const eventStore = useEventStore()
 
 onMounted(async () => {
-  try {
-    event.value = await fetchEventById(eventId)
-  } catch (err) {
-    console.error('Failed to load event:', err)
-  }
+  eventStore.getEventById(eventId)
 })
 
 function formatDate(dateStr: string): string {

@@ -4,12 +4,12 @@ import type { Event } from "../types/event"
 const API_BASE_URL = 'http://localhost:8000/api/v1'
 
 export async function fetchEvents(): Promise<Event[]> {
-  const response = await axios.get<{ data: Event[] }>(`${API_BASE_URL}/events`)
+  const response = await axios.get<{ data: Event[] }>(`${API_BASE_URL}/events`, { withCredentials: true })
   return response.data.data
 }
 
 export async function fetchEventById(id: string): Promise<Event> {
-  const response = await axios.get<{ data: Event }>(`${API_BASE_URL}/events/${id}`)
+  const response = await axios.get<{ data: Event }>(`${API_BASE_URL}/events/${id}`, { withCredentials: true })
   return response.data.data
 }
 
