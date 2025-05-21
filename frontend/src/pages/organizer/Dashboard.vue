@@ -52,7 +52,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
@@ -66,11 +66,11 @@ onMounted(() => {
   organizerStore.getDashboardStats()
 })
 
-const stats = [
+const stats = computed(() => [
   { label: 'Total Events', value: organizerStore.statsState.data?.total_events, icon: Calendar },
   { label: 'Registrations', value: organizerStore.statsState.data?.total_registrations, icon: Users },
   { label: 'Registered', value: organizerStore.statsState.data?.registered, icon: CalendarCheck },
   { label: 'Cancelled', value: organizerStore.statsState.data?.cancelled_registrations, icon: CalendarX },
   { label: 'Feedback Received', value: organizerStore.statsState.data?.feedback_received, icon: MessageSquare },
-]
+])
 </script>
