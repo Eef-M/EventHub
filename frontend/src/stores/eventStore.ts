@@ -1,7 +1,6 @@
 import { defineStore } from "pinia"
 import type { Event } from "@/types/event"
-import { fetchCreateEvent, fetchEventById, fetchEvents, fetchUpdateEvent } from "@/services/eventService"
-import { fetchMyEvents } from "@/services/organizerService"
+import { fetchCreateEvent, fetchDeleteEvent, fetchEventById, fetchEvents, fetchUpdateEvent } from "@/services/eventService"
 import { createAsyncState } from "@/utils/asyncState"
 
 export const useEventStore = defineStore('event', {
@@ -10,6 +9,7 @@ export const useEventStore = defineStore('event', {
     singleEventState: createAsyncState<Event | null>(null),
     createState: createAsyncState(null),
     updateState: createAsyncState(null),
+    deleteState: createAsyncState(null),
   }),
   actions: {
     async getEvents() {
@@ -44,7 +44,6 @@ export const useEventStore = defineStore('event', {
       this.createState.error = null
       try {
         await fetchCreateEvent(payload)
-        await fetchMyEvents()
       } catch (err: any) {
         this.createState.error = err?.response?.data?.error || 'Failed to create event'
         throw err
@@ -58,12 +57,23 @@ export const useEventStore = defineStore('event', {
       this.updateState.error = null
       try {
         await fetchUpdateEvent(id, payload)
-        await fetchMyEvents()
       } catch (err: any) {
         this.updateState.error = err?.response?.data?.error || 'Failed to update event'
         throw err
       } finally {
         this.updateState.loading = false
+      }
+    },
+
+    async deleteEvent(id: string) {
+      this.deleteState.loading = true
+      this.deleteState.error = null
+      try {
+        await fetchDeleteEvent(id)
+      } catch (err: any) {
+        this.deleteState.error = err?.response?.data?.error || 'Failed to delete event'
+      } finally {
+        this.deleteState.loading = false
       }
     }
   }

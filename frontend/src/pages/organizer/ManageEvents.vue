@@ -2,8 +2,8 @@
   <OrganizerLayout>
     <div class="flex items-center justify-between mb-4">
       <h1 class="text-2xl font-semibold">Manage Events</h1>
-      <Button variant="default" @click="showAddModal = true">
-        <Plus class="w-4 h-4 mr-2" /> Add Event
+      <Button class="bg-purple-600 hover:bg-purple-700 cursor-pointer" @click="showAddModal = true">
+        <Plus class="w-4 h-4 mr-2" /> Create Event
       </Button>
     </div>
 
@@ -38,10 +38,12 @@
               <TableCell>{{ formatDate(event.date) }}</TableCell>
               <TableCell>{{ formatTime(event.time) }}</TableCell>
               <TableCell class="text-right space-x-2">
-                <Button size="icon" variant="outline" @click="openEditModal(event)">
+                <Button size="icon" class="bg-slate-600 hover:bg-slate-700 cursor-pointer"
+                  @click="openEditModal(event)">
                   <Pencil class="w-4 h-4" />
                 </Button>
-                <Button size="icon" variant="destructive" @click="openDeleteModal(event.id)">
+                <Button size="icon" class="bg-red-600 hover:bg-red-700 cursor-pointer"
+                  @click="openDeleteModal(event.id)">
                   <Trash class="w-4 h-4" />
                 </Button>
               </TableCell>
@@ -55,7 +57,7 @@
     <Dialog v-model:open="showAddModal">
       <DialogContent class="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Add Event</DialogTitle>
+          <DialogTitle>Create Event</DialogTitle>
         </DialogHeader>
 
         <div class="grid gap-4 py-4">
@@ -104,8 +106,11 @@
         </div>
 
         <DialogFooter>
-          <Button variant="outline" @click="showAddModal = false">Cancel</Button>
-          <Button :disabled="eventStore.createState.loading" @click="handleCreateEvent">Add Event</Button>
+          <Button variant="outline" @click="showAddModal = false" class="cursor-pointer">Cancel</Button>
+          <Button :disabled="eventStore.createState.loading" @click="handleCreateEvent"
+            class="bg-purple-600 hover:bg-purple-700 cursor-pointer">
+            Create Event
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -170,7 +175,8 @@
 
         <DialogFooter>
           <Button variant="outline" @click="showEditModal = false">Cancel</Button>
-          <Button :disabled="eventStore.updateState.loading" @click="handleUpdateEvent">Update</Button>
+          <Button :disabled="eventStore.updateState.loading" @click="handleUpdateEvent"
+            class="bg-slate-600 hover:bg-slate-700 cursor-pointer">Update</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -186,8 +192,9 @@
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel @click="showDeleteModal = false">Cancel</AlertDialogCancel>
-          <AlertDialogAction @click="confirmDeleteEvent">Delete</AlertDialogAction>
+          <AlertDialogCancel @click="showDeleteModal = false" class="cursor-pointer">Cancel</AlertDialogCancel>
+          <AlertDialogAction @click="confirmDeleteEvent" class="bg-red-600 hover:bg-red-700 cursor-pointer">Delete
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -276,11 +283,6 @@ function openDeleteModal(id: string) {
   showDeleteModal.value = true
 }
 
-function confirmDeleteEvent(): void {
-  console.log('Delete confirmed for event ID:', eventToDelete.value)
-  showDeleteModal.value = false
-}
-
 const form = reactive({
   title: '',
   description: '',
@@ -364,10 +366,31 @@ async function handleUpdateEvent() {
     })
     showEditModal.value = false
   } catch (err) {
-    toast.error('Failed to create event', {
+    toast.error('Failed to update event', {
       description: eventStore.updateState.error || 'An unexpected error occurred.',
     })
     console.error('Update Event Failed:', eventStore.updateState.error)
+  }
+}
+
+async function confirmDeleteEvent() {
+  if (!eventToDelete.value) return
+
+  try {
+    await eventStore.deleteEvent(eventToDelete.value)
+
+    await organizerStore.getMyEvents()
+
+    toast.success('Event deleted successfully', {
+      description: new Date().toLocaleString(),
+    })
+    showDeleteModal.value = false
+    eventToDelete.value = null
+  } catch (err) {
+    toast.error('Failed to delete event', {
+      description: eventStore.deleteState.error || 'An unexpected error occurred.',
+    })
+    console.error('Delete Event Failed:', eventStore.deleteState.error)
   }
 }
 </script>
