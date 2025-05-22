@@ -6,3 +6,13 @@ type RecentRegistrationDTO struct {
 	TicketName string `json:"ticket_name"`
 	Status     string `json:"status"`
 }
+
+type EventRegistrationsDTO struct {
+	ID           string `json:"id"`
+	Username     string `json:"username"`
+	Email        string `json:"email"`
+	EventTitle   string `json:"event_title"`
+	TicketName   string `json:"ticket_name"`
+	Status       string `json:"status"`
+	RegisteredAt string `json:"registered_at"`
+}

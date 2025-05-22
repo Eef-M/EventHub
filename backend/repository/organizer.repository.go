@@ -72,3 +72,16 @@ func GetRecentRegistrationsByOrganizerID(db *gorm.DB, organizerID uuid.UUID, lim
 
 	return result, err
 }
+
+func GetAllRegistrationsByOrganizerID(db *gorm.DB, organizerID uuid.UUID) ([]models.EventRegistration, error) {
+	var registrations []models.EventRegistration
+
+	err := db.Preload("User").
+		Preload("Event").
+		Preload("Ticket").
+		Joins("JOIN events ON event_registrations.event_id = events.id").
+		Where("events.organizer_id = ?", organizerID).
+		Find(&registrations).Error
+
+	return registrations, err
+}
