@@ -2,47 +2,56 @@
   <OrganizerLayout>
     <div class="p-6">
       <h2 class="text-2xl font-semibold mb-4">Event Registrations</h2>
-
-      <table class="w-full table-auto border-collapse">
-        <thead>
-          <tr class="bg-gray-100 text-left">
-            <th class="px-4 py-2">Name</th>
-            <th class="px-4 py-2">Email</th>
-            <th class="px-4 py-2">Event</th>
-            <th class="px-4 py-2">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="reg in registrations" :key="reg.id" class="border-b hover:bg-gray-50">
-            <td class="px-4 py-2">{{ reg.name }}</td>
-            <td class="px-4 py-2">{{ reg.email }}</td>
-            <td class="px-4 py-2">{{ reg.event }}</td>
-            <td class="px-4 py-2">{{ reg.status }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <Card>
+        <CardContent class="py-2 px-4">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Username</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Event</TableHead>
+                <TableHead>Ticket</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Registered at</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow v-if="!organizerStore.registrationsState.data.length">
+                <TableCell :colspan="6" class="text-center text-muted-foreground">
+                  No events found
+                </TableCell>
+              </TableRow>
+              <TableRow v-for="reg in organizerStore.registrationsState.data" :key="reg.id">
+                <TableCell>{{ reg.username }}</TableCell>
+                <TableCell>{{ reg.email }}</TableCell>
+                <TableCell>{{ reg.event_title }}</TableCell>
+                <TableCell>{{ reg.ticket_name }}</TableCell>
+                <TableCell>
+                  <Badge class="text-sm font-bold" :class="reg.status === 'registered' ? 'bg-green-600' : 'bg-red-600'">
+                    {{ reg.status }}
+                  </Badge>
+                </TableCell>
+                <TableCell>{{ reg.registered_at }}</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   </OrganizerLayout>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
-import OrganizerLayout from '../../layouts/OrganizerLayout.vue';
+import { onMounted } from 'vue';
+import OrganizerLayout from '@/layouts/OrganizerLayout.vue';
+import { useOrganizerStore } from '@/stores/organizerStore';
+import { Card, CardContent } from '@/components/ui/card'
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge';
 
-const registrations = ref([
-  {
-    id: 1,
-    name: 'John Doe',
-    email: 'john@example.com',
-    event: 'Tech Expo 2025',
-    status: 'Approved',
-  },
-  {
-    id: 2,
-    name: 'Jane Smith',
-    email: 'jane@example.com',
-    event: 'Startup Fest',
-    status: 'Pending',
-  },
-])
+const organizerStore = useOrganizerStore()
+
+onMounted(() => {
+  organizerStore.getEventRegistrations()
+})
 </script>

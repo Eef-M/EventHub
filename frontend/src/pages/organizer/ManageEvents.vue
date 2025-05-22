@@ -23,7 +23,7 @@
           </TableHeader>
           <TableBody>
             <TableRow v-if="!organizerStore.eventsState.data.length">
-              <TableCell :colspan="4" class="text-center text-muted-foreground">
+              <TableCell :colspan="7" class="text-center text-muted-foreground">
                 No events found
               </TableCell>
             </TableRow>

@@ -11,3 +11,13 @@ export interface DashboardStats {
     status: string
   }[]
 }
+
+export interface EventRegistration {
+  id: string;
+  username: string;
+  email: string;
+  event_title: string;
+  ticket_name: string;
+  status: string;
+  registered_at: string;
+}
