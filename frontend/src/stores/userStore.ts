@@ -17,6 +17,7 @@ export const useUserStore = defineStore('user', {
         this.userState.data = data
       } catch (err: any) {
         this.userState.error = err?.response?.data?.error || 'Failed to get profile data'
+        throw err
       } finally {
         this.userState.loading = false
       }

@@ -34,6 +34,7 @@ export const useEventStore = defineStore('event', {
         this.singleEventState.data = data
       } catch (err: any) {
         this.singleEventState.error = err?.response?.data?.error || 'Failed to get event'
+        throw err
       } finally {
         this.singleEventState.loading = false
       }
@@ -72,6 +73,7 @@ export const useEventStore = defineStore('event', {
         await fetchDeleteEvent(id)
       } catch (err: any) {
         this.deleteState.error = err?.response?.data?.error || 'Failed to delete event'
+        throw err
       } finally {
         this.deleteState.loading = false
       }

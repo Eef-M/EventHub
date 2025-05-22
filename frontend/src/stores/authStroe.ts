@@ -21,6 +21,7 @@ export const useAuthStore = defineStore('auth', {
         await fetchRegister(payload)
       } catch (err: any) {
         this.registerState.error = err?.response?.data?.error || 'Register failed'
+        throw err
       } finally {
         this.registerState.loading = false
       }
@@ -35,6 +36,7 @@ export const useAuthStore = defineStore('auth', {
         await this.userStore.getMyProfile()
       } catch (err: any) {
         this.loginState.error = err?.response?.data?.error || 'Login failed'
+        throw err
       } finally {
         this.loginState.loading = false
       }
@@ -48,6 +50,7 @@ export const useAuthStore = defineStore('auth', {
         this.isAuthenticated = false
       } catch (err: any) {
         this.logoutState.error = err?.response?.data?.error || 'Logout failed'
+        throw err
       } finally {
         this.logoutState.loading = false
       }
