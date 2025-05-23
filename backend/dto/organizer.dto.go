@@ -16,3 +16,11 @@ type EventRegistrationsDTO struct {
 	Status       string `json:"status"`
 	RegisteredAt string `json:"registered_at"`
 }
+
+type EventFeedbackDTO struct {
+	Username   string `json:"username"`
+	EventTitle string `json:"event_title"`
+	Comment    string `json:"comment"`
+	Rating     int    `json:"rating"`
+	CreatedAt  string `json:"created_at"`
+}

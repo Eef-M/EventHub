@@ -85,3 +85,17 @@ func GetAllRegistrationsByOrganizerID(db *gorm.DB, organizerID uuid.UUID) ([]mod
 
 	return registrations, err
 }
+
+func GetAllFeedbackByOrganizerID(db *gorm.DB, organizerID uuid.UUID) ([]dto.EventFeedbackDTO, error) {
+	var feedbacks []dto.EventFeedbackDTO
+
+	err := db.Table("event_feedbacks").
+		Select("event_feedbacks.comment, event_feedbacks.rating, event_feedbacks.created_at, users.username, events.title AS event_title").
+		Joins("JOIN events ON event_feedbacks.event_id = events.id").
+		Joins("JOIN users ON event_feedbacks.user_id = users.id").
+		Where("events.organizer_id = ?", organizerID).
+		Order("event_feedbacks.created_at DESC").
+		Scan(&feedbacks).Error
+
+	return feedbacks, err
+}
