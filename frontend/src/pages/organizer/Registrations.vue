@@ -52,6 +52,6 @@ import { Badge } from '@/components/ui/badge';
 const organizerStore = useOrganizerStore()
 
 onMounted(() => {
-  organizerStore.getEventRegistrations()
+  organizerStore.getOrganizerEventRegistrations()
 })
 </script>

@@ -12,7 +12,7 @@ export interface DashboardStats {
   }[]
 }
 
-export interface EventRegistration {
+export interface OrganizerEventRegistration {
   id: string;
   username: string;
   email: string;
@@ -20,4 +20,12 @@ export interface EventRegistration {
   ticket_name: string;
   status: string;
   registered_at: string;
+}
+
+export interface OrganizerEventFeedback {
+  username: string;
+  event_title: string;
+  comment: string;
+  rating: number;
+  created_at: string;
 }
