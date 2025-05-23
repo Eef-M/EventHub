@@ -25,7 +25,7 @@ func OrganizerDashboard(c *gin.Context) {
 	totalEvents, totalRegistrations, registered, cancelledRegistrations, totalFeedbacks, err := repository.GetDashboardStatsByOrganizerID(initializers.DB, organizer.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to fetch stats. - " + err.Error(),
+			"error": "Failed to fetch stats. | " + err.Error(),
 		})
 		return
 	}
@@ -33,7 +33,7 @@ func OrganizerDashboard(c *gin.Context) {
 	recentRegistrations, err := repository.GetRecentRegistrationsByOrganizerID(initializers.DB, organizer.ID, 5)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to fetch recent registrations. - " + err.Error(),
+			"error": "Failed to fetch recent registrations. | " + err.Error(),
 		})
 		return
 	}
@@ -69,7 +69,7 @@ func GetMyEventsHandler(c *gin.Context) {
 	uid, err := uuid.Parse(userID.String())
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid user ID",
+			"error": "Invalid user ID. | " + err.Error(),
 		})
 		return
 	}
@@ -77,7 +77,7 @@ func GetMyEventsHandler(c *gin.Context) {
 	events, err := repository.GetEventsByOrganizerID(initializers.DB, uid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to get events",
+			"error": "Failed to get events. | " + err.Error(),
 		})
 		return
 	}
@@ -107,7 +107,7 @@ func GetAllRegistrationsHandler(c *gin.Context) {
 	uid, err := uuid.Parse(user.ID.String())
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid user ID",
+			"error": "Invalid user ID. | " + err.Error(),
 		})
 		return
 	}
@@ -115,7 +115,7 @@ func GetAllRegistrationsHandler(c *gin.Context) {
 	registrations, err := repository.GetAllRegistrationsByOrganizerID(initializers.DB, uid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to fetch registrations",
+			"error": "Failed to fetch registrations. | " + err.Error(),
 		})
 		return
 	}
@@ -135,5 +135,43 @@ func GetAllRegistrationsHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"data": result,
+	})
+}
+
+func GetAllFeedbackHandler(c *gin.Context) {
+	userInterface, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Unauthorized",
+		})
+		return
+	}
+
+	user, ok := userInterface.(models.User)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to cast user",
+		})
+		return
+	}
+
+	uid, err := uuid.Parse(user.ID.String())
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid user ID. | " + err.Error(),
+		})
+		return
+	}
+
+	feedbacks, err := repository.GetAllFeedbackByOrganizerID(initializers.DB, uid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to fetch feedbacks" + err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": feedbacks,
 	})
 }
