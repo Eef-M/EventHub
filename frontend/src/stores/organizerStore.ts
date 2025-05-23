@@ -1,14 +1,15 @@
 import { defineStore } from "pinia"
-import type { DashboardStats, EventRegistration } from "@/types/organizer"
+import type { DashboardStats, OrganizerEventFeedback, OrganizerEventRegistration } from "@/types/organizer"
 import type { Event } from "@/types/event"
-import { fetchDashboardStats, fetchEventRegistrations, fetchMyEvents } from "@/services/organizerService"
+import { fetchDashboardStats, fetchMyEvents, fetchOrganizerEventFeedback, fetchOrganizerEventRegistrations } from "@/services/organizerService"
 import { createAsyncState } from "@/utils/asyncState"
 
 export const useOrganizerStore = defineStore('organizer', {
   state: () => ({
     statsState: createAsyncState<DashboardStats | null>(null),
     eventsState: createAsyncState<Event[]>([]),
-    registrationsState: createAsyncState<EventRegistration[]>([])
+    registrationsState: createAsyncState<OrganizerEventRegistration[]>([]),
+    feedbackState: createAsyncState<OrganizerEventFeedback[]>([])
   }),
 
   actions: {
@@ -40,17 +41,31 @@ export const useOrganizerStore = defineStore('organizer', {
       }
     },
 
-    async getEventRegistrations() {
+    async getOrganizerEventRegistrations() {
       this.registrationsState.loading = true
       this.registrationsState.error = null
       try {
-        const data = await fetchEventRegistrations()
+        const data = await fetchOrganizerEventRegistrations()
         this.registrationsState.data = data
       } catch (err: any) {
         this.registrationsState.error = err?.response?.data?.error || 'Failed to get Event Registrations'
         throw err
       } finally {
         this.registrationsState.loading = false
+      }
+    },
+
+    async getOrganizerEventFeedback() {
+      this.feedbackState.loading = true
+      this.feedbackState.error = null
+      try {
+        const data = await fetchOrganizerEventFeedback()
+        this.feedbackState.data = data
+      } catch (err: any) {
+        this.feedbackState.error = err?.response?.data?.error || 'Failed to get Event Registrations'
+        throw err
+      } finally {
+        this.feedbackState.loading = false
       }
     }
   }
