@@ -12,11 +12,12 @@
 </template>
 
 <script setup>
-import { Home, Calendar, Users, MessageSquare } from 'lucide-vue-next'
+import { Home, Calendar, Users, MessageSquare, Ticket } from 'lucide-vue-next'
 
 const menu = [
   { label: 'Dashboard', href: '/organizer/dashboard', icon: Home },
   { label: 'Manage Events', href: '/organizer/manage-events', icon: Calendar },
+  { label: 'Manage Tickets', href: '/organizer/manage-tickets', icon: Ticket },
   { label: 'Registrations', href: '/organizer/registrations', icon: Users },
   { label: 'Feedback', href: '/organizer/feedback', icon: MessageSquare },
 ]

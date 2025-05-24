@@ -13,6 +13,7 @@ import { useAuthStore } from "../stores/authStroe";
 import { useUserStore } from "../stores/userStore";
 import NotFound from "../pages/error/NotFound.vue";
 import Forbidden from "../pages/error/Forbidden.vue";
+import Ticket from "@/pages/organizer/Ticket.vue";
 
 const routes = [
   {
@@ -52,6 +53,14 @@ const routes = [
   {
     path: '/organizer/manage-events',
     component: ManageEvents,
+    meta: {
+      requiresAuth: true,
+      requiresOrganizer: true
+    }
+  },
+  {
+    path: '/organizer/manage-tickets',
+    component: Ticket,
     meta: {
       requiresAuth: true,
       requiresOrganizer: true
