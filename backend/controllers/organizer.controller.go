@@ -175,3 +175,41 @@ func GetAllFeedbackHandler(c *gin.Context) {
 		"data": feedbacks,
 	})
 }
+
+func GetAllTicketsHandler(c *gin.Context) {
+	userInterface, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Unauthorized",
+		})
+		return
+	}
+
+	user, ok := userInterface.(models.User)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to cast user",
+		})
+		return
+	}
+
+	uid, err := uuid.Parse(user.ID.String())
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid user ID. | " + err.Error(),
+		})
+		return
+	}
+
+	tickets, err := repository.GetAllTicketsByOrganizerID(initializers.DB, uid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to fetch tickets. | " + err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": tickets,
+	})
+}
