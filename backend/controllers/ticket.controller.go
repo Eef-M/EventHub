@@ -56,6 +56,30 @@ func CreateTicket(c *gin.Context) {
 		return
 	}
 
+	userInterface, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Unauthorized",
+		})
+		return
+	}
+
+	user := userInterface.(models.User)
+
+	var event models.Event
+	if err := initializers.DB.First(&event, "id = ?", eventID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Event not found",
+		})
+		return
+	}
+	if event.OrganizerID != user.ID {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error": "You do not own this event",
+		})
+		return
+	}
+
 	name, ok := utils.RequireStringField(c, "name")
 	if !ok {
 		return
@@ -113,6 +137,30 @@ func UpdateTicket(c *gin.Context) {
 		return
 	}
 
+	userInterface, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Unauthorized",
+		})
+		return
+	}
+
+	user := userInterface.(models.User)
+
+	var event models.Event
+	if err := initializers.DB.First(&event, "id = ?", ticket.EventID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Event not found",
+		})
+		return
+	}
+	if event.OrganizerID != user.ID {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error": "You do not own this ticket's event",
+		})
+		return
+	}
+
 	name, ok := utils.RequireStringField(c, "name")
 	if !ok {
 		return
@@ -161,6 +209,30 @@ func DeleteTicket(c *gin.Context) {
 	if err := initializers.DB.First(&ticket, "id = ?", id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": "Record not found",
+		})
+		return
+	}
+
+	userInterface, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Unauthorized",
+		})
+		return
+	}
+
+	user := userInterface.(models.User)
+
+	var event models.Event
+	if err := initializers.DB.First(&event, "id = ?", ticket.EventID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Event not found",
+		})
+		return
+	}
+	if event.OrganizerID != user.ID {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error": "You do not own this ticket's event",
 		})
 		return
 	}
