@@ -29,3 +29,11 @@ export interface OrganizerEventFeedback {
   rating: number;
   created_at: string;
 }
+
+export interface OrganizerTicket {
+  id: string;
+  name: string;
+  price: number;
+  quota: number;
+  event_title: string;
+}
