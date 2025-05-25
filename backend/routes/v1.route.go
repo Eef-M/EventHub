@@ -49,9 +49,9 @@ func InitRoute(app *gin.Engine) {
 	{
 		ticket.GET("", middleware.RequireAuth, controllers.GetTickets)
 		ticket.GET("/:id", middleware.RequireAuth, controllers.GetTicket)
-		ticket.POST("", middleware.RequireAuth, controllers.CreateTicket)
-		ticket.PUT("/:id", middleware.RequireAuth, controllers.UpdateTicket)
-		ticket.DELETE("/:id", middleware.RequireAuth, controllers.DeleteTicket)
+		ticket.POST("", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.CreateTicket)
+		ticket.PUT("/:id", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.UpdateTicket)
+		ticket.DELETE("/:id", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.DeleteTicket)
 	}
 
 	// Organizer Group
