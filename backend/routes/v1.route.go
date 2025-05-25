@@ -59,6 +59,7 @@ func InitRoute(app *gin.Engine) {
 	{
 		organizer.GET("/dashboard", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.OrganizerDashboard)
 		organizer.GET("/events", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.GetMyEventsHandler)
+		organizer.GET("/tickets", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.GetAllTicketsHandler)
 		organizer.GET("/registrations", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.GetAllRegistrationsHandler)
 		organizer.GET("/feedbacks", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.GetAllFeedbackHandler)
 	}
