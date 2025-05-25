@@ -21,11 +21,16 @@
               </TableRow>
             </TableHeader>
             <TableBody>
+              <TableRow v-if="!tickets.length && !tickets">
+                <TableCell :colspan="5" class="text-center text-muted-foreground">
+                  No tickets found
+                </TableCell>
+              </TableRow>
               <TableRow v-for="ticket in tickets" :key="ticket.id" class="hover:bg-muted transition">
                 <TableCell>{{ ticket.name }}</TableCell>
                 <TableCell>$ {{ ticket.price.toLocaleString() }}</TableCell>
                 <TableCell>{{ ticket.quota }}</TableCell>
-                <TableCell>{{ ticket.eventTitle }}</TableCell>
+                <TableCell>{{ ticket.event_title }}</TableCell>
                 <TableCell class="text-right space-x-2">
                   <Button size="icon" class="bg-slate-600 hover:bg-slate-700 cursor-pointer"
                     @click="openEditModal(ticket)">
@@ -67,7 +72,7 @@
             </div>
             <div>
               <Label for="event">Event Title</Label>
-              <Select v-model="form.eventTitle">
+              <Select v-model="form.event_title">
                 <SelectTrigger id="event" class="w-full">
                   <SelectValue placeholder="Select an event" />
                 </SelectTrigger>
@@ -112,7 +117,7 @@
 
 <script setup lang="ts">
 import OrganizerLayout from "@/layouts/OrganizerLayout.vue";
-import { ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import {
   Card,
   CardContent,
@@ -145,17 +150,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Pencil, Plus, Trash } from "lucide-vue-next";
 import { toast } from "vue-sonner";
+import { useOrganizerStore } from "@/stores/organizerStore";
 
-// Dummy ticket data
-const tickets = ref([
-  { id: "1", name: "Early Bird", price: 150, quota: 50, eventTitle: "Tech Summit" },
-  { id: "2", name: "VIP", price: 300, quota: 30, eventTitle: "Startup Expo" },
-]);
+const organizerStore = useOrganizerStore()
+const tickets = computed(() => organizerStore.ticketsState.data)
+const events = computed(() => organizerStore.eventsState.data)
 
-const events = ref([
-  { id: "1", title: "Tech Expo 2025" },
-  { id: "2", title: "Startup Fest" },
-]);
+onMounted(() => {
+  organizerStore.getOrganizerTickets()
+  organizerStore.getMyEvents()
+})
 
 const showFormModal = ref(false);
 const showDeleteModal = ref(false);
@@ -167,12 +171,12 @@ const form = ref({
   name: "",
   price: 0,
   quota: 0,
-  eventTitle: "",
+  event_title: "",
 });
 
 function openCreateModal() {
   isEditing.value = false;
-  form.value = { id: "", name: "", price: 0, quota: 0, eventTitle: "" };
+  form.value = { id: "", name: "", price: 0, quota: 0, event_title: "" };
   showFormModal.value = true;
 }
 

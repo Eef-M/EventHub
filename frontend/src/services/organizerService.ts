@@ -1,5 +1,5 @@
 import type { Event } from "@/types/event"
-import type { DashboardStats, OrganizerEventFeedback, OrganizerEventRegistration } from "@/types/organizer"
+import type { DashboardStats, OrganizerEventFeedback, OrganizerEventRegistration, OrganizerTicket } from "@/types/organizer"
 import axios from "axios"
 
 const API_BASE_URL = 'http://localhost:8000/api/v1'
@@ -21,5 +21,10 @@ export async function fetchOrganizerEventRegistrations(): Promise<OrganizerEvent
 
 export async function fetchOrganizerEventFeedback(): Promise<OrganizerEventFeedback[]> {
   const response = await axios.get(`${API_BASE_URL}/organizer/feedbacks`, { withCredentials: true })
+  return response.data.data
+}
+
+export async function fetchOrganizerTickets(): Promise<OrganizerTicket[]> {
+  const response = await axios.get(`${API_BASE_URL}/organizer/tickets`, { withCredentials: true })
   return response.data.data
 }

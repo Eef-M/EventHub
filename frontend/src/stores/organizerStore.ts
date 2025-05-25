@@ -1,13 +1,14 @@
 import { defineStore } from "pinia"
-import type { DashboardStats, OrganizerEventFeedback, OrganizerEventRegistration } from "@/types/organizer"
+import type { DashboardStats, OrganizerEventFeedback, OrganizerEventRegistration, OrganizerTicket } from "@/types/organizer"
 import type { Event } from "@/types/event"
-import { fetchDashboardStats, fetchMyEvents, fetchOrganizerEventFeedback, fetchOrganizerEventRegistrations } from "@/services/organizerService"
+import { fetchDashboardStats, fetchMyEvents, fetchOrganizerEventFeedback, fetchOrganizerEventRegistrations, fetchOrganizerTickets } from "@/services/organizerService"
 import { createAsyncState } from "@/utils/asyncState"
 
 export const useOrganizerStore = defineStore('organizer', {
   state: () => ({
     statsState: createAsyncState<DashboardStats | null>(null),
     eventsState: createAsyncState<Event[]>([]),
+    ticketsState: createAsyncState<OrganizerTicket[]>([]),
     registrationsState: createAsyncState<OrganizerEventRegistration[]>([]),
     feedbackState: createAsyncState<OrganizerEventFeedback[]>([])
   }),
@@ -66,6 +67,20 @@ export const useOrganizerStore = defineStore('organizer', {
         throw err
       } finally {
         this.feedbackState.loading = false
+      }
+    },
+
+    async getOrganizerTickets() {
+      this.ticketsState.loading = true
+      this.ticketsState.error = null
+      try {
+        const data = await fetchOrganizerTickets()
+        this.ticketsState.data = data
+      } catch (err: any) {
+        this.ticketsState.error = err?.response?.data?.error || 'Failed to get Tickets'
+        throw err
+      } finally {
+        this.ticketsState.loading = false
       }
     }
   }
