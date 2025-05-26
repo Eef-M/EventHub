@@ -1,4 +1,4 @@
-import { fetchCreateTicket, fetchUpdateTicket } from "@/services/ticketService";
+import { fetchCreateTicket, fetchDeleteTicket, fetchUpdateTicket } from "@/services/ticketService";
 import { createAsyncState } from "@/utils/asyncState";
 import { defineStore } from "pinia";
 
@@ -6,6 +6,7 @@ export const useTicketStore = defineStore('ticket', {
   state: () => ({
     createState: createAsyncState(null),
     updateState: createAsyncState(null),
+    deleteState: createAsyncState(null),
   }),
 
   actions: {
@@ -34,5 +35,18 @@ export const useTicketStore = defineStore('ticket', {
         this.updateState.loading = false
       }
     },
+
+    async deleteTicket(id: string) {
+      this.deleteState.loading = true
+      this.deleteState.error = null
+      try {
+        await fetchDeleteTicket(id)
+      } catch (err: any) {
+        this.deleteState.error = err?.response?.data?.error || 'Failed to delete ticket'
+        throw err
+      } finally {
+        this.deleteState.loading = false
+      }
+    }
   }
 })

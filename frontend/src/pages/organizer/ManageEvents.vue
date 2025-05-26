@@ -328,9 +328,9 @@ async function handleCreateEvent() {
     resetForm()
   } catch (err) {
     toast.error('Failed to create event', {
-      description: eventStore.createState.error || 'An unexpected error occurred.',
+      description: eventStore.createState.error || `An unexpected error occurred. ${err}`,
     })
-    console.error('Create Event Failed:', eventStore.createState.error)
+    console.error('Create Event Failed:', eventStore.createState.error, err)
   }
 }
 
@@ -368,9 +368,9 @@ async function handleUpdateEvent() {
     showEditModal.value = false
   } catch (err) {
     toast.error('Failed to update event', {
-      description: eventStore.updateState.error || 'An unexpected error occurred.',
+      description: eventStore.updateState.error || `An unexpected error occurred. ${err}`,
     })
-    console.error('Update Event Failed:', eventStore.updateState.error)
+    console.error('Update Event Failed:', eventStore.updateState.error, err)
   }
 }
 
@@ -389,9 +389,9 @@ async function confirmDeleteEvent() {
     eventToDelete.value = null
   } catch (err) {
     toast.error('Failed to delete event', {
-      description: eventStore.deleteState.error || 'An unexpected error occurred.',
+      description: eventStore.deleteState.error || `An unexpected error occurred. ${err}`,
     })
-    console.error('Delete Event Failed:', eventStore.deleteState.error)
+    console.error('Delete Event Failed:', eventStore.deleteState.error, err)
   }
 }
 </script>
