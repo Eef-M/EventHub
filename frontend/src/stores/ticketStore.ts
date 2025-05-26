@@ -1,10 +1,11 @@
-import { fetchCreateTicket } from "@/services/ticketService";
+import { fetchCreateTicket, fetchUpdateTicket } from "@/services/ticketService";
 import { createAsyncState } from "@/utils/asyncState";
 import { defineStore } from "pinia";
 
 export const useTicketStore = defineStore('ticket', {
   state: () => ({
     createState: createAsyncState(null),
+    updateState: createAsyncState(null),
   }),
 
   actions: {
@@ -19,6 +20,19 @@ export const useTicketStore = defineStore('ticket', {
       } finally {
         this.createState.loading = false
       }
-    }
+    },
+
+    async updateTicket(id: string, payload: FormData) {
+      this.updateState.loading = true
+      this.updateState.error = null
+      try {
+        await fetchUpdateTicket(id, payload)
+      } catch (err: any) {
+        this.updateState.error = err?.response?.data?.error || 'Failed to update ticket'
+        throw err
+      } finally {
+        this.updateState.loading = false
+      }
+    },
   }
 })

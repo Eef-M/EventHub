@@ -104,7 +104,7 @@ func GetAllTicketsByOrganizerID(db *gorm.DB, organizerID uuid.UUID) ([]dto.Ticke
 	var tickets []dto.TicketDTO
 
 	err := db.Table("tickets").
-		Select("tickets.id, tickets.name, tickets.price, tickets.quota, events.title AS event_title").
+		Select("tickets.id, tickets.name, tickets.price, tickets.description, tickets.quota, tickets.event_id, events.title AS event_title").
 		Joins("JOIN events ON tickets.event_id = events.id").
 		Where("events.organizer_id = ?", organizerID).
 		Order("tickets.created_at DESC").

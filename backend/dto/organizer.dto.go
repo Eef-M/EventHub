@@ -26,9 +26,11 @@ type EventFeedbackDTO struct {
 }
 
 type TicketDTO struct {
-	ID         string  `json:"id"`
-	Name       string  `json:"name"`
-	Price      float64 `json:"price"`
-	Quota      int     `json:"quota"`
-	EventTitle string  `json:"event_title"`
+	ID          string  `json:"id"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Price       float64 `json:"price"`
+	Quota       int     `json:"quota"`
+	EventID     string  `json:"event_id"`
+	EventTitle  string  `json:"event_title"`
 }
