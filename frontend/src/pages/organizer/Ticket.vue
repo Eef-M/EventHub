@@ -110,7 +110,7 @@
           </DialogHeader>
           <DialogFooter>
             <Button class="cursor-pointer" variant="outline" @click="showDeleteModal = false">Cancel</Button>
-            <Button class="bg-red-600 hover:bg-red-700 cursor-pointer" @click="deleteTicket">Delete</Button>
+            <Button class="bg-red-600 hover:bg-red-700 cursor-pointer" @click="confirmDelteTicket">Delete</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -235,10 +235,25 @@ function openDeleteModal(ticket: any) {
   showDeleteModal.value = true;
 }
 
-function deleteTicket() {
-  toast.success('Ticket deleted successfully', {
-    description: new Date().toLocaleString(),
-  })
-  showDeleteModal.value = false;
+async function confirmDelteTicket() {
+  try {
+    if (!selectedTicket.value) return;
+
+    await ticketStore.deleteTicket(selectedTicket.value.id)
+
+    await organizerStore.getOrganizerTickets()
+
+    toast.success('Ticket deleted successfully', {
+      description: new Date().toLocaleString(),
+    })
+    showDeleteModal.value = false;
+    selectedTicket.value = null;
+  } catch (err) {
+    toast.error('Failed to delete ticket', {
+      description: ticketStore.deleteState.error || `An unexpected error occurred. ${err}`,
+    })
+    console.error('Delete Ticket Failed: ', ticketStore.deleteState.error, err)
+  }
 }
+
 </script>

@@ -18,3 +18,7 @@ export async function fetchUpdateTicket(id: string, payload: FormData): Promise<
   })
   return response.data.data
 }
+
+export async function fetchDeleteTicket(id: string): Promise<void> {
+  await axios.delete(`${API_BASE_URL}/tickets/${id}`, { withCredentials: true })
+}
