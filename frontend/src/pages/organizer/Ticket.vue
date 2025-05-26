@@ -23,7 +23,7 @@
             <TableBody>
               <TableRow v-if="!tickets.length && !tickets">
                 <TableCell :colspan="5" class="text-center text-muted-foreground">
-                  No tickets found
+                  No tickets available
                 </TableCell>
               </TableRow>
               <TableRow v-for="ticket in tickets" :key="ticket.id" class="hover:bg-muted transition">
@@ -57,27 +57,31 @@
           <DialogHeader>
             <DialogTitle>{{ isEditing ? "Edit Ticket" : "Add Ticket" }}</DialogTitle>
           </DialogHeader>
-          <div class="space-y-4">
-            <div>
+          <div class="grid gap-4 py-4">
+            <div class="grid gap-2">
               <Label for="name">Ticket Name</Label>
               <Input v-model="form.name" id="name" placeholder="e.g. VIP" />
             </div>
-            <div>
+            <div class="grid gap-2">
+              <Label for="description">Description</Label>
+              <Input v-model="form.description" id="description" placeholder="desc..." />
+            </div>
+            <div class="grid gap-2">
               <Label for="price">Price</Label>
               <Input v-model.number="form.price" id="price" type="number" />
             </div>
-            <div>
+            <div class="grid gap-2">
               <Label for="quota">Quota</Label>
               <Input v-model.number="form.quota" id="quota" type="number" />
             </div>
-            <div>
-              <Label for="event">Event Title</Label>
-              <Select v-model="form.event_title">
+            <div class="grid gap-2">
+              <Label for="event">Event</Label>
+              <Select v-model="form.event_id">
                 <SelectTrigger id="event" class="w-full">
                   <SelectValue placeholder="Select an event" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem v-for="event in events" :key="event.id" :value="event.title">
+                  <SelectItem v-for="event in events" :key="event.id" :value="event.id">
                     {{ event.title }}
                   </SelectItem>
                 </SelectContent>
@@ -89,7 +93,7 @@
             <Button variant="outline" @click="showFormModal = false" class="cursor-pointer">Cancel</Button>
             <Button
               :class="isEditing ? 'bg-slate-600 hover:bg-slate-700 cursor-pointer' : 'bg-purple-600 hover:bg-purple-700 cursor-pointer'"
-              @click="saveTicket">
+              @click="handleSubmitTicket">
               {{ isEditing ? "Update" : "Create" }}
             </Button>
           </DialogFooter>
@@ -117,7 +121,7 @@
 
 <script setup lang="ts">
 import OrganizerLayout from "@/layouts/OrganizerLayout.vue";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import {
   Card,
   CardContent,
@@ -151,8 +155,10 @@ import { Label } from "@/components/ui/label";
 import { Pencil, Plus, Trash } from "lucide-vue-next";
 import { toast } from "vue-sonner";
 import { useOrganizerStore } from "@/stores/organizerStore";
+import { useTicketStore } from "@/stores/ticketStore";
 
 const organizerStore = useOrganizerStore()
+const ticketStore = useTicketStore()
 const tickets = computed(() => organizerStore.ticketsState.data)
 const events = computed(() => organizerStore.eventsState.data)
 
@@ -166,37 +172,64 @@ const showDeleteModal = ref(false);
 const isEditing = ref(false);
 const selectedTicket = ref<any | null>(null);
 
-const form = ref({
-  id: "",
+const defaultForm = {
+  event_id: "",
   name: "",
+  description: "",
   price: 0,
   quota: 0,
-  event_title: "",
-});
+};
+
+const form = reactive({ ...defaultForm });
 
 function openCreateModal() {
   isEditing.value = false;
-  form.value = { id: "", name: "", price: 0, quota: 0, event_title: "" };
+  Object.assign(form, defaultForm);
   showFormModal.value = true;
 }
 
 function openEditModal(ticket: any) {
   isEditing.value = true;
-  form.value = { ...ticket };
+  Object.assign(form, {
+    event_id: ticket.event_id,
+    name: ticket.name,
+    description: ticket.description,
+    price: ticket.price,
+    quota: ticket.quota,
+  });
+  selectedTicket.value = ticket;
   showFormModal.value = true;
 }
 
-function saveTicket() {
-  if (isEditing.value) {
-    toast.success('Ticket updated successfully', {
-      description: new Date().toLocaleString(),
-    })
-  } else {
+async function handleSubmitTicket() {
+  try {
+    if (isEditing.value) {
+      // for update
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("event_id", form.event_id);
+    formData.append("name", form.name);
+    formData.append("description", form.description);
+    formData.append("price", form.price.toString());
+    formData.append("quota", form.quota.toString());
+
+    await ticketStore.createTicket(formData)
+
+    await organizerStore.getOrganizerTickets()
+
     toast.success('Ticket created successfully', {
       description: new Date().toLocaleString(),
     })
+    showFormModal.value = false;
+    Object.assign(form, defaultForm);
+  } catch (err) {
+    toast.error('Failed to create ticket', {
+      description: ticketStore.createState.error || 'An unexpected error occurred.',
+    })
+    console.error("Failed to create ticket", err);
   }
-  showFormModal.value = false;
 }
 
 function openDeleteModal(ticket: any) {
