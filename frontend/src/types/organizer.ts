@@ -33,7 +33,9 @@ export interface OrganizerEventFeedback {
 export interface OrganizerTicket {
   id: string;
   name: string;
+  description: string;
   price: number;
   quota: number;
+  event_id: string;
   event_title: string;
 }

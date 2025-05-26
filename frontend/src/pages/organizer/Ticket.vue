@@ -87,7 +87,6 @@
                 </SelectContent>
               </Select>
             </div>
-
           </div>
           <DialogFooter>
             <Button variant="outline" @click="showFormModal = false" class="cursor-pointer">Cancel</Button>
@@ -203,11 +202,6 @@ function openEditModal(ticket: any) {
 
 async function handleSubmitTicket() {
   try {
-    if (isEditing.value) {
-      // for update
-      return;
-    }
-
     const formData = new FormData();
     formData.append("event_id", form.event_id);
     formData.append("name", form.name);
@@ -215,20 +209,24 @@ async function handleSubmitTicket() {
     formData.append("price", form.price.toString());
     formData.append("quota", form.quota.toString());
 
-    await ticketStore.createTicket(formData)
+    if (isEditing.value && selectedTicket.value) {
+      await ticketStore.updateTicket(selectedTicket.value.id, formData)
+    } else {
+      await ticketStore.createTicket(formData)
+    }
 
     await organizerStore.getOrganizerTickets()
 
-    toast.success('Ticket created successfully', {
+    toast.success(`Ticket ${isEditing.value ? 'updated' : 'created'} successfuly`, {
       description: new Date().toLocaleString(),
     })
     showFormModal.value = false;
     Object.assign(form, defaultForm);
   } catch (err) {
-    toast.error('Failed to create ticket', {
-      description: ticketStore.createState.error || 'An unexpected error occurred.',
+    toast.error(`Failed to ${isEditing.value ? 'update' : 'create'} ticket`, {
+      description: `An unexpected error occurred. ${isEditing.value ? ticketStore.updateState.error : ticketStore.createState.error}`,
     })
-    console.error("Failed to create ticket", err);
+    console.error(`Failed to ${isEditing.value ? 'update' : 'create'} ticket`, err);
   }
 }
 
