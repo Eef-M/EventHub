@@ -47,10 +47,6 @@
         </CardContent>
       </Card>
 
-      <div v-if="tickets.length === 0" class="text-gray-500">
-        No tickets available.
-      </div>
-
       <!-- Modal: Create/Edit -->
       <Dialog :open="showFormModal" @update:open="showFormModal = $event">
         <DialogContent class="sm:max-w-md">
@@ -90,7 +86,7 @@
           </div>
           <DialogFooter>
             <Button variant="outline" @click="showFormModal = false" class="cursor-pointer">Cancel</Button>
-            <Button
+            <Button :disabled="isEditing ? ticketStore.updateState.loading : ticketStore.createState.loading"
               :class="isEditing ? 'bg-slate-600 hover:bg-slate-700 cursor-pointer' : 'bg-purple-600 hover:bg-purple-700 cursor-pointer'"
               @click="handleSubmitTicket">
               {{ isEditing ? "Update" : "Create" }}
@@ -105,7 +101,7 @@
           <DialogHeader>
             <DialogTitle>Delete Ticket</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete <strong>{{ selectedTicket?.name }}</strong>?
+              Are you sure you want to delete <strong>{{ selectedTicket?.name }}</strong>? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -200,6 +196,11 @@ function openEditModal(ticket: any) {
   showFormModal.value = true;
 }
 
+function openDeleteModal(ticket: any) {
+  selectedTicket.value = ticket;
+  showDeleteModal.value = true;
+}
+
 async function handleSubmitTicket() {
   try {
     const formData = new FormData();
@@ -228,11 +229,6 @@ async function handleSubmitTicket() {
     })
     console.error(`Failed to ${isEditing.value ? 'update' : 'create'} ticket`, err);
   }
-}
-
-function openDeleteModal(ticket: any) {
-  selectedTicket.value = ticket;
-  showDeleteModal.value = true;
 }
 
 async function confirmDelteTicket() {
