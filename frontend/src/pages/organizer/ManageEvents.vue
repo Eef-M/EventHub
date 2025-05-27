@@ -2,11 +2,12 @@
   <OrganizerLayout>
     <div class="flex items-center justify-between mb-4">
       <h1 class="text-2xl font-semibold">Manage Events</h1>
-      <Button class="bg-purple-600 hover:bg-purple-700 cursor-pointer" @click="showAddModal = true">
+      <Button class="bg-purple-600 hover:bg-purple-700 cursor-pointer" @click="openCreateModal">
         <Plus class="w-4 h-4 mr-2" /> Create Event
       </Button>
     </div>
 
+    <!-- Events data table -->
     <Card>
       <CardContent class="py-2 px-4">
         <Table>
@@ -24,7 +25,7 @@
           <TableBody>
             <TableRow v-if="!organizerStore.eventsState.data.length">
               <TableCell :colspan="7" class="text-center text-muted-foreground">
-                No events found
+                No events available
               </TableCell>
             </TableRow>
             <TableRow v-for="event in organizerStore.eventsState.data" :key="event.id">
@@ -42,8 +43,7 @@
                   @click="openEditModal(event)">
                   <Pencil class="w-4 h-4" />
                 </Button>
-                <Button size="icon" class="bg-red-600 hover:bg-red-700 cursor-pointer"
-                  @click="openDeleteModal(event.id)">
+                <Button size="icon" class="bg-red-600 hover:bg-red-700 cursor-pointer" @click="openDeleteModal(event)">
                   <Trash class="w-4 h-4" />
                 </Button>
               </TableCell>
@@ -53,151 +53,93 @@
       </CardContent>
     </Card>
 
-    <!-- Add Event Modal -->
-    <Dialog v-model:open="showAddModal">
+    <!-- Modal: Create/Edit -->
+    <Dialog :open="showFormModal" @update:open="showFormModal = $event">
       <DialogContent class="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Create Event</DialogTitle>
+          <DialogTitle>{{ isEditing ? "Edit Event" : "Create Event" }}</DialogTitle>
         </DialogHeader>
-
         <div class="grid gap-4 py-4">
           <div class="grid gap-2">
             <Label for="title">Title</Label>
             <Input id="title" v-model="form.title" placeholder="Event title" />
           </div>
-
           <div class="grid gap-2">
             <Label for="description">Description</Label>
             <Textarea id="description" v-model="form.description" placeholder="Event description" />
           </div>
-
           <div class="grid gap-2">
             <Label for="location">Location</Label>
             <Input id="location" v-model="form.location" placeholder="Location" />
           </div>
-
           <div class="grid gap-2">
             <Label for="category">Category</Label>
             <Input id="category" v-model="form.category" placeholder="Category" />
           </div>
-
           <div class="grid gap-2 md:grid-cols-2 md:grid">
             <div class="grid gap-2">
               <Label for="date">Date</Label>
               <Input id="date" type="date" v-model="form.date" />
             </div>
-
             <div class="grid gap-2">
               <Label for="time">Time</Label>
               <Input id="time" type="time" v-model="form.time" />
             </div>
           </div>
-
           <div class="grid gap-2">
             <Label for="banner">Image</Label>
-            <Input id="banner" type="file" accept="image/*"
-              @change="(e: any) => form.banner_image = e.target.files[0]" />
-            <div v-if="form.banner_image" class="mt-2">
-              <p class="text-sm text-muted-foreground mb-1">New preview:</p>
-              <img v-if="imagePreviewUrl" :src="imagePreviewUrl" alt="New Banner Preview"
-                class="rounded-md border max-w-24 object-cover max-h-24" />
+            <div v-if="isEditing">
+              <Input id="banner" type="file" accept="image/*" @change="handleBannerChange" />
+              <div class="flex gap-6 mt-2 items-start">
+                <div v-if="selectedEvent?.banner_url" class="flex flex-col items-center gap-1">
+                  <p class="text-sm text-muted-foreground">Current image:</p>
+                  <img :src="selectedEvent.banner_url" alt="Current Banner"
+                    class="rounded-md border w-24 h-24 object-cover" />
+                </div>
+                <div v-if="form.banner_image" class="flex flex-col items-center gap-1">
+                  <p class="text-sm text-muted-foreground">New preview:</p>
+                  <img v-if="imagePreviewUrl" :src="imagePreviewUrl" alt="New Banner Preview"
+                    class="rounded-md border w-24 h-24 object-cover" />
+                </div>
+              </div>
+            </div>
+            <div v-else>
+              <Input id="banner" type="file" accept="image/*"
+                @change="(e: any) => form.banner_image = e.target.files[0]" />
+              <div v-if="form.banner_image" class="mt-2">
+                <p class="text-sm text-muted-foreground mb-1">New preview:</p>
+                <img v-if="imagePreviewUrl" :src="imagePreviewUrl" alt="New Banner Preview"
+                  class="rounded-md border max-w-24 object-cover max-h-24" />
+              </div>
             </div>
           </div>
         </div>
-
         <DialogFooter>
-          <Button variant="outline" @click="showAddModal = false" class="cursor-pointer">Cancel</Button>
-          <Button :disabled="eventStore.createState.loading" @click="handleCreateEvent"
-            class="bg-purple-600 hover:bg-purple-700 cursor-pointer">
-            Create Event
+          <Button variant="outline" @click="showFormModal = false" class="cursor-pointer">Cancel</Button>
+          <Button :disabled="isEditing ? eventStore.updateState.loading : eventStore.createState.loading"
+            @click="handleSubmitEvent"
+            :class="isEditing ? 'bg-slate-600 hover:bg-slate-700 cursor-pointer' : 'bg-purple-600 hover:bg-purple-700 cursor-pointer'">
+            {{ isEditing ? "Update" : "Create" }}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
 
-    <!-- Edit Event Modal -->
-    <Dialog v-model:open="showEditModal">
-      <DialogContent class="sm:max-w-lg">
+    <!-- Modal: Confirm Delete -->
+    <Dialog :open="showDeleteModal" @update:open="showDeleteModal = $event">
+      <DialogContent class="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>Edit Event</DialogTitle>
+          <DialogTitle>Delete Ticket</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to delete <strong>{{ selectedEvent?.title }}</strong>? This action cannot be undone.
+          </DialogDescription>
         </DialogHeader>
-
-        <div class="grid gap-4 py-4">
-          <div class="grid gap-2">
-            <Label for="title">Title</Label>
-            <Input id="title" v-model="form.title" placeholder="Event title" />
-          </div>
-
-          <div class="grid gap-2">
-            <Label for="description">Description</Label>
-            <Textarea id="description" v-model="form.description" placeholder="Event description" />
-          </div>
-
-          <div class="grid gap-2">
-            <Label for="location">Location</Label>
-            <Input id="location" v-model="form.location" placeholder="Location" />
-          </div>
-
-          <div class="grid gap-2">
-            <Label for="category">Category</Label>
-            <Input id="category" v-model="form.category" placeholder="Category" />
-          </div>
-
-          <div class="grid gap-2 md:grid-cols-2 md:grid">
-            <div class="grid gap-2">
-              <Label for="date">Date</Label>
-              <Input id="date" type="date" v-model="form.date" />
-            </div>
-
-            <div class="grid gap-2">
-              <Label for="time">Time</Label>
-              <Input id="time" type="time" v-model="form.time" />
-            </div>
-          </div>
-
-          <div class="grid gap-2">
-            <Label for="banner">Image</Label>
-            <Input id="banner" type="file" accept="image/*" @change="handleBannerChange" />
-            <div class="flex gap-6 mt-2 items-start">
-              <div v-if="selectedEvent?.banner_url" class="flex flex-col items-center gap-1">
-                <p class="text-sm text-muted-foreground">Current image:</p>
-                <img :src="selectedEvent.banner_url" alt="Current Banner"
-                  class="rounded-md border w-24 h-24 object-cover" />
-              </div>
-              <div v-if="form.banner_image" class="flex flex-col items-center gap-1">
-                <p class="text-sm text-muted-foreground">New preview:</p>
-                <img v-if="imagePreviewUrl" :src="imagePreviewUrl" alt="New Banner Preview"
-                  class="rounded-md border w-24 h-24 object-cover" />
-              </div>
-            </div>
-          </div>
-        </div>
-
         <DialogFooter>
-          <Button variant="outline" @click="showEditModal = false">Cancel</Button>
-          <Button :disabled="eventStore.updateState.loading" @click="handleUpdateEvent"
-            class="bg-slate-600 hover:bg-slate-700 cursor-pointer">Update</Button>
+          <Button class="cursor-pointer" variant="outline" @click="showDeleteModal = false">Cancel</Button>
+          <Button class="bg-red-600 hover:bg-red-700 cursor-pointer" @click="confirmDeleteEvent">Delete</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-
-
-    <!-- Delete Confirm Modal -->
-    <AlertDialog v-model:open="showDeleteModal">
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Confirm Delete</AlertDialogTitle>
-          <AlertDialogDescription>
-            Are you sure you want to delete this event? This action cannot be undone.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel @click="showDeleteModal = false" class="cursor-pointer">Cancel</AlertDialogCancel>
-          <AlertDialogAction @click="confirmDeleteEvent" class="bg-red-600 hover:bg-red-700 cursor-pointer">Delete
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
   </OrganizerLayout>
 </template>
 
@@ -214,18 +156,9 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter
+  DialogFooter,
+  DialogDescription
 } from '@/components/ui/dialog'
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction
-} from '@/components/ui/alert-dialog'
 import type { Event } from '@/types/event'
 import { useEventStore } from '@/stores/eventStore'
 import { Input } from '@/components/ui/input'
@@ -236,15 +169,109 @@ import { Label } from '@/components/ui/label'
 const organizerStore = useOrganizerStore()
 const eventStore = useEventStore()
 
-const showAddModal = ref(false)
-const showEditModal = ref(false)
+const showFormModal = ref(false)
 const showDeleteModal = ref(false)
+const isEditing = ref(false)
 const selectedEvent = ref<Event | null>(null)
-const eventToDelete = ref<string | null>(null)
 
 onMounted(() => {
   organizerStore.getMyEvents()
 })
+
+const defaultForm = {
+  title: '',
+  description: '',
+  location: '',
+  category: '',
+  date: '',
+  time: '',
+  banner_image: null as File | null,
+}
+
+const form = reactive({ ...defaultForm })
+
+function openCreateModal() {
+  isEditing.value = false;
+  Object.assign(form, defaultForm);
+  showFormModal.value = true;
+}
+
+function openEditModal(event: any) {
+  isEditing.value = true;
+  const isoDate = new Date(event.date)
+  const formattedDate = isoDate.toISOString().split('T')[0]
+  Object.assign(form, {
+    title: event.title,
+    description: event.description,
+    location: event.location,
+    category: event.category,
+    date: formattedDate,
+    time: formatTime(event.time),
+    banner_image: null
+  });
+  selectedEvent.value = event;
+  showFormModal.value = true;
+}
+
+function openDeleteModal(event: any) {
+  selectedEvent.value = event;
+  showDeleteModal.value = true;
+}
+
+async function handleSubmitEvent() {
+  try {
+    const formData = new FormData();
+    formData.append('title', form.title)
+    formData.append('description', form.description)
+    formData.append('location', form.location)
+    formData.append('category', form.category)
+    formData.append('date', form.date)
+    formData.append('time', form.time)
+    if (form.banner_image) {
+      formData.append('banner_image', form.banner_image)
+    }
+
+    if (isEditing.value && selectedEvent.value) {
+      await eventStore.updateEvent(selectedEvent.value.id, formData)
+    } else {
+      await eventStore.createEvent(formData)
+    }
+
+    await organizerStore.getMyEvents()
+
+    toast.success(`Event ${isEditing.value ? 'updated' : 'created'} successfuly`, {
+      description: new Date().toLocaleString(),
+    })
+    showFormModal.value = false;
+    Object.assign(form, defaultForm);
+  } catch (err) {
+    toast.error(`Failed to ${isEditing.value ? 'update' : 'create'} event`, {
+      description: `An unexpected error occurred. ${isEditing.value ? eventStore.updateState.error : eventStore.createState.error}`,
+    })
+    console.error(`Failed to ${isEditing.value ? 'update' : 'create'} event`, err);
+  }
+}
+
+async function confirmDeleteEvent() {
+  try {
+    if (!selectedEvent.value) return;
+
+    await eventStore.deleteEvent(selectedEvent.value.id);
+
+    await organizerStore.getMyEvents();
+
+    toast.success('Event deleted successfully', {
+      description: new Date().toLocaleString(),
+    })
+    showDeleteModal.value = false;
+    selectedEvent.value = null;
+  } catch (err) {
+    toast.error('Failed to delete event', {
+      description: eventStore.deleteState.error || `An unexpected error occurred. ${err}`,
+    })
+    console.error('Delete Event Failed: ', eventStore.deleteState.error, err)
+  }
+}
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('en-US', {
@@ -264,76 +291,6 @@ function formatTime(timeStr: string): string {
   })
 }
 
-function openEditModal(event: Event) {
-  selectedEvent.value = event
-  const isoDate = new Date(event.date)
-  const formattedDate = isoDate.toISOString().split('T')[0]
-
-  form.title = event.title
-  form.description = event.description
-  form.location = event.location
-  form.category = event.category
-  form.date = formattedDate
-  form.time = formatTime(event.time)
-  form.banner_image = null
-  showEditModal.value = true
-}
-
-function openDeleteModal(id: string) {
-  eventToDelete.value = id
-  showDeleteModal.value = true
-}
-
-const form = reactive({
-  title: '',
-  description: '',
-  location: '',
-  category: '',
-  date: '',
-  time: '',
-  banner_image: null as File | null,
-})
-
-function resetForm() {
-  form.title = ''
-  form.description = ''
-  form.location = ''
-  form.category = ''
-  form.date = ''
-  form.time = ''
-  form.banner_image = null
-}
-
-async function handleCreateEvent() {
-  try {
-    const payload = new FormData()
-    payload.append('title', form.title)
-    payload.append('description', form.description)
-    payload.append('location', form.location)
-    payload.append('category', form.category)
-    payload.append('date', form.date)
-    payload.append('time', form.time)
-    if (form.banner_image) {
-      payload.append('banner_image', form.banner_image)
-    }
-
-    await eventStore.createEvent(payload)
-
-    await organizerStore.getMyEvents()
-
-    toast.success('Event created successfully', {
-      description: new Date().toLocaleString(),
-    })
-    showAddModal.value = false
-    resetForm()
-  } catch (err) {
-    toast.error('Failed to create event', {
-      description: eventStore.createState.error || `An unexpected error occurred. ${err}`,
-    })
-    console.error('Create Event Failed:', eventStore.createState.error, err)
-  }
-}
-
 function handleBannerChange(e: Event & { target: HTMLInputElement }) {
   form.banner_image = e.target.files?.[0] || null
 }
@@ -341,57 +298,4 @@ function handleBannerChange(e: Event & { target: HTMLInputElement }) {
 const imagePreviewUrl = computed(() =>
   form.banner_image ? URL.createObjectURL(form.banner_image) : null
 )
-
-
-async function handleUpdateEvent() {
-  if (!selectedEvent.value) return
-
-  try {
-    const payload = new FormData()
-    payload.append('title', form.title)
-    payload.append('description', form.description)
-    payload.append('location', form.location)
-    payload.append('category', form.category)
-    payload.append('date', form.date)
-    payload.append('time', form.time)
-    if (form.banner_image) {
-      payload.append('banner_image', form.banner_image)
-    }
-
-    await eventStore.updateEvent(selectedEvent.value.id, payload)
-
-    await organizerStore.getMyEvents()
-
-    toast.success('Event updated successfully', {
-      description: new Date().toLocaleString(),
-    })
-    showEditModal.value = false
-  } catch (err) {
-    toast.error('Failed to update event', {
-      description: eventStore.updateState.error || `An unexpected error occurred. ${err}`,
-    })
-    console.error('Update Event Failed:', eventStore.updateState.error, err)
-  }
-}
-
-async function confirmDeleteEvent() {
-  if (!eventToDelete.value) return
-
-  try {
-    await eventStore.deleteEvent(eventToDelete.value)
-
-    await organizerStore.getMyEvents()
-
-    toast.success('Event deleted successfully', {
-      description: new Date().toLocaleString(),
-    })
-    showDeleteModal.value = false
-    eventToDelete.value = null
-  } catch (err) {
-    toast.error('Failed to delete event', {
-      description: eventStore.deleteState.error || `An unexpected error occurred. ${err}`,
-    })
-    console.error('Delete Event Failed:', eventStore.deleteState.error, err)
-  }
-}
 </script>
