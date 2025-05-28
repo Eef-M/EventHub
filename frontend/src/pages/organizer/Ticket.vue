@@ -8,207 +8,71 @@
         </Button>
       </div>
 
-      <Card>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Ticket Name</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Quota</TableHead>
-                <TableHead>Event</TableHead>
-                <TableHead class="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow v-if="!tickets.length && !tickets">
-                <TableCell :colspan="5" class="text-center text-muted-foreground">
-                  No tickets available
-                </TableCell>
-              </TableRow>
-              <TableRow v-for="ticket in tickets" :key="ticket.id" class="hover:bg-muted transition">
-                <TableCell>{{ ticket.name }}</TableCell>
-                <TableCell>$ {{ ticket.price.toLocaleString() }}</TableCell>
-                <TableCell>{{ ticket.quota }}</TableCell>
-                <TableCell>{{ ticket.event_title }}</TableCell>
-                <TableCell class="text-right space-x-2">
-                  <Button size="icon" class="bg-slate-600 hover:bg-slate-700 cursor-pointer"
-                    @click="openEditModal(ticket)">
-                    <Pencil class="w-4 h-4" />
-                  </Button>
-                  <Button size="icon" class="bg-red-600 hover:bg-red-700 cursor-pointer"
-                    @click="openDeleteModal(ticket)">
-                    <Trash class="w-4 h-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      <TicketsTable :tickets="organizerStore.ticketsState.data" @edit="openEditModal" @delete="openDeleteModal" />
 
-      <!-- Modal: Create/Edit -->
-      <Dialog :open="showFormModal" @update:open="showFormModal = $event">
-        <DialogContent class="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{{ isEditing ? "Edit Ticket" : "Add Ticket" }}</DialogTitle>
-          </DialogHeader>
-          <div class="grid gap-4 py-4">
-            <div class="grid gap-2">
-              <Label for="name">Ticket Name</Label>
-              <Input v-model="form.name" id="name" placeholder="e.g. VIP" />
-            </div>
-            <div class="grid gap-2">
-              <Label for="description">Description</Label>
-              <Input v-model="form.description" id="description" placeholder="desc..." />
-            </div>
-            <div class="grid gap-2">
-              <Label for="price">Price</Label>
-              <Input v-model.number="form.price" id="price" type="number" />
-            </div>
-            <div class="grid gap-2">
-              <Label for="quota">Quota</Label>
-              <Input v-model.number="form.quota" id="quota" type="number" />
-            </div>
-            <div class="grid gap-2">
-              <Label for="event">Event</Label>
-              <Select v-model="form.event_id">
-                <SelectTrigger id="event" class="w-full">
-                  <SelectValue placeholder="Select an event" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem v-for="event in events" :key="event.id" :value="event.id">
-                    {{ event.title }}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" @click="showFormModal = false" class="cursor-pointer">Cancel</Button>
-            <Button :disabled="isEditing ? ticketStore.updateState.loading : ticketStore.createState.loading"
-              :class="isEditing ? 'bg-slate-600 hover:bg-slate-700 cursor-pointer' : 'bg-purple-600 hover:bg-purple-700 cursor-pointer'"
-              @click="handleSubmitTicket">
-              {{ isEditing ? "Update" : "Create" }}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <TicketFormModal v-model:isOpen="showFormModal" :isEditing="isEditing" :ticketData="selectedTicket"
+        :events="organizerStore.eventsState.data"
+        :isLoading="isEditing ? ticketStore.updateState.loading : ticketStore.createState.loading"
+        @submit="handleSubmitTicket" @cancel="handleCancelForm" />
 
-      <!-- Modal: Confirm Delete -->
-      <Dialog :open="showDeleteModal" @update:open="showDeleteModal = $event">
-        <DialogContent class="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Delete Ticket</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete <strong>{{ selectedTicket?.name }}</strong>? This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button class="cursor-pointer" variant="outline" @click="showDeleteModal = false">Cancel</Button>
-            <Button class="bg-red-600 hover:bg-red-700 cursor-pointer" @click="confirmDelteTicket">Delete</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteConfirmModal v-model:isOpen="showDeleteModal" :ticketName="selectedTicket?.name"
+        :isLoading="ticketStore.deleteState.loading" @confirm="confirmDelteTicket" @cancel="handleCancelDelete" />
+
     </div>
   </OrganizerLayout>
 </template>
 
 <script setup lang="ts">
 import OrganizerLayout from "@/layouts/OrganizerLayout.vue";
-import { computed, onMounted, reactive, ref } from "vue";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Pencil, Plus, Trash } from "lucide-vue-next";
+import TicketsTable from "@/components/organizer/tickets/TicketsTable.vue";
+import TicketFormModal from "@/components/organizer/tickets/TicketFormModal.vue";
+import DeleteConfirmModal from "@/components/organizer/tickets/DeleteConfirmModal.vue";
+import { onMounted, ref } from "vue";
+import { Plus } from "lucide-vue-next";
 import { toast } from "vue-sonner";
 import { useOrganizerStore } from "@/stores/organizerStore";
 import { useTicketStore } from "@/stores/ticketStore";
+import type { TicketType } from "@/types/ticket";
+import { Button } from "@/components/ui/button";
 
 const organizerStore = useOrganizerStore()
 const ticketStore = useTicketStore()
-const tickets = computed(() => organizerStore.ticketsState.data)
-const events = computed(() => organizerStore.eventsState.data)
+
+const showFormModal = ref(false);
+const showDeleteModal = ref(false);
+const isEditing = ref(false);
+const selectedTicket = ref<TicketType | null>(null);
 
 onMounted(() => {
   organizerStore.getOrganizerTickets()
   organizerStore.getMyEvents()
 })
 
-const showFormModal = ref(false);
-const showDeleteModal = ref(false);
-const isEditing = ref(false);
-const selectedTicket = ref<any | null>(null);
-
-const defaultForm = {
-  event_id: "",
-  name: "",
-  description: "",
-  price: 0,
-  quota: 0,
-};
-
-const form = reactive({ ...defaultForm });
-
 function openCreateModal() {
   isEditing.value = false;
-  Object.assign(form, defaultForm);
+  selectedTicket.value = null
   showFormModal.value = true;
 }
 
-function openEditModal(ticket: any) {
+function openEditModal(ticket: TicketType) {
   isEditing.value = true;
-  Object.assign(form, {
-    event_id: ticket.event_id,
-    name: ticket.name,
-    description: ticket.description,
-    price: ticket.price,
-    quota: ticket.quota,
-  });
   selectedTicket.value = ticket;
   showFormModal.value = true;
 }
 
-function openDeleteModal(ticket: any) {
+function openDeleteModal(ticket: TicketType) {
   selectedTicket.value = ticket;
   showDeleteModal.value = true;
 }
 
-async function handleSubmitTicket() {
+async function handleSubmitTicket(formData: any) {
   try {
-    const formData = new FormData();
-    formData.append("event_id", form.event_id);
-    formData.append("name", form.name);
-    formData.append("description", form.description);
-    formData.append("price", form.price.toString());
-    formData.append("quota", form.quota.toString());
+    const formDataToSend = new FormData();
+    formDataToSend.append("event_id", formData.event_id);
+    formDataToSend.append("name", formData.name);
+    formDataToSend.append("description", formData.description);
+    formDataToSend.append("price", formData.price.toString());
+    formDataToSend.append("quota", formData.quota.toString());
 
     if (isEditing.value && selectedTicket.value) {
       await ticketStore.updateTicket(selectedTicket.value.id, formData)
@@ -222,7 +86,7 @@ async function handleSubmitTicket() {
       description: new Date().toLocaleString(),
     })
     showFormModal.value = false;
-    Object.assign(form, defaultForm);
+    selectedTicket.value = null
   } catch (err) {
     toast.error(`Failed to ${isEditing.value ? 'update' : 'create'} ticket`, {
       description: `An unexpected error occurred. ${isEditing.value ? ticketStore.updateState.error : ticketStore.createState.error}`,
@@ -236,12 +100,12 @@ async function confirmDelteTicket() {
     if (!selectedTicket.value) return;
 
     await ticketStore.deleteTicket(selectedTicket.value.id)
-
     await organizerStore.getOrganizerTickets()
 
     toast.success('Ticket deleted successfully', {
       description: new Date().toLocaleString(),
     })
+
     showDeleteModal.value = false;
     selectedTicket.value = null;
   } catch (err) {
@@ -252,4 +116,11 @@ async function confirmDelteTicket() {
   }
 }
 
+function handleCancelForm() {
+  selectedTicket.value = null
+}
+
+function handleCancelDelete() {
+  selectedTicket.value = null
+}
 </script>
