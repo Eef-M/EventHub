@@ -23,6 +23,7 @@ type User struct {
 	FirstName string    `gorm:"type:varchar(255);not null" json:"first_name"`
 	LastName  string    `gorm:"type:varchar(255);not null" json:"last_name"`
 	Role      Roles     `gorm:"type:user_role;default:'participant'" json:"role"`
+	AvatarURL string    `gorm:"type:text;not null" json:"avatar_url"`
 	CreatedAt time.Time `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAT time.Time `gorm:"autoUpdateTime" json:"updated_at"`
 }

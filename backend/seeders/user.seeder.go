@@ -1,6 +1,8 @@
 package seeders
 
 import (
+	"fmt"
+
 	"github.com/Eef-M/EventHub/backend/initializers"
 	"github.com/Eef-M/EventHub/backend/models"
 	"github.com/google/uuid"
@@ -63,6 +65,11 @@ func SeedUsers() []models.User {
 			panic("Failed to hash password: " + err.Error())
 		}
 
+		defaultAvatar := fmt.Sprintf(
+			"%s/uploads/avatars/default_avatar.png",
+			initializers.BaseURL,
+		)
+
 		user := models.User{
 			ID:        uuid.New(),
 			Username:  ru.Username,
@@ -71,6 +78,7 @@ func SeedUsers() []models.User {
 			Email:     ru.Email,
 			Password:  hashedPassword,
 			Role:      ru.Role,
+			AvatarURL: defaultAvatar,
 		}
 
 		initializers.DB.Create(&user)

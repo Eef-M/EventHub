@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -39,6 +40,10 @@ func Register(c *gin.Context) {
 		return
 	}
 
+	defaultAvatar := fmt.Sprintf(
+		"%s/uploads/avatars/default_avatar.png",
+		initializers.BaseURL,
+	)
 	user := models.User{
 		Username:  body.Username,
 		FirstName: body.FirstName,
@@ -46,6 +51,7 @@ func Register(c *gin.Context) {
 		Email:     body.Email,
 		Role:      models.Roles(body.Role),
 		Password:  string(hash),
+		AvatarURL: defaultAvatar,
 	}
 
 	result := initializers.DB.Create(&user)
