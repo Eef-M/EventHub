@@ -2,14 +2,24 @@ package controllers
 
 import (
 	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/Eef-M/EventHub/backend/initializers"
 	"github.com/Eef-M/EventHub/backend/models"
+	"github.com/Eef-M/EventHub/backend/utils"
 	"github.com/gin-gonic/gin"
 )
 
 func GetMyProfile(c *gin.Context) {
-	user, _ := c.Get("user")
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "User not found in context",
+		})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"data": user,
@@ -17,28 +27,58 @@ func GetMyProfile(c *gin.Context) {
 }
 
 func UpdateMyProfile(c *gin.Context) {
-	user, _ := c.Get("user")
-	currentUser := user.(models.User)
-
-	var body struct {
-		Username  string `json:"username"`
-		FirstName string `json:"first_name"`
-		LastName  string `json:"last_name"`
-		Email     string `json:"email"`
+	username, ok := utils.RequireStringField(c, "username")
+	if !ok {
+		return
 	}
 
-	if err := c.BindJSON(&body); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid request body",
+	firstName, ok := utils.RequireStringField(c, "first_name")
+	if !ok {
+		return
+	}
+
+	lastName, ok := utils.RequireStringField(c, "last_name")
+	if !ok {
+		return
+	}
+
+	email, ok := utils.RequireStringField(c, "email")
+	if !ok {
+		return
+	}
+
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "User not found in context",
+		})
+		return
+	}
+
+	currentUser, ok := user.(models.User)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Failed to cast user",
 		})
 		return
 	}
 
 	updates := models.User{
-		Username:  body.Username,
-		FirstName: body.FirstName,
-		LastName:  body.LastName,
-		Email:     body.Email,
+		Username:  username,
+		FirstName: firstName,
+		LastName:  lastName,
+		Email:     email,
+	}
+
+	if file, err := c.FormFile("avatar"); err == nil {
+		if url, err := utils.SaveAvatarImage(c, file, currentUser.AvatarURL); err == nil {
+			updates.AvatarURL = url
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Failed to upload avatar | " + err.Error(),
+			})
+			return
+		}
 	}
 
 	if err := initializers.DB.Model(&currentUser).Updates(updates).Error; err != nil {
@@ -55,8 +95,26 @@ func UpdateMyProfile(c *gin.Context) {
 }
 
 func DeleteMyAccount(c *gin.Context) {
-	user, _ := c.Get("user")
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "User not found in context",
+		})
+		return
+	}
+
 	currentUser := user.(models.User)
+
+	if strings.Contains(currentUser.AvatarURL, "/uploads/avatars/") {
+		parts := strings.SplitN(currentUser.AvatarURL, "/uploads/avatars/", 2)
+		if len(parts) == 2 {
+			filename := parts[1]
+			if filename != "default_avatar.png" {
+				localPath := filepath.Join("uploads", "avatars", filename)
+				_ = os.Remove(localPath)
+			}
+		}
+	}
 
 	if err := initializers.DB.Delete(&currentUser).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
