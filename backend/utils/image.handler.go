@@ -31,13 +31,13 @@ func SaveImage(c *gin.Context, file *multipart.FileHeader) (string, error) {
 }
 
 func SaveAvatarImage(c *gin.Context, file *multipart.FileHeader, oldAvatarURL string) (string, error) {
-	if oldAvatarURL != "" && strings.Contains(oldAvatarURL, "/uploads/avatars/") {
+	if oldAvatarURL != "" {
 		parts := strings.Split(oldAvatarURL, "/uploads/avatars/")
 		if len(parts) == 2 {
-			filename := parts[1]
-			if filename != "default_avatar.png" {
-				localPath := filepath.Join("uploads", "avatars", filename)
-				_ = os.Remove(localPath)
+			oldFilename := parts[1]
+			if oldFilename != "default_avatar.png" {
+				oldPath := filepath.Join("uploads", "avatars", oldFilename)
+				_ = os.Remove(oldPath)
 			}
 		}
 	}
@@ -47,13 +47,13 @@ func SaveAvatarImage(c *gin.Context, file *multipart.FileHeader, oldAvatarURL st
 		return "", err
 	}
 
-	filename := fmt.Sprintf("%s_%s", uuid.New().String(), file.Filename)
-	uploadPath := filepath.Join(uploadDir, filename)
+	newFilename := fmt.Sprintf("%s_%s", uuid.New().String(), file.Filename)
+	uploadPath := filepath.Join(uploadDir, newFilename)
 
 	if err := c.SaveUploadedFile(file, uploadPath); err != nil {
 		return "", err
 	}
 
-	baseURL := os.Getenv("APP_BASE_URL")
-	return fmt.Sprintf("%s/%s", baseURL, uploadPath), nil
+	baseURL := initializers.BaseURL
+	return fmt.Sprintf("%s/uploads/avatars/%s", baseURL, newFilename), nil
 }
