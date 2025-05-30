@@ -6,8 +6,8 @@
           <div class="py-8">
             <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
               <div class="relative">
-                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
-                  alt="user avatar" class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg">
+                <img :src="user.avatar_url" alt="user avatar"
+                  class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg">
                 <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 border-2 border-white rounded-full"></div>
               </div>
 
