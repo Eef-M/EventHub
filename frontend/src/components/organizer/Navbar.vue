@@ -8,7 +8,7 @@
       <DropdownMenuTrigger as-child>
         <Button variant="ghost" size="icon">
           <Avatar>
-            <AvatarImage src="/avatar.png" />
+            <AvatarImage :src="userStore.userState.data?.avatar_url || ''" />
             <AvatarFallback>A</AvatarFallback>
           </Avatar>
         </Button>
