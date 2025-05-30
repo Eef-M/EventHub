@@ -70,15 +70,15 @@ func UpdateMyProfile(c *gin.Context) {
 		Email:     email,
 	}
 
-	if file, err := c.FormFile("avatar"); err == nil {
-		if url, err := utils.SaveAvatarImage(c, file, currentUser.AvatarURL); err == nil {
-			updates.AvatarURL = url
-		} else {
+	if file, err := c.FormFile("avatar_url"); err == nil {
+		newAvatarURL, err := utils.SaveAvatarImage(c, file, currentUser.AvatarURL)
+		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": "Failed to upload avatar | " + err.Error(),
+				"error": "Failed to upload avatar",
 			})
 			return
 		}
+		updates.AvatarURL = newAvatarURL
 	}
 
 	if err := initializers.DB.Model(&currentUser).Updates(updates).Error; err != nil {
@@ -106,12 +106,12 @@ func DeleteMyAccount(c *gin.Context) {
 	currentUser := user.(models.User)
 
 	if strings.Contains(currentUser.AvatarURL, "/uploads/avatars/") {
-		parts := strings.SplitN(currentUser.AvatarURL, "/uploads/avatars/", 2)
+		parts := strings.Split(currentUser.AvatarURL, "/uploads/avatars/")
 		if len(parts) == 2 {
 			filename := parts[1]
 			if filename != "default_avatar.png" {
-				localPath := filepath.Join("uploads", "avatars", filename)
-				_ = os.Remove(localPath)
+				avatarPath := filepath.Join("uploads", "avatars", filename)
+				_ = os.Remove(avatarPath)
 			}
 		}
 	}
