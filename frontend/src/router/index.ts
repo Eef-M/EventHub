@@ -1,19 +1,19 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Home from "../pages/participant/Home.vue";
-import Login from "../pages/auth/Login.vue";
-import Register from "../pages/auth/Register.vue";
-import Events from "../pages/participant/Events.vue";
-import EventDetail from "../pages/participant/EventDetail.vue";
-import Dashboard from "../pages/organizer/Dashboard.vue";
-import ManageEvents from "../pages/organizer/ManageEvents.vue";
-import Registrations from "../pages/organizer/Registrations.vue";
-import Feedback from "../pages/organizer/Feedback.vue";
-import Profile from "../pages/participant/Profile.vue";
 import { useAuthStore } from "../stores/authStroe";
 import { useUserStore } from "../stores/userStore";
-import NotFound from "../pages/error/NotFound.vue";
-import Forbidden from "../pages/error/Forbidden.vue";
-import Ticket from "@/pages/organizer/Ticket.vue";
+import Home from "@/views/participant/Home.vue";
+import Login from "@/views/auth/Login.vue";
+import Register from "@/views/auth/Register.vue";
+import Events from "@/views/participant/Events.vue";
+import EventDetail from "@/views/participant/EventDetail.vue";
+import Dashboard from "@/views/organizer/Dashboard.vue";
+import ManageEvents from "@/views/organizer/ManageEvents.vue";
+import Ticket from "@/views/organizer/Ticket.vue";
+import Registrations from "@/views/organizer/Registrations.vue";
+import Feedback from "@/views/organizer/Feedback.vue";
+import Profile from "@/views/participant/Profile.vue";
+import Forbidden from "@/views/error/Forbidden.vue";
+import NotFound from "@/views/error/NotFound.vue";
 
 const routes = [
   {
