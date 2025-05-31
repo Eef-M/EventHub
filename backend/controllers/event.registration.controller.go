@@ -5,6 +5,7 @@ import (
 
 	"github.com/Eef-M/EventHub/backend/initializers"
 	"github.com/Eef-M/EventHub/backend/models"
+	"github.com/Eef-M/EventHub/backend/repository"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
@@ -83,10 +84,10 @@ func MyRegistrations(c *gin.Context) {
 		return
 	}
 
-	var registrations []models.EventRegistration
-	if err := initializers.DB.Where("user_id = ?", user.ID).Find(&registrations).Error; err != nil {
+	registrations, err := repository.GetMyRegistrations(initializers.DB, user.ID)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
+			"error": "Failed to fetch my registrations: " + err.Error(),
 		})
 		return
 	}
