@@ -6,21 +6,22 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetMyTickets(db *gorm.DB, organizerID uuid.UUID) ([]dto.TicketDTO, error) {
+func GetMyTickets(db *gorm.DB, userID uuid.UUID) ([]dto.TicketDTO, error) {
 	var tickets []dto.TicketDTO
 
-	err := db.Table("tickets").
+	err := db.Table("event_registrations AS r").
 		Select(`
-            tickets.id AS ticket_id,
-            tickets.event_id,
-            events.title,
-            events.location,
-            events.date,
-            tickets.ticket_code,
-            tickets.price
+            t.id AS ticket_id,
+            e.id AS event_id,
+            e.title,
+            e.location,
+            e.date,
+            t.ticket_code,
+            t.price
         `).
-		Joins("JOIN events ON tickets.event_id = events.id").
-		Where("events.organizer_id = ?", organizerID).
+		Joins("JOIN events AS e ON r.event_id = e.id").
+		Joins("JOIN tickets AS t ON t.event_id = e.id").
+		Where("r.user_id = ?", userID).
 		Scan(&tickets).Error
 
 	return tickets, err
