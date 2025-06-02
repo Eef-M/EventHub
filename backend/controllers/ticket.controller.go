@@ -5,16 +5,27 @@ import (
 
 	"github.com/Eef-M/EventHub/backend/initializers"
 	"github.com/Eef-M/EventHub/backend/models"
+	"github.com/Eef-M/EventHub/backend/repository"
 	"github.com/Eef-M/EventHub/backend/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
-func GetTickets(c *gin.Context) {
-	var tickets []models.Ticket
-	if err := initializers.DB.Find(&tickets).Error; err != nil {
+func GetMyTickets(c *gin.Context) {
+	userInterface, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Unauthorized",
+		})
+		return
+	}
+
+	user := userInterface.(models.User)
+
+	tickets, err := repository.GetMyTickets(initializers.DB, user.ID)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
+			"error": "Failed to fetch my tickets: " + err.Error(),
 		})
 		return
 	}
@@ -98,12 +109,15 @@ func CreateTicket(c *gin.Context) {
 		return
 	}
 
+	ticketCode := utils.GenerateTicketCode()
+
 	ticket := models.Ticket{
 		EventID:     eventID,
 		Name:        name,
 		Description: description,
 		Price:       price,
 		Quota:       quota,
+		TicketCode:  ticketCode,
 	}
 
 	if err := initializers.DB.Create(&ticket).Error; err != nil {

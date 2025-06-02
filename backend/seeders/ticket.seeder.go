@@ -3,6 +3,7 @@ package seeders
 import (
 	"github.com/Eef-M/EventHub/backend/initializers"
 	"github.com/Eef-M/EventHub/backend/models"
+	"github.com/Eef-M/EventHub/backend/utils"
 	"github.com/google/uuid"
 )
 
@@ -15,6 +16,7 @@ func SeedTickets(events []models.Event) []models.Ticket {
 			Description: "Ticket for early bird.",
 			Price:       25,
 			Quota:       100,
+			TicketCode:  utils.GenerateTicketCode(),
 		},
 		{
 			ID:          uuid.New(),
@@ -23,6 +25,7 @@ func SeedTickets(events []models.Event) []models.Ticket {
 			Description: "Ticket for reguler.",
 			Price:       40,
 			Quota:       200,
+			TicketCode:  utils.GenerateTicketCode(),
 		},
 		{
 			ID:          uuid.New(),
@@ -31,6 +34,7 @@ func SeedTickets(events []models.Event) []models.Ticket {
 			Description: "Ticket for VIP.",
 			Price:       145,
 			Quota:       50,
+			TicketCode:  utils.GenerateTicketCode(),
 		},
 		{
 			ID:          uuid.New(),
@@ -39,6 +43,7 @@ func SeedTickets(events []models.Event) []models.Ticket {
 			Description: "Ticket for reguler.",
 			Price:       45,
 			Quota:       230,
+			TicketCode:  utils.GenerateTicketCode(),
 		},
 		{
 			ID:          uuid.New(),
@@ -47,6 +52,7 @@ func SeedTickets(events []models.Event) []models.Ticket {
 			Description: "Ticket for early bird.",
 			Price:       15,
 			Quota:       125,
+			TicketCode:  utils.GenerateTicketCode(),
 		},
 		{
 			ID:          uuid.New(),
@@ -55,6 +61,7 @@ func SeedTickets(events []models.Event) []models.Ticket {
 			Description: "Tikcet for VIP.",
 			Price:       95,
 			Quota:       100,
+			TicketCode:  utils.GenerateTicketCode(),
 		},
 	}
 
