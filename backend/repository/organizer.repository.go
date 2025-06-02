@@ -100,8 +100,8 @@ func GetAllFeedbackByOrganizerID(db *gorm.DB, organizerID uuid.UUID) ([]dto.Even
 	return feedbacks, err
 }
 
-func GetAllTicketsByOrganizerID(db *gorm.DB, organizerID uuid.UUID) ([]dto.TicketDTO, error) {
-	var tickets []dto.TicketDTO
+func GetAllTicketsByOrganizerID(db *gorm.DB, organizerID uuid.UUID) ([]dto.TicketOrganizerDTO, error) {
+	var tickets []dto.TicketOrganizerDTO
 
 	err := db.Table("tickets").
 		Select("tickets.id, tickets.name, tickets.price, tickets.description, tickets.quota, tickets.event_id, events.title AS event_title").

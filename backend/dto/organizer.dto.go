@@ -7,7 +7,7 @@ type RecentRegistrationDTO struct {
 	Status     string `json:"status"`
 }
 
-type EventRegistrationsDTO struct {
+type EventRegistrationsOrganizerDTO struct {
 	ID           string `json:"id"`
 	Username     string `json:"username"`
 	Email        string `json:"email"`
@@ -25,7 +25,7 @@ type EventFeedbackDTO struct {
 	CreatedAt  string `json:"created_at"`
 }
 
-type TicketDTO struct {
+type TicketOrganizerDTO struct {
 	ID          string  `json:"id"`
 	Name        string  `json:"name"`
 	Description string  `json:"description"`

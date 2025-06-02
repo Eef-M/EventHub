@@ -6,8 +6,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetMyRegistrations(db *gorm.DB, userID uuid.UUID) ([]dto.EventRegistrationDTO, error) {
-	var results []dto.EventRegistrationDTO
+func GetMyRegistrations(db *gorm.DB, userID uuid.UUID) ([]dto.EventRegistrationsDTO, error) {
+	var results []dto.EventRegistrationsDTO
 
 	err := db.Table("event_registrations AS r").
 		Select("r.id AS registration_id, "+

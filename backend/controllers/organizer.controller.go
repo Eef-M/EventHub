@@ -120,9 +120,9 @@ func GetAllRegistrationsHandler(c *gin.Context) {
 		return
 	}
 
-	var result []dto.EventRegistrationsDTO
+	var result []dto.EventRegistrationsOrganizerDTO
 	for _, r := range registrations {
-		result = append(result, dto.EventRegistrationsDTO{
+		result = append(result, dto.EventRegistrationsOrganizerDTO{
 			ID:           r.ID.String(),
 			Username:     r.User.Username,
 			Email:        r.User.Email,

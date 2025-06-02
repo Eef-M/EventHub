@@ -1,6 +1,6 @@
 package dto
 
-type EventRegistrationDTO struct {
+type EventRegistrationsDTO struct {
 	RegistrationID     string `json:"registration_id"`
 	EventID            string `json:"event_id"`
 	Title              string `json:"title"`
