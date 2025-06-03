@@ -6,15 +6,15 @@
           <div class="py-8">
             <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
               <div class="relative">
-                <img :src="user.avatar_url" alt="user avatar"
+                <img :src="user?.avatar_url" alt="user avatar"
                   class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg">
                 <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 border-2 border-white rounded-full"></div>
               </div>
 
               <div class="flex-1 text-center sm:text-left">
-                <h1 class="text-3xl font-bold text-gray-900">{{ user.first_name }} {{ user.last_name }}</h1>
-                <p class="text-slate-600 mt-1 italic">@{{ user.username }}</p>
-                <p class="text-slate-600 mt-1 font-bold">{{ user.role }}</p>
+                <h1 class="text-3xl font-bold text-gray-900">{{ user?.first_name }} {{ user?.last_name }}</h1>
+                <p class="text-slate-600 mt-1 italic">@{{ user?.username }}</p>
+                <p class="text-slate-600 mt-1 font-bold">{{ user?.role }}</p>
 
                 <div class="flex flex-col sm:flex-row gap-3 mt-4">
                   <Button
@@ -58,24 +58,25 @@
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card v-for="event in eventRegistrations" :key="event.id"
+            <Card v-for="myReg in myRegistrations" :key="myReg.registration_id"
               class="overflow-hidden hover:shadow-lg transition-shadow">
               <div class="aspect-video bg-gradient-to-br from-blue-400 to-purple-600 relative">
-                <img v-if="event.image" :src="event.image" :alt="event.title" class="w-full h-full object-cover">
+                <img v-if="myReg.banner_url" :src="myReg.banner_url" :alt="myReg.title"
+                  class="w-full h-full object-cover">
                 <div class="absolute top-3 right-3">
-                  <Badge :class="event.status === 'registered' ? 'bg-green-600' : 'bg-red-600'">
-                    {{ event.status }}
+                  <Badge :class="myReg.status === 'registered' ? 'bg-green-600' : 'bg-red-600'">
+                    {{ myReg.status }}
                   </Badge>
                 </div>
               </div>
               <CardHeader>
-                <CardTitle class="text-lg">{{ event.title }}</CardTitle>
-                <p class="text-sm text-gray-600">{{ event.date }} • {{ event.location }}</p>
+                <CardTitle class="text-lg">{{ myReg.title }}</CardTitle>
+                <p class="text-sm text-gray-600">{{ formatDate(myReg.date) }} • {{ myReg.location }}</p>
               </CardHeader>
               <CardContent>
-                <p class="text-gray-700 text-sm">{{ event.description }}</p>
+                <p class="text-gray-700 text-sm">{{ myReg.description }}</p>
                 <div class="flex justify-between items-center mt-4">
-                  <span class="text-sm text-gray-500">{{ event.attendees }} attendees</span>
+                  <span class="text-sm text-gray-500">{{ myReg.total_registrations }} attendees</span>
                   <Button variant="outline" size="sm">View Details</Button>
                 </div>
               </CardContent>
@@ -127,7 +128,7 @@
   </ParticipantLayout>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -135,13 +136,17 @@ import { Badge } from '@/components/ui/badge'
 import { MoreHorizontal, Plus, Ticket, QrCode } from 'lucide-vue-next'
 import ParticipantLayout from '@/layouts/ParticipantLayout.vue'
 import { useUserStore } from '@/stores/userStore'
+import { useEventRegistrationsStore } from '@/stores/eventRegistrationsStore'
 
 const userStore = useUserStore()
+const eventRegStore = useEventRegistrationsStore()
 
 const user = computed(() => userStore.userState.data)
+const myRegistrations = computed(() => eventRegStore.myRegState.data)
 
 onMounted(() => {
   userStore.getMyProfile()
+  eventRegStore.getMyRegistrations()
 })
 
 const activeTab = ref('registrations')
@@ -151,41 +156,15 @@ const tabs = [
   { id: 'tickets', name: 'Tickets' }
 ]
 
+function formatDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
 // TEMPORARY DATA !
 // have to fix the backend part first if you want to use the API!
-const eventRegistrations = ref([
-  {
-    id: 1,
-    title: 'Tech Conference 2024',
-    date: 'June 15, 2024',
-    location: 'Jakarta Convention Center',
-    description: 'Annual technology conference featuring the latest innovations in software development.',
-    attendees: 1250,
-    status: 'registered',
-    image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&h=225&fit=crop'
-  },
-  {
-    id: 2,
-    title: 'Startup Pitch Night',
-    date: 'July 8, 2024',
-    location: 'Bandung Creative Hub',
-    description: 'Evening event where innovative startups present their ideas to investors.',
-    attendees: 85,
-    status: 'cancelled',
-    image: 'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=400&h=225&fit=crop'
-  },
-  {
-    id: 3,
-    title: 'Design Workshop',
-    date: 'August 20, 2024',
-    location: 'Yogyakarta Design Center',
-    description: 'Hands-on workshop covering modern UI/UX design principles and tools.',
-    attendees: 45,
-    status: 'registered',
-    image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=400&h=225&fit=crop'
-  }
-])
-
 const tickets = ref([
   {
     id: 1,
