@@ -70,6 +70,7 @@ import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import ParticipantLayout from '../../layouts/ParticipantLayout.vue'
 import { useEventStore } from '@/stores/eventStore'
+import { formatDate, formatTime } from '@/utils/format'
 
 const route = useRoute()
 const eventId = route.params.id as string
@@ -78,22 +79,4 @@ const eventStore = useEventStore()
 onMounted(async () => {
   eventStore.getEventById(eventId)
 })
-
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-}
-
-function formatTime(timeStr: string): string {
-  const time = new Date(timeStr)
-  if (time.getFullYear() === 1) return 'N/A'
-  return time.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  })
-}
 </script>
