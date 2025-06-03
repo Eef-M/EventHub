@@ -51,6 +51,7 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@
 import { Button } from '@/components/ui/button'
 import { Pencil, Trash } from 'lucide-vue-next'
 import type { Event } from '@/types/event'
+import { formatDate, formatTime } from '@/utils/format'
 
 interface Props {
   events: Event[]
@@ -62,22 +63,4 @@ defineEmits<{
   edit: [event: Event]
   delete: [event: Event]
 }>()
-
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-}
-
-function formatTime(timeStr: string): string {
-  const time = new Date(timeStr)
-  if (time.getFullYear() === 1) return 'N/A'
-  return time.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  })
-}
 </script>

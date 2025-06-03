@@ -84,6 +84,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import type { Event } from '@/types/event'
+import { formatTime } from '@/utils/format'
 
 interface Props {
   isOpen: boolean
@@ -156,16 +157,6 @@ function handleSubmit() {
 function handleCancel() {
   emit('cancel')
   emit('update:isOpen', false)
-}
-
-function formatTime(timeStr: string): string {
-  const time = new Date(timeStr)
-  if (time.getFullYear() === 1) return ''
-  return time.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  })
 }
 
 const imagePreviewUrl = computed(() =>

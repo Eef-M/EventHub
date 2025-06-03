@@ -33,6 +33,7 @@ import { computed, onMounted } from 'vue';
 import OrganizerLayout from '@/layouts/OrganizerLayout.vue';
 import { useOrganizerStore } from '@/stores/organizerStore';
 import { Star } from 'lucide-vue-next';
+import { formatDate } from '@/utils/format';
 
 const organizerStore = useOrganizerStore()
 const feedbacks = computed(() => organizerStore.feedbackState.data)
@@ -40,13 +41,4 @@ const feedbacks = computed(() => organizerStore.feedbackState.data)
 onMounted(() => {
   organizerStore.getOrganizerEventFeedback()
 })
-
-function formatDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
 </script>

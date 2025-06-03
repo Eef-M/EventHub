@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PrimitiveProps } from 'reka-ui'
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils/utils'
 import { Primitive } from 'reka-ui'
 import { computed, type HTMLAttributes } from 'vue'
 import { type BadgeVariants, badgeVariants } from '.'
@@ -18,11 +18,7 @@ const delegatedProps = computed(() => {
 </script>
 
 <template>
-  <Primitive
-    data-slot="badge"
-    :class="cn(badgeVariants({ variant }), props.class)"
-    v-bind="delegatedProps"
-  >
+  <Primitive data-slot="badge" :class="cn(badgeVariants({ variant }), props.class)" v-bind="delegatedProps">
     <slot />
   </Primitive>
 </template>

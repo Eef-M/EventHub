@@ -22,6 +22,7 @@
 </template>
 
 <script setup lang="ts">
+import { formatDate } from '@/utils/format';
 import type { Event } from '../../types/event';
 
 defineProps<{
@@ -29,13 +30,4 @@ defineProps<{
 }>()
 
 const defaultImage = 'https://images.pexels.com/photos/50675/banquet-wedding-society-deco-50675.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
-
-const formatDate = (dateStr: string): string => {
-  const options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  }
-  return new Date(dateStr).toLocaleDateString('en-US', options)
-}
 </script>

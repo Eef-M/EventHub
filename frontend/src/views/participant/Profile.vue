@@ -137,6 +137,7 @@ import { MoreHorizontal, Plus, Ticket, QrCode } from 'lucide-vue-next'
 import ParticipantLayout from '@/layouts/ParticipantLayout.vue'
 import { useUserStore } from '@/stores/userStore'
 import { useEventRegistrationsStore } from '@/stores/eventRegistrationsStore'
+import { formatDate } from '@/utils/format'
 
 const userStore = useUserStore()
 const eventRegStore = useEventRegistrationsStore()
@@ -156,13 +157,6 @@ const tabs = [
   { id: 'tickets', name: 'Tickets' }
 ]
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-}
 // TEMPORARY DATA !
 // have to fix the backend part first if you want to use the API!
 const tickets = ref([
