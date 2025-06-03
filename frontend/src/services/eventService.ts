@@ -1,5 +1,5 @@
 import axios from "axios"
-import type { Event } from "../types/event"
+import type { Event } from "@/types/event"
 
 const API_BASE_URL = 'http://localhost:8000/api/v1'
 
