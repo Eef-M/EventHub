@@ -1,4 +1,4 @@
-export interface MyRegistrations {
+export interface MyRegistrationsInterface {
   registration_id: string
   event_id: string
   title: string

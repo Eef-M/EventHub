@@ -1,4 +1,4 @@
-export interface DashboardStats {
+export interface DashboardStatsInterface {
   total_events: number
   total_registrations: number
   registered: number
@@ -12,7 +12,7 @@ export interface DashboardStats {
   }[]
 }
 
-export interface OrganizerEventRegistration {
+export interface OrganizerEventRegistrationInterface {
   id: string;
   username: string;
   email: string;
@@ -22,7 +22,7 @@ export interface OrganizerEventRegistration {
   registered_at: string;
 }
 
-export interface OrganizerEventFeedback {
+export interface OrganizerEventFeedbackInterface {
   username: string;
   event_title: string;
   comment: string;
@@ -30,7 +30,7 @@ export interface OrganizerEventFeedback {
   created_at: string;
 }
 
-export interface OrganizerTicket {
+export interface OrganizerTicketInterface {
   id: string;
   name: string;
   description: string;

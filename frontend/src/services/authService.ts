@@ -1,14 +1,14 @@
 import axios from "axios"
-import type { LoginPayload, RegisterPayload } from "../types/auth"
+import type { LoginInterface, RegisterInterface } from "@/types/auth"
 
 const API_BASE_URL = 'http://localhost:8000/api/v1'
 
-export async function fetchRegister(data: RegisterPayload) {
+export async function fetchRegister(data: RegisterInterface) {
   const response = await axios.post(`${API_BASE_URL}/auth/register`, data, { withCredentials: true })
   return response
 }
 
-export async function fetchLogin(data: LoginPayload) {
+export async function fetchLogin(data: LoginInterface) {
   const response = await axios.post(`${API_BASE_URL}/auth/login`, data, { withCredentials: true })
   return response
 }

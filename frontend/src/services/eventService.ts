@@ -1,19 +1,19 @@
 import axios from "axios"
-import type { Event } from "@/types/event"
+import type { EventInterface } from "@/types/event"
 
 const API_BASE_URL = 'http://localhost:8000/api/v1'
 
-export async function fetchEvents(): Promise<Event[]> {
-  const response = await axios.get<{ data: Event[] }>(`${API_BASE_URL}/events`, { withCredentials: true })
+export async function fetchEvents(): Promise<EventInterface[]> {
+  const response = await axios.get<{ data: EventInterface[] }>(`${API_BASE_URL}/events`, { withCredentials: true })
   return response.data.data
 }
 
-export async function fetchEventById(id: string): Promise<Event> {
-  const response = await axios.get<{ data: Event }>(`${API_BASE_URL}/events/${id}`, { withCredentials: true })
+export async function fetchEventById(id: string): Promise<EventInterface> {
+  const response = await axios.get<{ data: EventInterface }>(`${API_BASE_URL}/events/${id}`, { withCredentials: true })
   return response.data.data
 }
 
-export async function fetchCreateEvent(payload: FormData): Promise<Event> {
+export async function fetchCreateEvent(payload: FormData): Promise<EventInterface> {
   const response = await axios.post(`${API_BASE_URL}/events`, payload, {
     headers: { 'Content-Type': 'multipart/form-data' },
     withCredentials: true,
@@ -21,7 +21,7 @@ export async function fetchCreateEvent(payload: FormData): Promise<Event> {
   return response.data.data
 }
 
-export async function fetchUpdateEvent(id: string, payload: FormData): Promise<Event> {
+export async function fetchUpdateEvent(id: string, payload: FormData): Promise<EventInterface> {
   const response = await axios.put(`${API_BASE_URL}/events/${id}`, payload, {
     headers: { 'Content-Type': 'multipart/form-data' },
     withCredentials: true,

@@ -28,7 +28,7 @@ import EventFormModal from '@/components/organizer/events/EventFormModal.vue'
 import DeleteConfirmModal from '@/components/organizer/events/DeleteConfirmModal.vue'
 import { useOrganizerStore } from '@/stores/organizerStore'
 import { useEventStore } from '@/stores/eventStore'
-import type { Event } from '@/types/event'
+import type { EventInterface } from '@/types/event'
 import { toast } from 'vue-sonner'
 
 const organizerStore = useOrganizerStore()
@@ -37,7 +37,7 @@ const eventStore = useEventStore()
 const showFormModal = ref(false)
 const showDeleteModal = ref(false)
 const isEditing = ref(false)
-const selectedEvent = ref<Event | null>(null)
+const selectedEvent = ref<EventInterface | null>(null)
 
 onMounted(() => {
   organizerStore.getMyEvents()
@@ -49,13 +49,13 @@ function openCreateModal() {
   showFormModal.value = true
 }
 
-function openEditModal(event: Event) {
+function openEditModal(event: EventInterface) {
   isEditing.value = true
   selectedEvent.value = event
   showFormModal.value = true
 }
 
-function openDeleteModal(event: Event) {
+function openDeleteModal(event: EventInterface) {
   selectedEvent.value = event
   showDeleteModal.value = true
 }

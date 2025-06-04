@@ -1,8 +1,8 @@
 import { defineStore } from "pinia"
-import type { LoginPayload, RegisterPayload } from "@/types/auth"
 import { fetchLogin, fetchLogout, fetchRegister } from "@/services/authService"
 import { useUserStore } from "@/stores/userStore"
 import { createAsyncState } from "@/utils/asyncState"
+import type { LoginInterface, RegisterInterface } from "@/types/auth"
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -14,7 +14,7 @@ export const useAuthStore = defineStore('auth', {
   }),
 
   actions: {
-    async register(payload: RegisterPayload) {
+    async register(payload: RegisterInterface) {
       this.registerState.loading = true
       this.registerState.error = null
       try {
@@ -27,7 +27,7 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    async login(payload: LoginPayload) {
+    async login(payload: LoginInterface) {
       this.loginState.loading = true
       this.loginState.error = null
       try {
