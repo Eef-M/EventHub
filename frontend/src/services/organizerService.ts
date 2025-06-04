@@ -1,30 +1,30 @@
-import type { Event } from "@/types/event"
-import type { DashboardStats, OrganizerEventFeedback, OrganizerEventRegistration, OrganizerTicket } from "@/types/organizer"
+import type { EventInterface } from "@/types/event"
+import type { DashboardStatsInterface, OrganizerEventFeedbackInterface, OrganizerEventRegistrationInterface, OrganizerTicketInterface } from "@/types/organizer"
 import axios from "axios"
 
 const API_BASE_URL = 'http://localhost:8000/api/v1'
 
-export async function fetchDashboardStats(): Promise<DashboardStats> {
+export async function fetchDashboardStats(): Promise<DashboardStatsInterface> {
   const response = await axios.get(`${API_BASE_URL}/organizer/dashboard`, { withCredentials: true })
   return response.data
 }
 
-export async function fetchMyEvents(): Promise<Event[]> {
+export async function fetchMyEvents(): Promise<EventInterface[]> {
   const response = await axios.get(`${API_BASE_URL}/organizer/events`, { withCredentials: true })
   return response.data.data
 }
 
-export async function fetchOrganizerEventRegistrations(): Promise<OrganizerEventRegistration[]> {
+export async function fetchOrganizerEventRegistrations(): Promise<OrganizerEventRegistrationInterface[]> {
   const response = await axios.get(`${API_BASE_URL}/organizer/registrations`, { withCredentials: true })
   return response.data.data
 }
 
-export async function fetchOrganizerEventFeedback(): Promise<OrganizerEventFeedback[]> {
+export async function fetchOrganizerEventFeedback(): Promise<OrganizerEventFeedbackInterface[]> {
   const response = await axios.get(`${API_BASE_URL}/organizer/feedbacks`, { withCredentials: true })
   return response.data.data
 }
 
-export async function fetchOrganizerTickets(): Promise<OrganizerTicket[]> {
+export async function fetchOrganizerTickets(): Promise<OrganizerTicketInterface[]> {
   const response = await axios.get(`${API_BASE_URL}/organizer/tickets`, { withCredentials: true })
   return response.data.data
 }

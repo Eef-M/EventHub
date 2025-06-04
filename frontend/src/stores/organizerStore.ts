@@ -1,16 +1,16 @@
 import { defineStore } from "pinia"
-import type { DashboardStats, OrganizerEventFeedback, OrganizerEventRegistration, OrganizerTicket } from "@/types/organizer"
-import type { Event } from "@/types/event"
+import type { DashboardStatsInterface, OrganizerEventFeedbackInterface, OrganizerEventRegistrationInterface, OrganizerTicketInterface } from "@/types/organizer"
+import type { EventInterface } from "@/types/event"
 import { fetchDashboardStats, fetchMyEvents, fetchOrganizerEventFeedback, fetchOrganizerEventRegistrations, fetchOrganizerTickets } from "@/services/organizerService"
 import { createAsyncState } from "@/utils/asyncState"
 
 export const useOrganizerStore = defineStore('organizer', {
   state: () => ({
-    statsState: createAsyncState<DashboardStats | null>(null),
-    eventsState: createAsyncState<Event[]>([]),
-    ticketsState: createAsyncState<OrganizerTicket[]>([]),
-    registrationsState: createAsyncState<OrganizerEventRegistration[]>([]),
-    feedbackState: createAsyncState<OrganizerEventFeedback[]>([])
+    statsState: createAsyncState<DashboardStatsInterface | null>(null),
+    eventsState: createAsyncState<EventInterface[]>([]),
+    ticketsState: createAsyncState<OrganizerTicketInterface[]>([]),
+    registrationsState: createAsyncState<OrganizerEventRegistrationInterface[]>([]),
+    feedbackState: createAsyncState<OrganizerEventFeedbackInterface[]>([])
   }),
 
   actions: {

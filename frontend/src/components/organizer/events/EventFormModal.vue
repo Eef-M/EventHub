@@ -83,13 +83,13 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import type { Event } from '@/types/event'
+import type { EventInterface } from '@/types/event'
 import { formatTime } from '@/utils/format'
 
 interface Props {
   isOpen: boolean
   isEditing: boolean
-  eventData?: Event | null
+  eventData?: EventInterface | null
   isLoading?: boolean
 }
 
@@ -146,7 +146,7 @@ watch([() => props.isOpen, () => props.isEditing, () => props.eventData], () => 
   }
 })
 
-function handleBannerChange(e: Event & { target: HTMLInputElement }) {
+function handleBannerChange(e: EventInterface & { target: HTMLInputElement }) {
   form.banner_image = e.target.files?.[0] || null
 }
 

@@ -1,11 +1,11 @@
 import { fetchMyRegistrations } from "@/services/eventRegsitrationsService";
-import type { MyRegistrations } from "@/types/eventRegistrations";
+import type { MyRegistrationsInterface } from "@/types/eventRegistrations";
 import { createAsyncState } from "@/utils/asyncState";
 import { defineStore } from "pinia";
 
 export const useEventRegistrationsStore = defineStore('event_registrations', {
   state: () => ({
-    myRegState: createAsyncState<MyRegistrations[]>([])
+    myRegState: createAsyncState<MyRegistrationsInterface[]>([])
   }),
 
   actions: {

@@ -50,17 +50,17 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Pencil, Trash } from 'lucide-vue-next'
-import type { Event } from '@/types/event'
+import type { EventInterface } from '@/types/event'
 import { formatDate, formatTime } from '@/utils/format'
 
 interface Props {
-  events: Event[]
+  events: EventInterface[]
 }
 
 defineProps<Props>()
 
 defineEmits<{
-  edit: [event: Event]
-  delete: [event: Event]
+  edit: [event: EventInterface]
+  delete: [event: EventInterface]
 }>()
 </script>

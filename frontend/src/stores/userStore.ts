@@ -1,11 +1,11 @@
 import { defineStore } from "pinia";
-import type { User } from "@/types/user";
+import type { UserInterface } from "@/types/user";
 import { fetchMyProfile } from "@/services/userService";
 import { createAsyncState } from "@/utils/asyncState";
 
 export const useUserStore = defineStore('user', {
   state: () => ({
-    userState: createAsyncState<User | null>(null)
+    userState: createAsyncState<UserInterface | null>(null)
   }),
 
   actions: {

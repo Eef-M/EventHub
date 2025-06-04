@@ -52,16 +52,16 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash } from 'lucide-vue-next'
-import type { OrganizerTicket } from "@/types/organizer";
+import type { OrganizerTicketInterface } from "@/types/organizer";
 
 interface Props {
-  tickets: OrganizerTicket[]
+  tickets: OrganizerTicketInterface[]
 }
 
 defineProps<Props>()
 
 defineEmits<{
-  edit: [ticket: OrganizerTicket]
-  delete: [ticket: OrganizerTicket]
+  edit: [ticket: OrganizerTicketInterface]
+  delete: [ticket: OrganizerTicketInterface]
 }>()
 </script>

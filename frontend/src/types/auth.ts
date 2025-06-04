@@ -1,4 +1,4 @@
-export interface RegisterPayload {
+export interface RegisterInterface {
   username: string
   first_name: string
   last_name: string
@@ -7,7 +7,7 @@ export interface RegisterPayload {
   role: string
 }
 
-export interface LoginPayload {
+export interface LoginInterface {
   email: string
   password: string
 }

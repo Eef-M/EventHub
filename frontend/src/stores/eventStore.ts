@@ -1,12 +1,12 @@
 import { defineStore } from "pinia"
-import type { Event } from "@/types/event"
+import type { EventInterface } from "@/types/event"
 import { fetchCreateEvent, fetchDeleteEvent, fetchEventById, fetchEvents, fetchUpdateEvent } from "@/services/eventService"
 import { createAsyncState } from "@/utils/asyncState"
 
 export const useEventStore = defineStore('event', {
   state: () => ({
-    eventsState: createAsyncState<Event[]>([]),
-    singleEventState: createAsyncState<Event | null>(null),
+    eventsState: createAsyncState<EventInterface[]>([]),
+    singleEventState: createAsyncState<EventInterface | null>(null),
     createState: createAsyncState(null),
     updateState: createAsyncState(null),
     deleteState: createAsyncState(null),
