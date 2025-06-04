@@ -87,31 +87,28 @@
         <div v-if="activeTab === 'tickets'" class="space-y-6">
           <div class="flex justify-between items-center">
             <h2 class="text-2xl font-bold text-gray-900">My Tickets</h2>
-            <Button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
+            <Button class="bg-slate-600 hover:bg-slate-700 text-white px-4 py-2 rounded-lg cursor-pointer">
               <Ticket class="w-4 h-4 mr-2" />
               Buy Tickets
             </Button>
           </div>
 
           <div class="space-y-4">
-            <Card v-for="ticket in tickets" :key="ticket.id" class="hover:shadow-md transition-shadow">
+            <Card v-for="ticket in myTickets" :key="ticket.ticket_id" class="hover:shadow-md transition-shadow">
               <CardContent class="p-6">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center space-x-4">
                     <div
-                      class="w-16 h-16 bg-gradient-to-br from-green-400 to-blue-500 rounded-lg flex items-center justify-center">
+                      class="w-16 h-16 bg-gradient-to-br from-slate-400 to-purple-500 rounded-lg flex items-center justify-center">
                       <Ticket class="w-8 h-8 text-white" />
                     </div>
                     <div>
-                      <h3 class="font-semibold text-lg">{{ ticket.eventName }}</h3>
-                      <p class="text-gray-600">{{ ticket.date }} • {{ ticket.venue }}</p>
-                      <p class="text-sm text-gray-500">Ticket ID: {{ ticket.ticketId }}</p>
+                      <h3 class="font-semibold text-lg">{{ ticket.title }}</h3>
+                      <p class="text-gray-600">{{ formatDate(ticket.date) }} • {{ ticket.location }}</p>
+                      <p class="text-sm text-gray-500">Ticket Code: {{ ticket.ticket_code }}</p>
                     </div>
                   </div>
                   <div class="text-right">
-                    <Badge :class="ticket.status === 'valid' ? 'bg-blue-600' : 'bg-yellow-600'">
-                      {{ ticket.status }}
-                    </Badge>
                     <p class="text-lg font-bold mt-2">${{ ticket.price }}</p>
                     <Button variant="outline" size="sm" class="mt-2">
                       <QrCode class="w-4 h-4 mr-1" />
@@ -138,16 +135,20 @@ import ParticipantLayout from '@/layouts/ParticipantLayout.vue'
 import { useUserStore } from '@/stores/userStore'
 import { useEventRegistrationsStore } from '@/stores/eventRegistrationsStore'
 import { formatDate } from '@/utils/format'
+import { useTicketStore } from '@/stores/ticketStore'
 
 const userStore = useUserStore()
 const eventRegStore = useEventRegistrationsStore()
+const ticketStore = useTicketStore()
 
 const user = computed(() => userStore.userState.data)
 const myRegistrations = computed(() => eventRegStore.myRegState.data)
+const myTickets = computed(() => ticketStore.myTicketState.data)
 
 onMounted(() => {
   userStore.getMyProfile()
   eventRegStore.getMyRegistrations()
+  ticketStore.getMyTickets()
 })
 
 const activeTab = ref('registrations')
@@ -156,36 +157,4 @@ const tabs = [
   { id: 'registrations', name: 'Event Registrations' },
   { id: 'tickets', name: 'Tickets' }
 ]
-
-// TEMPORARY DATA !
-// have to fix the backend part first if you want to use the API!
-const tickets = ref([
-  {
-    id: 1,
-    eventName: 'Music Festival 2024',
-    date: 'September 15, 2024',
-    venue: 'GBK Stadium, Jakarta',
-    ticketId: 'MF2024-001234',
-    price: 150,
-    status: 'valid'
-  },
-  {
-    id: 2,
-    eventName: 'Food & Culture Expo',
-    date: 'October 3, 2024',
-    venue: 'Yogyakarta Exhibition Hall',
-    ticketId: 'FCE2024-005678',
-    price: 75,
-    status: 'valid'
-  },
-  {
-    id: 3,
-    eventName: 'Art Gallery Opening',
-    date: 'May 10, 2024',
-    venue: 'Museum Nasional',
-    ticketId: 'AGO2024-009876',
-    price: 25,
-    status: 'used'
-  }
-])
 </script>

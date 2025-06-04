@@ -1,7 +1,12 @@
-import type { TicketInterface } from "@/types/ticket"
+import type { MyTicketInterface, TicketInterface } from "@/types/ticket"
 import axios from "axios"
 
 const API_BASE_URL = 'http://localhost:8000/api/v1'
+
+export async function fetchMyTickets(): Promise<MyTicketInterface[]> {
+  const response = await axios.get(`${API_BASE_URL}/tickets`, { withCredentials: true })
+  return response.data.data
+}
 
 export async function fetchCreateTicket(payload: FormData): Promise<TicketInterface> {
   const response = await axios.post(`${API_BASE_URL}/tickets`, payload, {
