@@ -1,15 +1,31 @@
-import { fetchCreateTicket, fetchDeleteTicket, fetchUpdateTicket } from "@/services/ticketService";
+import { fetchCreateTicket, fetchDeleteTicket, fetchMyTickets, fetchUpdateTicket } from "@/services/ticketService";
+import type { MyTicketInterface } from "@/types/ticket";
 import { createAsyncState } from "@/utils/asyncState";
 import { defineStore } from "pinia";
 
 export const useTicketStore = defineStore('ticket', {
   state: () => ({
+    myTicketState: createAsyncState<MyTicketInterface[]>([]),
     createState: createAsyncState(null),
     updateState: createAsyncState(null),
     deleteState: createAsyncState(null),
   }),
 
   actions: {
+    async getMyTickets() {
+      this.myTicketState.loading = true
+      this.myTicketState.error = null
+      try {
+        const data = await fetchMyTickets()
+        this.myTicketState.data = data
+      } catch (err: any) {
+        this.myTicketState.error = err?.response?.data?.error || 'Failed to get My Tickets'
+        throw err
+      } finally {
+        this.myTicketState.loading = false
+      }
+    },
+
     async createTicket(payload: FormData) {
       this.createState.loading = true
       this.createState.error = null
