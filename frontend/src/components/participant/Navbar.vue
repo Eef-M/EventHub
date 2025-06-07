@@ -15,7 +15,6 @@
           </RouterLink>
 
           <div class="flex items-center">
-            <!-- Logged in user -->
             <div v-if="user" class="relative">
               <DropdownMenu>
                 <DropdownMenuTrigger as-child>

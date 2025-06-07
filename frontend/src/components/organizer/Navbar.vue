@@ -8,13 +8,21 @@
       <DropdownMenuTrigger as-child>
         <Button variant="ghost" size="icon">
           <Avatar>
-            <AvatarImage :src="userStore.userState.data?.avatar_url || ''" />
-            <AvatarFallback>A</AvatarFallback>
+            <AvatarImage :src="user?.avatar_url || ''" :alt="user?.username || 'User'" />
+            <AvatarFallback class="text-sm font-medium bg-purple-100 text-purple-700">
+              {{ getUserInitials(user) }}
+            </AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuLabel class="font-normal">
+          <div class="flex flex-col space-y-1">
+            <p class="text-sm font-medium leading-none">{{ user?.username || 'User' }}</p>
+            <p class="text-xs leading-none text-muted-foreground">{{ user?.email }}</p>
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
         <RouterLink to="/profile">
           <DropdownMenuItem>Profile</DropdownMenuItem>
         </RouterLink>
@@ -26,7 +34,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import { useAuthStore } from '@/stores/authStroe'
@@ -45,6 +53,8 @@ const router = useRouter()
 const userStore = useUserStore()
 const authStore = useAuthStore()
 
+const user = computed(() => userStore.userState.data)
+
 onMounted(() => {
   userStore.getMyProfile()
 })
@@ -53,5 +63,24 @@ const handleLogout = async () => {
   await authStore.logout()
   router.push('/')
   window.location.reload()
+}
+
+// Helper function to get user initials
+const getUserInitials = (user: any) => {
+  if (!user) return 'U'
+
+  if (user.name) {
+    const names = user.name.split(' ')
+    if (names.length >= 2) {
+      return `${names[0][0]}${names[1][0]}`.toUpperCase()
+    }
+    return names[0][0].toUpperCase()
+  }
+
+  if (user.email) {
+    return user.email[0].toUpperCase()
+  }
+
+  return 'U'
 }
 </script>
