@@ -79,4 +79,14 @@ const eventStore = useEventStore()
 onMounted(async () => {
   eventStore.getEventById(eventId)
 })
+
+// Fix the backend first before proceeding!!!
+// const ticketStore = useTicketStore()
+
+// const event = computed(() => eventStore.eventsState.data)
+// const tickets = computed(() => ticketStore)
+
+// async function handleBuyTicket(formData: any) {
+  
+// }
 </script>
