@@ -11,6 +11,21 @@ import (
 	"github.com/google/uuid"
 )
 
+func GetTickets(c *gin.Context) {
+	var tickets []models.Ticket
+
+	if err := initializers.DB.Find(&tickets).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": tickets,
+	})
+}
+
 func GetMyTickets(c *gin.Context) {
 	userInterface, exists := c.Get("user")
 	if !exists {
