@@ -47,7 +47,8 @@ func InitRoute(app *gin.Engine) {
 	// Ticket Group
 	ticket := api.Group("/tickets")
 	{
-		ticket.GET("", middleware.RequireAuth, controllers.GetMyTickets)
+		ticket.GET("", controllers.GetTickets)
+		ticket.GET("/my-tickets", middleware.RequireAuth, controllers.GetMyTickets)
 		ticket.GET("/:id", middleware.RequireAuth, controllers.GetTicket)
 		ticket.POST("", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.CreateTicket)
 		ticket.PUT("/:id", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.UpdateTicket)
