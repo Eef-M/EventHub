@@ -3,8 +3,13 @@ import axios from "axios"
 
 const API_BASE_URL = 'http://localhost:8000/api/v1'
 
-export async function fetchMyTickets(): Promise<MyTicketInterface[]> {
+export async function fetchTickets(): Promise<TicketInterface[]> {
   const response = await axios.get(`${API_BASE_URL}/tickets`, { withCredentials: true })
+  return response.data.data
+}
+
+export async function fetchMyTickets(): Promise<MyTicketInterface[]> {
+  const response = await axios.get(`${API_BASE_URL}/tickets/my-tickets`, { withCredentials: true })
   return response.data.data
 }
 
