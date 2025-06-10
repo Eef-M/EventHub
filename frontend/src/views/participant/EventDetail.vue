@@ -56,7 +56,23 @@
         </CardContent>
       </Card>
 
+      <!-- Tikcets Section -->
       <Card v-if="isTicketsLoaded" class="mb-8 shadow-lg border-0">
+        <CardHeader>
+          <CardTitle class="text-2xl font-semibold text-slate-900 flex items-center">
+            <TicketIcon class="w-6 h-6 mr-3 text-primary" />
+            Available Tickets
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div class="flex items-center justify-center py-8">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <span class="ml-3 text-slate-600">Loading tickets...</span>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card v-else class="mb-8 shadow-lg border-0">
         <CardHeader>
           <CardTitle class="text-2xl font-semibold text-slate-900 flex items-center">
             <TicketIcon class="w-6 h-6 mr-3 text-primary" />
@@ -109,23 +125,10 @@
           </div>
         </CardContent>
       </Card>
+      <!-- Tikcets Section End -->
 
-      <Card v-else class="mb-8 shadow-lg border-0">
-        <CardHeader>
-          <CardTitle class="text-2xl font-semibold text-slate-900 flex items-center">
-            <TicketIcon class="w-6 h-6 mr-3 text-primary" />
-            Available Tickets
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="flex items-center justify-center py-8">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <span class="ml-3 text-slate-600">Loading tickets...</span>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card class="shadow-lg border-0">
+      <!-- Feedback Section -->
+      <Card v-if="isFeedbacksLoaded" class="shadow-lg border-0">
         <CardHeader>
           <CardTitle class="text-2xl font-semibold text-slate-900 flex items-center">
             <MessageSquareIcon class="w-6 h-6 mr-3 text-primary" />
@@ -133,19 +136,45 @@
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div class="text-center py-8">
+          <div class="flex items-center justify-center py-8">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <span class="ml-3 text-slate-600">Loading feedback...</span>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card v-else class="shadow-lg border-0">
+        <CardHeader>
+          <CardTitle class="text-2xl font-semibold text-slate-900 flex items-center">
+            <MessageSquareIcon class="w-6 h-6 mr-3 text-primary" />
+            Feedback
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div v-if="feedbacks.length > 0" class="grid gap-4">
+            <Card v-for="feedback in feedbacks" :key="feedback.id">
+              <!-- Not finished yet. need to fix the backend first!!! -->
+              <CardContent class="p-6">
+                <span>{{ feedback.comment }}</span><br>
+                <span>{{ feedback.rating }}</span>
+              </CardContent>
+              <!-- Not finished yet. need to fix the backend first!!! -->
+            </Card>
+          </div>
+          <div v-else class="text-center py-8">
             <MessageSquareIcon class="w-16 h-16 mx-auto text-slate-300 mb-4" />
             <p class="text-slate-500 text-lg italic">No feedback yet.</p>
             <p class="text-slate-400 text-sm mt-2">Be the first to share your thoughts about this event!</p>
           </div>
         </CardContent>
       </Card>
+      <!-- Feedback Section End -->
     </section>
   </ParticipantLayout>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import ParticipantLayout from '../../layouts/ParticipantLayout.vue'
 import { useEventStore } from '@/stores/eventStore'
@@ -165,32 +194,40 @@ import {
   ShoppingCartIcon,
   UsersIcon
 } from 'lucide-vue-next'
+import { useFeedbackStore } from '@/stores/feedbackStore'
+import { useUserStore } from '@/stores/userStore'
+
+const eventStore = useEventStore()
+const ticketStore = useTicketStore()
+const feedbackStore = useFeedbackStore()
+const userStore = useUserStore()
 
 const route = useRoute()
 const eventId = route.params.id as string
-const eventStore = useEventStore()
-const ticketStore = useTicketStore()
-const isTicketsLoaded = ref(false)
+const userId = userStore.userState.data?.id
+
+const isTicketsLoaded = computed(() => ticketStore.ticketsState.loading)
+const isFeedbacksLoaded = computed(() => feedbackStore.feedbacksState.loading)
 
 const event = computed(() => eventStore?.singleEventState?.data)
 const tickets = computed(() => {
   const allTickets = ticketStore.ticketsState?.data || []
   return allTickets.filter(ticket => ticket.event_id === eventId)
 })
+const feedbacks = computed(() => {
+  const allFeedbacks = feedbackStore.feedbacksState?.data || []
+  return allFeedbacks.filter(feedback => feedback.event_id === eventId)
+})
 
-onMounted(async () => {
-  try {
-    await eventStore.getEventById(eventId)
-    await ticketStore.getTickets()
-    isTicketsLoaded.value = true
-  } catch (error) {
-    console.error('Error loading event details:', error)
-    isTicketsLoaded.value = true
-  }
+onMounted(() => {
+  eventStore.getEventById(eventId)
+  ticketStore.getTickets()
+  feedbackStore.getFeedbacks(eventId)
 })
 
 async function handleBuyTicket(ticketId: string) {
-  console.log(ticketId)
+  console.log(`Tikcet ID: ${ticketId}`)
+  console.log(`User ID: ${userId}`)
   // buy ticket logic here
 }
 </script>
