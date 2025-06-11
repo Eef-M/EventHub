@@ -5,6 +5,7 @@ import (
 
 	"github.com/Eef-M/EventHub/backend/initializers"
 	"github.com/Eef-M/EventHub/backend/models"
+	"github.com/Eef-M/EventHub/backend/repository"
 	"github.com/Eef-M/EventHub/backend/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -75,10 +76,10 @@ func GetFeedbacks(c *gin.Context) {
 		return
 	}
 
-	var feedbacks []models.EventFeedback
-	if err := initializers.DB.Where("event_id = ?", eventID).Find(&feedbacks).Error; err != nil {
+	feedbacks, err := repository.GetAllFeedback(initializers.DB, eventID)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
+			"error": "Failed to fetch feedbacks: " + err.Error(),
 		})
 		return
 	}
@@ -86,5 +87,4 @@ func GetFeedbacks(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"data": feedbacks,
 	})
-
 }
