@@ -10,7 +10,7 @@ func GetAllFeedback(db *gorm.DB, eventID uuid.UUID) ([]dto.EventFeedbacksDTO, er
 	var feedbacks []dto.EventFeedbacksDTO
 
 	err := db.Table("event_feedbacks").
-		Select("event_feedbacks.comment, event_feedbacks.rating, event_feedbacks.created_at, users.username, users.avatar_url").
+		Select("event_feedbacks.id, event_feedbacks.comment, event_feedbacks.rating, event_feedbacks.created_at, users.username, users.avatar_url").
 		Joins("JOIN users ON event_feedbacks.user_id = users.id").
 		Order("event_feedbacks.created_at DESC").
 		Where("event_feedbacks.event_id = ?", eventID).
