@@ -86,8 +86,8 @@ func GetAllRegistrationsByOrganizerID(db *gorm.DB, organizerID uuid.UUID) ([]mod
 	return registrations, err
 }
 
-func GetAllFeedbackByOrganizerID(db *gorm.DB, organizerID uuid.UUID) ([]dto.EventFeedbackDTO, error) {
-	var feedbacks []dto.EventFeedbackDTO
+func GetAllFeedbackByOrganizerID(db *gorm.DB, organizerID uuid.UUID) ([]dto.EventFeedbackOrganizerDTO, error) {
+	var feedbacks []dto.EventFeedbackOrganizerDTO
 
 	err := db.Table("event_feedbacks").
 		Select("event_feedbacks.comment, event_feedbacks.rating, event_feedbacks.created_at, users.username, events.title AS event_title").

@@ -17,7 +17,7 @@ type EventRegistrationsOrganizerDTO struct {
 	RegisteredAt string `json:"registered_at"`
 }
 
-type EventFeedbackDTO struct {
+type EventFeedbackOrganizerDTO struct {
 	Username   string `json:"username"`
 	EventTitle string `json:"event_title"`
 	Comment    string `json:"comment"`
