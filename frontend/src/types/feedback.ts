@@ -1,7 +1,8 @@
 export interface FeedbackInterface {
   id: string
-  user_id: string
-  event_id: string
+  username: string
+  avatar_url: string
   rating: number
   comment: string
+  created_at: string
 }
