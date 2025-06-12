@@ -128,43 +128,95 @@
       <!-- Tikcets Section End -->
 
       <!-- Feedback Section -->
-      <Card v-if="isFeedbacksLoaded" class="shadow-lg border-0">
-        <CardHeader>
+      <Card v-if="isFeedbacksLoaded" class="shadow-lg border-0 bg-gradient-to-br from-slate-50 to-white">
+        <CardHeader class="pb-6">
           <CardTitle class="text-2xl font-semibold text-slate-900 flex items-center">
             <MessageSquareIcon class="w-6 h-6 mr-3 text-primary" />
-            Feedback
+            Community Feedback
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div class="flex items-center justify-center py-8">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <span class="ml-3 text-slate-600">Loading feedback...</span>
+          <div class="flex items-center justify-center py-12">
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+            <span class="ml-4 text-slate-600 text-lg">Loading feedback...</span>
           </div>
         </CardContent>
       </Card>
 
-      <Card v-else class="shadow-lg border-0">
-        <CardHeader>
-          <CardTitle class="text-2xl font-semibold text-slate-900 flex items-center">
-            <MessageSquareIcon class="w-6 h-6 mr-3 text-primary" />
-            Feedback
-          </CardTitle>
+      <Card v-else class="shadow-lg border-0 bg-gradient-to-br from-slate-50 to-white">
+        <CardHeader class="pb-6">
+          <div class="flex items-center justify-between">
+            <CardTitle class="text-2xl font-semibold text-slate-900 flex items-center">
+              <MessageSquareIcon class="w-6 h-6 mr-3 text-primary" />
+              Feedback
+            </CardTitle>
+            <Badge v-if="feedbacks && feedbacks.length > 0" variant="secondary" class="px-3 py-1">
+              {{ feedbacks.length }} {{ feedbacks.length === 1 ? 'Review' : 'Reviews' }}
+            </Badge>
+          </div>
         </CardHeader>
         <CardContent>
-          <div v-if="feedbacks.length > 0" class="grid gap-4">
-            <Card v-for="feedback in feedbacks" :key="feedback.id">
-              <!-- Not finished yet. need to fix the backend first!!! -->
-              <CardContent class="p-6">
-                <span>{{ feedback.comment }}</span><br>
-                <span>{{ feedback.rating }}</span>
-              </CardContent>
-              <!-- Not finished yet. need to fix the backend first!!! -->
-            </Card>
+          <div v-if="feedbacks && feedbacks.length > 0" class="space-y-6">
+            <div v-for="feedback in feedbacks" :key="feedback.id"
+              class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all duration-300">
+              <div class="flex items-start space-x-4">
+                <div class="flex-shrink-0">
+                  <img class="w-12 h-12 rounded-full object-cover ring-2 ring-slate-100" :src="feedback.avatar_url"
+                    :alt="feedback.username" />
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center space-x-2">
+                      <h4 class="text-sm font-semibold text-slate-900">{{ feedback.username }}</h4>
+                      <span class="text-xs text-slate-400">•</span>
+                      <span class="text-xs text-slate-500">{{ formatFeedbackDate(feedback.created_at) }}</span>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                      <div class="flex">
+                        <StarIcon v-for="star in 5" :key="star" :class="[
+                          'w-4 h-4 transition-colors',
+                          star <= feedback.rating
+                            ? 'text-yellow-400 fill-current'
+                            : 'text-gray-300'
+                        ]" />
+                      </div>
+                      <span class="text-sm font-medium text-slate-700 ml-1">{{ feedback.rating }}/5</span>
+                    </div>
+                  </div>
+                  <p class="text-slate-700 leading-relaxed text-sm">{{ feedback.comment }}</p>
+                  <div class="flex items-center space-x-4 mt-3 pt-3 border-t border-slate-100">
+                    <button
+                      class="flex items-center space-x-1 text-xs text-slate-500 hover:text-slate-700 transition-colors">
+                      <ThumbsUpIcon class="w-3 h-3" />
+                      <span>Helpful</span>
+                    </button>
+                    <button
+                      class="flex items-center space-x-1 text-xs text-slate-500 hover:text-slate-700 transition-colors">
+                      <MessageCircleIcon class="w-3 h-3" />
+                      <span>Reply</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="feedbacks.length >= 5" class="text-center pt-4">
+              <Button variant="outline" class="px-6 py-2">
+                Load More Reviews
+              </Button>
+            </div>
           </div>
+
           <div v-else class="text-center py-8">
             <MessageSquareIcon class="w-16 h-16 mx-auto text-slate-300 mb-4" />
             <p class="text-slate-500 text-lg italic">No feedback yet.</p>
             <p class="text-slate-400 text-sm mt-2">Be the first to share your thoughts about this event!</p>
+            <div class="mt-6">
+              <Button class="px-6 py-2 bg-purple-600 hover:bg-purple-700 cursor-pointer">
+                <MessageSquareIcon class="w-4 h-4 mr-2" />
+                Write First Feedback
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -178,7 +230,7 @@ import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import ParticipantLayout from '../../layouts/ParticipantLayout.vue'
 import { useEventStore } from '@/stores/eventStore'
-import { formatDate, formatTime } from '@/utils/format'
+import { formatDate, formatFeedbackDate, formatTime } from '@/utils/format'
 import { useTicketStore } from '@/stores/ticketStore'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -192,7 +244,10 @@ import {
   FileTextIcon,
   MessageSquareIcon,
   ShoppingCartIcon,
-  UsersIcon
+  UsersIcon,
+  StarIcon,
+  ThumbsUpIcon,
+  MessageCircleIcon
 } from 'lucide-vue-next'
 import { useFeedbackStore } from '@/stores/feedbackStore'
 import { useUserStore } from '@/stores/userStore'
@@ -214,10 +269,7 @@ const tickets = computed(() => {
   const allTickets = ticketStore.ticketsState?.data || []
   return allTickets.filter(ticket => ticket.event_id === eventId)
 })
-const feedbacks = computed(() => {
-  const allFeedbacks = feedbackStore.feedbacksState?.data || []
-  return allFeedbacks.filter(feedback => feedback.event_id === eventId)
-})
+const feedbacks = computed(() => feedbackStore.feedbacksState?.data)
 
 onMounted(() => {
   eventStore.getEventById(eventId)
