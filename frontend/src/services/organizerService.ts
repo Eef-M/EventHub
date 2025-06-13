@@ -2,7 +2,7 @@ import type { EventInterface } from "@/types/event"
 import type { DashboardStatsInterface, OrganizerEventFeedbackInterface, OrganizerEventRegistrationInterface, OrganizerTicketInterface } from "@/types/organizer"
 import axios from "axios"
 
-const API_BASE_URL = 'http://localhost:8000/api/v1'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 export async function fetchDashboardStats(): Promise<DashboardStatsInterface> {
   const response = await axios.get(`${API_BASE_URL}/organizer/dashboard`, { withCredentials: true })

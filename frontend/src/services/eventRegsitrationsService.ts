@@ -1,7 +1,7 @@
 import type { EventRegistrationsInterface, MyRegistrationsInterface } from "@/types/eventRegistrations";
 import axios from "axios";
 
-const API_BASE_URL = 'http://localhost:8000/api/v1'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 export async function fetchMyRegistrations(): Promise<MyRegistrationsInterface[]> {
   const response = await axios.get(`${API_BASE_URL}/events/my-registrations`, { withCredentials: true })
