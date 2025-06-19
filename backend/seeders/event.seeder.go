@@ -27,7 +27,8 @@ func SeedEvents(user []models.User) []models.Event {
 			Time:        utils.RandomTimeWIB(r),
 			Category:    "Webinar",
 			Description: "A conference about Vue.js and modern web development.",
-			EventStatus: "open",
+			IsPublic:    true,
+			IsOpen:      true,
 			BannerURL:   "https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg",
 		},
 		{
@@ -39,7 +40,8 @@ func SeedEvents(user []models.User) []models.Event {
 			Time:        utils.RandomTimeWIB(r),
 			Category:    "Concert",
 			Description: "Music and tech come together in this spectacular event.",
-			EventStatus: "open",
+			IsPublic:    true,
+			IsOpen:      true,
 			BannerURL:   "https://images.pexels.com/photos/167636/pexels-photo-167636.jpeg",
 		},
 		{
@@ -51,7 +53,8 @@ func SeedEvents(user []models.User) []models.Event {
 			Time:        utils.RandomTimeWIB(r),
 			Category:    "Workshop",
 			Description: "A workshop for aspiring startup founders.",
-			EventStatus: "open",
+			IsPublic:    true,
+			IsOpen:      true,
 			BannerURL:   "https://images.pexels.com/photos/3183197/pexels-photo-3183197.jpeg",
 		},
 		{
@@ -63,7 +66,8 @@ func SeedEvents(user []models.User) []models.Event {
 			Time:        utils.RandomTimeWIB(r),
 			Category:    "Conference",
 			Description: "Exploring the latest trends in data science, AI, and machine learning.",
-			EventStatus: "open",
+			IsPublic:    true,
+			IsOpen:      true,
 			BannerURL:   "https://images.pexels.com/photos/2004161/pexels-photo-2004161.jpeg",
 		},
 		{
@@ -75,7 +79,8 @@ func SeedEvents(user []models.User) []models.Event {
 			Time:        utils.RandomTimeWIB(r),
 			Category:    "Workshop",
 			Description: "Intensive 3-day bootcamp for building modern mobile applications.",
-			EventStatus: "open",
+			IsPublic:    true,
+			IsOpen:      true,
 			BannerURL:   "https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg",
 		},
 		{
@@ -87,8 +92,22 @@ func SeedEvents(user []models.User) []models.Event {
 			Time:        utils.RandomTimeWIB(r),
 			Category:    "Exhibition",
 			Description: "Showcasing the future of gaming technology and innovation.",
-			EventStatus: "open",
+			IsPublic:    true,
+			IsOpen:      true,
 			BannerURL:   "https://images.pexels.com/photos/159393/gamepad-video-game-controller-game-controller-controller-159393.jpeg",
+		},
+		{
+			ID:          uuid.New(),
+			OrganizerID: user[1].ID,
+			Title:       "LLM Development",
+			Location:    "Bandung",
+			Date:        utils.RandomDateBetween(startDate, endDate, r),
+			Time:        utils.RandomTimeWIB(r),
+			Category:    "Workshop",
+			Description: "Getting to know the basics of the Large Language Model.",
+			IsPublic:    true,
+			IsOpen:      false,
+			BannerURL:   "https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg",
 		},
 	}
 
