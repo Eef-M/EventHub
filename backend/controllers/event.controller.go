@@ -144,6 +144,7 @@ func CreateEvent(c *gin.Context) {
 		Time:        parseTime,
 		BannerURL:   filename,
 		IsPublic:    true,
+		IsOpen:      true,
 	}
 
 	if err := initializers.DB.Create(&event).Error; err != nil {
@@ -310,5 +311,54 @@ func DeleteEvent(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Delete successfully",
+	})
+}
+
+func IsPublicAndIsOpenHandler(c *gin.Context) {
+	eventID := c.Param("id")
+	parsedID, err := uuid.Parse(eventID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid event ID",
+		})
+		return
+	}
+
+	var body struct {
+		IsPublic bool `json:"is_public" form:"is_public"`
+		IsOpen   bool `json:"is_open" form:"is_open"`
+	}
+
+	if err := c.ShouldBind(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid request body",
+		})
+		return
+	}
+
+	var event models.Event
+	if err := initializers.DB.First(&event, "id = ?", parsedID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Event not found!",
+		})
+		return
+	}
+
+	event.IsPublic = body.IsPublic
+	event.IsOpen = body.IsOpen
+
+	if err := initializers.DB.Save(&event).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to update event status: " + err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Event visibility and status updated successfully",
+		"data": gin.H{
+			"is_public": event.IsPublic,
+			"is_open":   event.IsOpen,
+		},
 	})
 }

@@ -42,6 +42,8 @@ func InitRoute(app *gin.Engine) {
 
 		events.POST("/:id/feedbacks", middleware.RequireAuth, controllers.SendFeedback)
 		events.GET("/:id/feedbacks", controllers.GetFeedbacks)
+
+		events.PATCH("/:id/availability", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.IsPublicAndIsOpenHandler)
 	}
 
 	// Ticket Group
