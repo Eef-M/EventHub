@@ -63,6 +63,15 @@ func SeedTickets(events []models.Event) []models.Ticket {
 			Quota:       100,
 			TicketCode:  utils.GenerateTicketCode(),
 		},
+		{
+			ID:          uuid.New(),
+			EventID:     events[6].ID,
+			Name:        "VIP",
+			Description: "Tikcet for VIP.",
+			Price:       95,
+			Quota:       100,
+			TicketCode:  utils.GenerateTicketCode(),
+		},
 	}
 
 	for _, ticket := range tickets {

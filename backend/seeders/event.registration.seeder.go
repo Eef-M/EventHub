@@ -74,6 +74,22 @@ func SeedEventRegistrations(users []models.User, events []models.Event, tickets 
 			Status:       "registered",
 			RegisteredAt: time.Now(),
 		},
+		{
+			ID:           uuid.New(),
+			UserID:       users[2].ID,
+			EventID:      events[6].ID,
+			TicketID:     tickets[6].ID,
+			Status:       "registered",
+			RegisteredAt: time.Now(),
+		},
+		{
+			ID:           uuid.New(),
+			UserID:       users[3].ID,
+			EventID:      events[6].ID,
+			TicketID:     tickets[6].ID,
+			Status:       "registered",
+			RegisteredAt: time.Now(),
+		},
 	}
 
 	for _, registration := range registrations {
