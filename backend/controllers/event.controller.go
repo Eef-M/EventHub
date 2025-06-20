@@ -324,6 +324,15 @@ func IsPublicAndIsOpenHandler(c *gin.Context) {
 		return
 	}
 
+	userInterface, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Unauthorized",
+		})
+		return
+	}
+	user := userInterface.(models.User)
+
 	var body struct {
 		IsPublic bool `json:"is_public" form:"is_public"`
 		IsOpen   bool `json:"is_open" form:"is_open"`
@@ -337,9 +346,9 @@ func IsPublicAndIsOpenHandler(c *gin.Context) {
 	}
 
 	var event models.Event
-	if err := initializers.DB.First(&event, "id = ?", parsedID).Error; err != nil {
+	if err := initializers.DB.Where("id = ? AND organizer_id = ?", parsedID, user.ID).First(&event).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
-			"error": "Event not found!",
+			"error": "You are not allowed to update event status / " + err.Error(),
 		})
 		return
 	}

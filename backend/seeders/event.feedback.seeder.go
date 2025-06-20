@@ -29,6 +29,20 @@ func SeedEventFeedbacks(users []models.User, events []models.Event) {
 			Rating:  4,
 			Comment: "Nice",
 		},
+		{
+			ID:      uuid.New(),
+			UserID:  users[2].ID,
+			EventID: events[6].ID,
+			Rating:  5,
+			Comment: "Good!",
+		},
+		{
+			ID:      uuid.New(),
+			UserID:  users[3].ID,
+			EventID: events[6].ID,
+			Rating:  4,
+			Comment: "Not Bad!",
+		},
 	}
 
 	for _, feedback := range feedbacks {
