@@ -32,3 +32,8 @@ export async function fetchUpdateEvent(id: string, payload: FormData): Promise<E
 export async function fetchDeleteEvent(id: string): Promise<void> {
   await axios.delete(`${API_BASE_URL}/events/${id}`, { withCredentials: true })
 }
+
+export async function fetchEventAvailability(id: string, payload: FormData): Promise<EventInterface> {
+  const response = await axios.patch(`${API_BASE_URL}/event/${id}/availability`, payload, { withCredentials: true })
+  return response.data.data
+} 
