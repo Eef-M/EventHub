@@ -1,6 +1,6 @@
 import { defineStore } from "pinia"
 import type { EventInterface } from "@/types/event"
-import { fetchCreateEvent, fetchDeleteEvent, fetchEventById, fetchEvents, fetchUpdateEvent } from "@/services/eventService"
+import { fetchCreateEvent, fetchDeleteEvent, fetchEventAvailability, fetchEventById, fetchEvents, fetchUpdateEvent } from "@/services/eventService"
 import { createAsyncState } from "@/utils/asyncState"
 
 export const useEventStore = defineStore('event', {
@@ -10,6 +10,7 @@ export const useEventStore = defineStore('event', {
     createState: createAsyncState(null),
     updateState: createAsyncState(null),
     deleteState: createAsyncState(null),
+    eventAvl: createAsyncState(null)
   }),
   actions: {
     async getEvents() {
@@ -76,6 +77,19 @@ export const useEventStore = defineStore('event', {
         throw err
       } finally {
         this.deleteState.loading = false
+      }
+    },
+
+    async eventAvailability(id: string, payload: FormData) {
+      this.eventAvl.loading = true
+      this.eventAvl.error = null
+      try {
+        await fetchEventAvailability(id, payload)
+      } catch (err: any) {
+        this.eventAvl.error = err?.response?.data?.error || 'Failed to update event availability'
+        throw err
+      } finally {
+        this.eventAvl.loading = false
       }
     }
   }
