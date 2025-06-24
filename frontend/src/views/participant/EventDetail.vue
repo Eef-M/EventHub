@@ -128,177 +128,179 @@
       <!-- Tickets Section End -->
 
       <!-- Feedback Section -->
-      <Card v-if="isFeedbacksLoaded" class="shadow-lg border-0 bg-gradient-to-br from-slate-50 to-white">
-        <CardHeader class="pb-6">
-          <CardTitle class="text-2xl font-semibold text-slate-900 flex items-center">
-            <MessageSquareIcon class="w-6 h-6 mr-3 text-primary" />
-            Community Feedback
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="flex items-center justify-center py-12">
-            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
-            <span class="ml-4 text-slate-600 text-lg">Loading feedback...</span>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card v-else class="shadow-lg border-0 bg-gradient-to-br from-slate-50 to-white">
-        <CardHeader class="pb-6">
-          <div class="flex items-center justify-between">
+      <div v-if="event?.is_open === false">
+        <Card v-if="isFeedbacksLoaded" class="shadow-lg border-0 bg-gradient-to-br from-slate-50 to-white">
+          <CardHeader class="pb-6">
             <CardTitle class="text-2xl font-semibold text-slate-900 flex items-center">
               <MessageSquareIcon class="w-6 h-6 mr-3 text-primary" />
               Feedback
             </CardTitle>
-            <Badge v-if="feedbacks && feedbacks.length > 0" variant="secondary" class="px-3 py-1">
-              {{ feedbacks.length }} {{ feedbacks.length === 1 ? 'Review' : 'Reviews' }}
-            </Badge>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <!-- Feedback Form -->
-          <div v-if="userStore.userState.data"
-            class="mb-8 p-6 bg-white rounded-xl border-2 border-dashed border-slate-200 hover:border-purple-300 transition-colors">
-            <h3 class="text-lg font-semibold text-slate-900 mb-4 flex items-center">
-              <EditIcon class="w-5 h-5 mr-2 text-purple-600" />
-              Share Your Experience
-            </h3>
-
-            <form @submit.prevent="handleSubmitFeedback" class="space-y-4">
-              <!-- Rating Section -->
-              <div>
-                <label class="block text-sm font-medium text-slate-700 mb-2">Rating</label>
-                <div class="flex items-center space-x-2">
-                  <div class="flex space-x-1">
-                    <button v-for="star in 5" :key="star" type="button" @click="feedbackForm.rating = star"
-                      @mouseover="hoverRating = star" @mouseleave="hoverRating = 0"
-                      class="p-1 transition-transform hover:scale-110">
-                      <StarIcon :class="[
-                        'w-6 h-6 transition-colors',
-                        (hoverRating || feedbackForm.rating) >= star
-                          ? 'text-yellow-400 fill-current'
-                          : 'text-gray-300 hover:text-yellow-200'
-                      ]" />
-                    </button>
-                  </div>
-                  <span v-if="feedbackForm.rating > 0" class="text-sm text-slate-600">
-                    {{ feedbackForm.rating }}/5 {{ getRatingText(feedbackForm.rating) }}
-                  </span>
-                </div>
-              </div>
-
-              <!-- Comment Section -->
-              <div>
-                <label for="comment" class="block text-sm font-medium text-slate-700 mb-2">
-                  Your Comment
-                </label>
-                <textarea id="comment" v-model="feedbackForm.comment" rows="4"
-                  class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none transition-all"
-                  placeholder="Share your thoughts about this event..." :maxlength="500"></textarea>
-                <div class="flex justify-between items-center mt-1">
-                  <p class="text-xs text-slate-500">
-                    {{ feedbackForm.comment.length }}/500 characters
-                  </p>
-                  <p v-if="feedbackForm.comment.length > 450" class="text-xs text-orange-500">
-                    {{ 500 - feedbackForm.comment.length }} characters remaining
-                  </p>
-                </div>
-              </div>
-
-              <!-- Form Actions -->
-              <div class="flex items-center justify-between pt-4 border-t border-slate-100">
-                <Button type="button" variant="outline" @click="resetFeedbackForm" class="px-4 py-2">
-                  <XIcon class="w-4 h-4 mr-2" />
-                  Clear
-                </Button>
-                <Button type="submit"
-                  :disabled="!feedbackForm.rating || !feedbackForm.comment.trim() || feedbackSubmitting"
-                  class="px-6 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed">
-                  <div v-if="feedbackSubmitting" class="flex items-center">
-                    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Submitting...
-                  </div>
-                  <div v-else class="flex items-center">
-                    <SendIcon class="w-4 h-4 mr-2" />
-                    Submit Feedback
-                  </div>
-                </Button>
-              </div>
-            </form>
-          </div>
-
-          <!-- Login prompt for non-authenticated users -->
-          <div v-else class="mb-8 p-6 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-200">
-            <div class="text-center">
-              <UserIcon class="w-12 h-12 mx-auto text-purple-400 mb-3" />
-              <h3 class="text-lg font-semibold text-slate-900 mb-2">Login to Share Your Feedback</h3>
-              <p class="text-slate-600 mb-4">Join our community and share your experience with this event.</p>
-              <Button class="px-6 py-2 bg-purple-600 hover:bg-purple-700">
-                <LogInIcon class="w-4 h-4 mr-2" />
-                Login to Continue
-              </Button>
+          </CardHeader>
+          <CardContent>
+            <div class="flex items-center justify-center py-12">
+              <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+              <span class="ml-4 text-slate-600 text-lg">Loading feedback...</span>
             </div>
-          </div>
+          </CardContent>
+        </Card>
 
-          <!-- Feedback List -->
-          <div v-if="feedbacks && feedbacks.length > 0" class="space-y-6">
-            <div v-for="feedback in feedbacks" :key="feedback.id"
-              class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all duration-300">
-              <div class="flex items-start space-x-4">
-                <div class="flex-shrink-0">
-                  <img class="w-12 h-12 rounded-full object-cover ring-2 ring-slate-100" :src="feedback.avatar_url"
-                    :alt="feedback.username" />
-                </div>
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center justify-between mb-2">
-                    <div class="flex items-center space-x-2">
-                      <h4 class="text-sm font-semibold text-slate-900">{{ feedback.username }}</h4>
-                      <span class="text-xs text-slate-400">•</span>
-                      <span class="text-xs text-slate-500">{{ formatFeedbackDate(feedback.created_at) }}</span>
-                    </div>
-                    <div class="flex items-center space-x-1">
-                      <div class="flex">
-                        <StarIcon v-for="star in 5" :key="star" :class="[
-                          'w-4 h-4 transition-colors',
-                          star <= feedback.rating
+        <Card v-else class="shadow-lg border-0 bg-gradient-to-br from-slate-50 to-white">
+          <CardHeader class="pb-6">
+            <div class="flex items-center justify-between">
+              <CardTitle class="text-2xl font-semibold text-slate-900 flex items-center">
+                <MessageSquareIcon class="w-6 h-6 mr-3 text-primary" />
+                Feedback
+              </CardTitle>
+              <Badge v-if="feedbacks && feedbacks.length > 0" variant="secondary" class="px-3 py-1">
+                {{ feedbacks.length }} {{ feedbacks.length === 1 ? 'Review' : 'Reviews' }}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <!-- Feedback Form -->
+            <div v-if="userStore.userState.data"
+              class="mb-8 p-6 bg-white rounded-xl border-2 border-dashed border-slate-200 hover:border-purple-300 transition-colors">
+              <h3 class="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+                <EditIcon class="w-5 h-5 mr-2 text-purple-600" />
+                Share Your Experience
+              </h3>
+
+              <form @submit.prevent="handleSubmitFeedback" class="space-y-4">
+                <!-- Rating Section -->
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-2">Rating</label>
+                  <div class="flex items-center space-x-2">
+                    <div class="flex space-x-1">
+                      <button v-for="star in 5" :key="star" type="button" @click="feedbackForm.rating = star"
+                        @mouseover="hoverRating = star" @mouseleave="hoverRating = 0"
+                        class="p-1 transition-transform hover:scale-110">
+                        <StarIcon :class="[
+                          'w-6 h-6 transition-colors',
+                          (hoverRating || feedbackForm.rating) >= star
                             ? 'text-yellow-400 fill-current'
-                            : 'text-gray-300'
+                            : 'text-gray-300 hover:text-yellow-200'
                         ]" />
-                      </div>
-                      <span class="text-sm font-medium text-slate-700 ml-1">{{ feedback.rating }}/5</span>
+                      </button>
                     </div>
-                  </div>
-                  <p class="text-slate-700 leading-relaxed text-sm">{{ feedback.comment }}</p>
-                  <div class="flex items-center space-x-4 mt-3 pt-3 border-t border-slate-100">
-                    <button
-                      class="flex items-center space-x-1 text-xs text-slate-500 hover:text-slate-700 transition-colors">
-                      <ThumbsUpIcon class="w-3 h-3" />
-                      <span>Helpful</span>
-                    </button>
-                    <button
-                      class="flex items-center space-x-1 text-xs text-slate-500 hover:text-slate-700 transition-colors">
-                      <MessageCircleIcon class="w-3 h-3" />
-                      <span>Reply</span>
-                    </button>
+                    <span v-if="feedbackForm.rating > 0" class="text-sm text-slate-600">
+                      {{ feedbackForm.rating }}/5 {{ getRatingText(feedbackForm.rating) }}
+                    </span>
                   </div>
                 </div>
+
+                <!-- Comment Section -->
+                <div>
+                  <label for="comment" class="block text-sm font-medium text-slate-700 mb-2">
+                    Your Comment
+                  </label>
+                  <textarea id="comment" v-model="feedbackForm.comment" rows="4"
+                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none transition-all"
+                    placeholder="Share your thoughts about this event..." :maxlength="500"></textarea>
+                  <div class="flex justify-between items-center mt-1">
+                    <p class="text-xs text-slate-500">
+                      {{ feedbackForm.comment.length }}/500 characters
+                    </p>
+                    <p v-if="feedbackForm.comment.length > 450" class="text-xs text-orange-500">
+                      {{ 500 - feedbackForm.comment.length }} characters remaining
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+                  <Button type="button" variant="outline" @click="resetFeedbackForm" class="px-4 py-2">
+                    <XIcon class="w-4 h-4 mr-2" />
+                    Clear
+                  </Button>
+                  <Button type="submit"
+                    :disabled="!feedbackForm.rating || !feedbackForm.comment.trim() || feedbackSubmitting"
+                    class="px-6 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <div v-if="feedbackSubmitting" class="flex items-center">
+                      <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Submitting...
+                    </div>
+                    <div v-else class="flex items-center">
+                      <SendIcon class="w-4 h-4 mr-2" />
+                      Submit Feedback
+                    </div>
+                  </Button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Login prompt for non-authenticated users -->
+            <div v-else class="mb-8 p-6 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-200">
+              <div class="text-center">
+                <UserIcon class="w-12 h-12 mx-auto text-purple-400 mb-3" />
+                <h3 class="text-lg font-semibold text-slate-900 mb-2">Login to Share Your Feedback</h3>
+                <p class="text-slate-600 mb-4">Join our community and share your experience with this event.</p>
+                <Button class="px-6 py-2 bg-purple-600 hover:bg-purple-700">
+                  <LogInIcon class="w-4 h-4 mr-2" />
+                  Login to Continue
+                </Button>
               </div>
             </div>
 
-            <div v-if="feedbacks.length >= 5" class="text-center pt-4">
-              <Button variant="outline" class="px-6 py-2">
-                Load More Reviews
-              </Button>
-            </div>
-          </div>
+            <!-- Feedback List -->
+            <div v-if="feedbacks && feedbacks.length > 0" class="space-y-6">
+              <div v-for="feedback in feedbacks" :key="feedback.id"
+                class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all duration-300">
+                <div class="flex items-start space-x-4">
+                  <div class="flex-shrink-0">
+                    <img class="w-12 h-12 rounded-full object-cover ring-2 ring-slate-100" :src="feedback.avatar_url"
+                      :alt="feedback.username" />
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between mb-2">
+                      <div class="flex items-center space-x-2">
+                        <h4 class="text-sm font-semibold text-slate-900">{{ feedback.username }}</h4>
+                        <span class="text-xs text-slate-400">•</span>
+                        <span class="text-xs text-slate-500">{{ formatFeedbackDate(feedback.created_at) }}</span>
+                      </div>
+                      <div class="flex items-center space-x-1">
+                        <div class="flex">
+                          <StarIcon v-for="star in 5" :key="star" :class="[
+                            'w-4 h-4 transition-colors',
+                            star <= feedback.rating
+                              ? 'text-yellow-400 fill-current'
+                              : 'text-gray-300'
+                          ]" />
+                        </div>
+                        <span class="text-sm font-medium text-slate-700 ml-1">{{ feedback.rating }}/5</span>
+                      </div>
+                    </div>
+                    <p class="text-slate-700 leading-relaxed text-sm">{{ feedback.comment }}</p>
+                    <div class="flex items-center space-x-4 mt-3 pt-3 border-t border-slate-100">
+                      <button
+                        class="flex items-center space-x-1 text-xs text-slate-500 hover:text-slate-700 transition-colors">
+                        <ThumbsUpIcon class="w-3 h-3" />
+                        <span>Helpful</span>
+                      </button>
+                      <button
+                        class="flex items-center space-x-1 text-xs text-slate-500 hover:text-slate-700 transition-colors">
+                        <MessageCircleIcon class="w-3 h-3" />
+                        <span>Reply</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-          <div v-else class="text-center py-8">
-            <MessageSquareIcon class="w-16 h-16 mx-auto text-slate-300 mb-4" />
-            <p class="text-slate-500 text-lg italic">No feedback yet.</p>
-            <p class="text-slate-400 text-sm mt-2">Be the first to share your thoughts about this event!</p>
-          </div>
-        </CardContent>
-      </Card>
+              <div v-if="feedbacks.length >= 5" class="text-center pt-4">
+                <Button variant="outline" class="px-6 py-2">
+                  Load More Reviews
+                </Button>
+              </div>
+            </div>
+
+            <div v-else class="text-center py-8">
+              <MessageSquareIcon class="w-16 h-16 mx-auto text-slate-300 mb-4" />
+              <p class="text-slate-500 text-lg italic">No feedback yet.</p>
+              <p class="text-slate-400 text-sm mt-2">Be the first to share your thoughts about this event!</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
       <!-- Feedback Section End -->
     </section>
   </ParticipantLayout>
