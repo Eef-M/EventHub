@@ -7,7 +7,9 @@
       </Button>
     </div>
 
-    <EventsTable :events="organizerStore.eventsState.data" @edit="openEditModal" @delete="openDeleteModal" />
+    <EventsTable :events="organizerStore.eventsState.data" :isUpdatingAvailability="eventStore.eventAvl.loading"
+      @edit="openEditModal" @delete="openDeleteModal" @togglePublic="handleTogglePublic"
+      @toggleOpen="handleToggleOpen" />
 
     <EventFormModal v-model:isOpen="showFormModal" :isEditing="isEditing" :eventData="selectedEvent"
       :isLoading="isEditing ? eventStore.updateState.loading : eventStore.createState.loading"
@@ -115,6 +117,55 @@ async function confirmDeleteEvent() {
     })
     console.error('Delete Event Failed: ', eventStore.deleteState.error, err)
   }
+}
+
+async function handleTogglePublic(event: EventInterface) {
+  try {
+    const payload = {
+      is_public: !event.is_public,
+      is_open: event.is_open
+    }
+
+    await eventStore.eventAvailability(event.id, createAvailabilityFormData(payload))
+    await organizerStore.getMyEvents()
+
+    toast.success('Event availiability updated', {
+      description: `Event is now ${!event.is_public ? 'public' : 'private'}`,
+    })
+  } catch (err) {
+    toast.error('Failed to update event public status', {
+      description: eventStore.eventAvl.error || 'An unexpected error occurred',
+    })
+    console.error('Toggle Public Failed: ', err)
+  }
+}
+
+async function handleToggleOpen(event: EventInterface) {
+  try {
+    const payload = {
+      is_public: event.is_public,
+      is_open: !event.is_open
+    }
+
+    await eventStore.eventAvailability(event.id, createAvailabilityFormData(payload))
+    await organizerStore.getMyEvents()
+
+    toast.success('Event availiability updated', {
+      description: `Event is now ${!event.is_open ? 'open' : 'closed'}`,
+    })
+  } catch (err) {
+    toast.error('Failed to update event open status', {
+      description: eventStore.eventAvl.error || 'An unexpected error occurred',
+    })
+    console.error('Toggle Open Failed: ', err)
+  }
+}
+
+function createAvailabilityFormData(payload: { is_public: boolean; is_open: boolean }) {
+  const formData = new FormData()
+  formData.append('is_public', payload.is_public.toString())
+  formData.append('is_open', payload.is_open.toString())
+  return formData
 }
 
 function handleCancelForm() {
