@@ -19,7 +19,7 @@ type EventRegistration struct {
 	UserID       uuid.UUID `gorm:"type:uuid;not null" json:"user_id"`
 	EventID      uuid.UUID `gorm:"type:uuid;not null" json:"event_id"`
 	TicketID     uuid.UUID `gorm:"type:uuid;not null" json:"ticket_id"`
-	Status       string    `gorm:"type:registration_status;default:'registered'" json:"status"`
+	Status       Status    `gorm:"type:registration_status;default:'registered'" json:"status"`
 	RegisteredAt time.Time `gorm:"autoCreateTime" json:"registered_at"`
 
 	User   User   `gorm:"foreignKey:UserID;references:ID" json:"-"`

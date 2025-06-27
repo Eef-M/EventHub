@@ -128,7 +128,7 @@ func GetAllRegistrationsHandler(c *gin.Context) {
 			Email:        r.User.Email,
 			EventTitle:   r.Event.Title,
 			TicketName:   r.Ticket.Name,
-			Status:       r.Status,
+			Status:       string(r.Status),
 			RegisteredAt: r.RegisteredAt.Format("2006-01-02 15:04"),
 		})
 	}
