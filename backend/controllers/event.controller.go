@@ -29,7 +29,7 @@ func GetEvents(c *gin.Context) {
 	}
 	offset := (page - 1) * limit
 
-	if err := initializers.DB.Limit(limit).Offset(offset).Find(&events).Error; err != nil {
+	if err := initializers.DB.Limit(limit).Offset(offset).Where("is_open = ?", true).Find(&events).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
