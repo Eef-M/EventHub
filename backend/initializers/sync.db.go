@@ -9,5 +9,6 @@ func SyncDB() {
 		&models.Ticket{},
 		&models.EventRegistration{},
 		&models.EventFeedback{},
+		&models.Payment{},
 	)
 }
