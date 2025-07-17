@@ -10,7 +10,7 @@ import (
 
 type CreatePaymentRequest struct {
 	EventID  uuid.UUID `json:"event_id"`
-	Amount   int64     `json:amount`
+	Amount   int64     `json:"amount"`
 	Currency string    `json:"currency"`
 }
 
