@@ -28,8 +28,11 @@ func ParseTime(timeStr string) (time.Time, error) {
 
 func RandomDateBetween(start, end time.Time, r *rand.Rand) time.Time {
 	diff := end.Sub(start)
-	randomSeconds := time.Duration(r.Int63n(int64(diff.Seconds()))) * time.Second
-	return start.Add(randomSeconds)
+	if diff <= 0 {
+		return start
+	}
+	randomOffset := time.Duration(r.Int63n(int64(diff)))
+	return start.Add(randomOffset)
 }
 
 func RandomTimeWIB(r *rand.Rand) time.Time {
