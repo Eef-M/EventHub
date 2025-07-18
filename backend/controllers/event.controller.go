@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/Eef-M/EventHub/backend/handlers"
 	"github.com/Eef-M/EventHub/backend/initializers"
 	"github.com/Eef-M/EventHub/backend/models"
 	"github.com/Eef-M/EventHub/backend/utils"
@@ -126,7 +127,7 @@ func CreateEvent(c *gin.Context) {
 		return
 	}
 
-	filename, err := utils.SaveImage(c, file)
+	filename, err := handlers.SaveImage(c, file)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -242,7 +243,7 @@ func UpdateEvent(c *gin.Context) {
 			}
 		}
 
-		filename, err := utils.SaveImage(c, file)
+		filename, err := handlers.SaveImage(c, file)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": err.Error(),

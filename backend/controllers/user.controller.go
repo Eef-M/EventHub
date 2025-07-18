@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/Eef-M/EventHub/backend/handlers"
 	"github.com/Eef-M/EventHub/backend/initializers"
 	"github.com/Eef-M/EventHub/backend/models"
 	"github.com/Eef-M/EventHub/backend/utils"
@@ -71,7 +72,7 @@ func UpdateMyProfile(c *gin.Context) {
 	}
 
 	if file, err := c.FormFile("avatar_url"); err == nil {
-		newAvatarURL, err := utils.SaveAvatarImage(c, file, currentUser.AvatarURL)
+		newAvatarURL, err := handlers.SaveAvatarImage(c, file, currentUser.AvatarURL)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": "Failed to upload avatar",
