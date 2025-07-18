@@ -2,6 +2,8 @@ package routes
 
 import (
 	"github.com/Eef-M/EventHub/backend/controllers"
+	"github.com/Eef-M/EventHub/backend/handlers"
+	"github.com/Eef-M/EventHub/backend/initializers"
 	"github.com/Eef-M/EventHub/backend/middleware"
 	"github.com/gin-gonic/gin"
 )
@@ -65,5 +67,11 @@ func InitRoute(app *gin.Engine) {
 		organizer.GET("/tickets", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.GetAllTicketsHandler)
 		organizer.GET("/registrations", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.GetAllRegistrationsHandler)
 		organizer.GET("/feedbacks", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.GetAllFeedbackHandler)
+	}
+
+	// Payment Group
+	payment := api.Group("/payments")
+	{
+		payment.POST("/webhook", middleware.RequireAuth, handlers.StripeWebhookhandler(initializers.DB))
 	}
 }
