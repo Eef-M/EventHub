@@ -1,5 +1,5 @@
-import { useAuthStore } from "../stores/authStroe"
-import { useUserStore } from "../stores/userStore"
+import { useAuthStore } from "@/stores/authStore"
+import { useUserStore } from "@/stores/userStore"
 
 export const initAuth = async () => {
   const authStore = useAuthStore();

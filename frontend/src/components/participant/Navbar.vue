@@ -15,7 +15,7 @@
           </RouterLink>
 
           <div class="flex items-center">
-            <div v-if="user" class="relative">
+            <div v-if="userStore.isLoggedIn" class="relative">
               <DropdownMenu>
                 <DropdownMenuTrigger as-child>
                   <Button variant="ghost" size="sm"
@@ -73,7 +73,7 @@
 import { RouterLink } from 'vue-router'
 import { computed, onMounted } from 'vue';
 import { useUserStore } from '@/stores/userStore';
-import { useAuthStore } from '@/stores/authStroe';
+import { useAuthStore } from '@/stores/authStore';
 import router from '@/router';
 import {
   DropdownMenu,
@@ -89,16 +89,22 @@ import { Button } from '@/components/ui/button'
 const userStore = useUserStore()
 const authStore = useAuthStore()
 
-const user = computed(() => userStore.userState.data)
+const user = computed(() => userStore.user)
 
-onMounted(() => {
-  userStore.getMyProfile()
+onMounted(async () => {
+  if (!userStore.isLoggedIn) {
+    await userStore.checkAuthStatus()
+  }
 })
 
 const handleLogout = async () => {
-  await authStore.logout()
-  router.push('/')
-  window.location.reload()
+  try {
+    await authStore.logout()
+    userStore.clearUserData()
+    router.push('/')
+  } catch (error) {
+    console.error('Logout failed:', error)
+  }
 }
 
 // Helper function to get user initials
