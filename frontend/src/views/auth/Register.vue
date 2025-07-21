@@ -76,7 +76,7 @@
 
 <script lang="ts" setup>
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '../../stores/authStroe';
+import { useAuthStore } from '@/stores/authStore';
 import { reactive } from 'vue';
 
 const router = useRouter()

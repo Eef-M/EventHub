@@ -37,7 +37,7 @@
 import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
-import { useAuthStore } from '@/stores/authStroe'
+import { useAuthStore } from '@/stores/authStore'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
