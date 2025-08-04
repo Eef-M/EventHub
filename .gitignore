@@ -1,10 +1,11 @@
 # Backend
 /backend/bin/
-/backend/.env
 /backend/uploads/
 
 # Frontend
 /frontend/vscode/*
 
+
 # Node modules (frontend already has its own, but just in case)
 **/node_modules
+**/.env
