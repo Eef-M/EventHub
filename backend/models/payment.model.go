@@ -13,18 +13,23 @@ const (
 	PaymentStatusPending   PaymentStatus = "pending"
 	PaymentStatusSucceeded PaymentStatus = "succeeded"
 	PaymentStatusFailed    PaymentStatus = "failed"
+	PaymentStatusCanceled  PaymentStatus = "canceled"
 )
 
 type Payment struct {
 	ID              uuid.UUID     `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
+	TicketID        uuid.UUID     `gorm:"type:uuid;not null" json:"ticket_id"`
 	UserID          uuid.UUID     `gorm:"type:uuid;not null" json:"user_id"`
-	EventID         uuid.UUID     `gorm:"type:uuid;not null" json:"event_id"`
-	Amount          int64         `gorm:"not null" json:"amount"`
-	Currency        string        `gorm:"type:varchar(10);not null" json:"currency"`
-	Status          PaymentStatus `gorm:"type:varchar(20);not null" json:"status"`
-	PaymentIntentID string        `gorm:"type:varchar(255)" json:"payment_intent_id"`
+	PaymentIntentID string        `gorm:"unique;not null;index" json:"payment_intent_id"`
+	Amount          float64       `gorm:"not null" json:"amount"`
+	Currency        string        `gorm:"type:varchar(10);default:'usd'" json:"currency"`
+	Status          PaymentStatus `gorm:"type:varchar(20);default:'pending'" json:"status"`
+	Quantity        int           `gorm:"default:1" json:"quantity" `
 	CreatedAt       time.Time     `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAT       time.Time     `gorm:"autoUpdateTime" json:"updated_at"`
+
+	User   User   `gorm:"foreignKey:UserID;references:ID" json:"-"`
+	Ticket Ticket `gorm:"foreignKey:TicketID;references:ID" json:"-"`
 }
 
 func (Payment) TableName() string {

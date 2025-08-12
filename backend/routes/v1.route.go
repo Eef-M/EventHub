@@ -5,12 +5,16 @@ import (
 	"github.com/Eef-M/EventHub/backend/handlers"
 	"github.com/Eef-M/EventHub/backend/initializers"
 	"github.com/Eef-M/EventHub/backend/middleware"
+	"github.com/Eef-M/EventHub/backend/services"
 	"github.com/gin-gonic/gin"
 )
 
 func InitRoute(app *gin.Engine) {
 	router := app
 	api := router.Group("/api/v1")
+
+	// Initialize services
+	stripeService := services.NewStripeService(initializers.DB)
 
 	// Auth Group
 	auth := api.Group("/auth")
@@ -72,6 +76,7 @@ func InitRoute(app *gin.Engine) {
 	// Payment Group
 	payment := api.Group("/payments")
 	{
-		payment.POST("/webhook", middleware.RequireAuth, handlers.StripeWebhookhandler(initializers.DB))
+		payment.POST("/create", middleware.RequireAuth, handlers.CreatePaymentHandler(stripeService))
+		payment.POST("/webhook", handlers.StripeWebhookHandler(initializers.DB, stripeService))
 	}
 }
