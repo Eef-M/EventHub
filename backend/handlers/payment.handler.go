@@ -9,9 +9,15 @@ import (
 )
 
 type CreatePaymentRequest struct {
-	EventID  uuid.UUID `json:"event_id"`
-	Amount   int64     `json:"amount"`
-	Currency string    `json:"currency"`
+	TicketID uuid.UUID `json:"ticket_id" binding:"required"`
+	Quantity int       `json:"quantity"`
+}
+
+type CreatePaymentResponse struct {
+	ClientSecret    string  `json:"client_secret"`
+	PaymentIntentID string  `json:"payment_intent_id"`
+	Amount          float64 `json:"amount"`
+	Currency        string  `json:"currency"`
 }
 
 func CreatePaymentHandler(stripeService *services.StripeService) gin.HandlerFunc {
@@ -19,7 +25,18 @@ func CreatePaymentHandler(stripeService *services.StripeService) gin.HandlerFunc
 		var req CreatePaymentRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "Invalild request: " + err.Error(),
+				"error": "Invalid request: " + err.Error(),
+			})
+			return
+		}
+
+		if req.Quantity <= 0 {
+			req.Quantity = 1
+		}
+
+		if req.Quantity > 10 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Quantity cannot exceed 10",
 			})
 			return
 		}
@@ -32,24 +49,41 @@ func CreatePaymentHandler(stripeService *services.StripeService) gin.HandlerFunc
 			return
 		}
 
-		userID, ok := userIDVal.(uuid.UUID)
-		if !ok {
+		var userID uuid.UUID
+		switch v := userIDVal.(type) {
+		case uuid.UUID:
+			userID = v
+		case string:
+			parsed, err := uuid.Parse(v)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error": "Invalid user ID format",
+				})
+				return
+			}
+			userID = parsed
+		default:
 			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": "Invalid user ID",
+				"error": "Invalid user ID type",
 			})
 			return
 		}
 
-		pi, err := stripeService.CreatePaymentIntent(c.Request.Context(), userID, req.EventID, req.Amount, req.Currency)
+		pi, err := stripeService.CreatePaymentIntent(c.Request.Context(), userID, req.TicketID, req.Quantity)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": err.Error(),
+				"error": "Failed to create payment: " + err.Error(),
 			})
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"client_secret": pi.ClientSecret,
-		})
+		response := CreatePaymentResponse{
+			ClientSecret:    pi.ClientSecret,
+			PaymentIntentID: pi.ID,
+			Amount:          float64(pi.Amount) / 100,
+			Currency:        string(pi.Currency),
+		}
+
+		c.JSON(http.StatusOK, response)
 	}
 }
