@@ -77,6 +77,10 @@ func InitRoute(app *gin.Engine) {
 	payment := api.Group("/payments")
 	{
 		payment.POST("/create", middleware.RequireAuth, handlers.CreatePaymentHandler(stripeService))
+		payment.GET("/history", middleware.RequireAuth, handlers.GetPaymentHistoryHandler(stripeService))
+		payment.GET("/:id", middleware.RequireAuth, handlers.GetPaymentHandler(stripeService))
 		payment.POST("/webhook", handlers.StripeWebhookHandler(initializers.DB, stripeService))
+		payment.GET("/organizer/all", middleware.RequireAuth, middleware.RequireRole("organizer"), handlers.GetAllPaymentsHandler(stripeService))
+		payment.GET("/organizer/:id", middleware.RequireAuth, middleware.RequireRole("organizer"), handlers.GetPaymentDetailsHandler(stripeService))
 	}
 }
