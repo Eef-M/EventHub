@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/Eef-M/EventHub/backend/services"
 	"github.com/gin-gonic/gin"
@@ -85,5 +86,170 @@ func CreatePaymentHandler(stripeService *services.StripeService) gin.HandlerFunc
 		}
 
 		c.JSON(http.StatusOK, response)
+	}
+}
+
+func GetPaymentHistoryHandler(stripeService *services.StripeService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userIDVal, exists := c.Get("user_id")
+		if !exists {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": "Unauthorized",
+			})
+			return
+		}
+
+		var userID uuid.UUID
+		switch v := userIDVal.(type) {
+		case uuid.UUID:
+			userID = v
+		case string:
+			parsed, err := uuid.Parse(v)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"error": "Invalid user ID",
+				})
+				return
+			}
+			userID = parsed
+		default:
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Invalid user ID",
+			})
+			return
+		}
+
+		page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+		limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+
+		payments, total, err := stripeService.GetUserPayments(userID, page, limit)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"payments": payments,
+			"total":    total,
+			"page":     page,
+			"limit":    limit,
+		})
+	}
+}
+
+func GetPaymentHandler(stripeService *services.StripeService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		paymentID := c.Param("id")
+		if paymentID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Payment ID is required",
+			})
+			return
+		}
+
+		paymentUUID, err := uuid.Parse(paymentID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Invalid payment ID",
+			})
+			return
+		}
+
+		userIDVal, exists := c.Get("user_id")
+		if !exists {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": "Unauthorized",
+			})
+			return
+		}
+
+		var userID uuid.UUID
+		switch v := userIDVal.(type) {
+		case uuid.UUID:
+			userID = v
+		case string:
+			parsed, err := uuid.Parse(v)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"error": "Invalid user ID",
+				})
+				return
+			}
+			userID = parsed
+		default:
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Invalid user ID",
+			})
+			return
+		}
+
+		payment, err := stripeService.GetPaymentByID(paymentUUID, userID)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{
+				"error": "Payment not found",
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"payment": payment,
+		})
+	}
+}
+
+func GetAllPaymentsHandler(stripeService *services.StripeService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+		limit, _ := strconv.Atoi(c.DefaultQuery("limit", "20"))
+		status := c.Query("status")
+
+		payments, total, err := stripeService.GetAllPayments(page, limit, status)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"payments": payments,
+			"total":    total,
+			"page":     page,
+			"limit":    limit,
+		})
+	}
+}
+
+func GetPaymentDetailsHandler(stripeService *services.StripeService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		paymentID := c.Param("id")
+		if paymentID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Payment ID is required",
+			})
+			return
+		}
+
+		paymentUUID, err := uuid.Parse(paymentID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Invalid payment ID",
+			})
+			return
+		}
+
+		payment, err := stripeService.GetPaymentByIDOrganizer(paymentUUID)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{
+				"error": "Payment not found",
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"payment": payment,
+		})
 	}
 }
