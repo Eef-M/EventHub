@@ -110,7 +110,7 @@
                     </div>
                     <Button size="lg"
                       class="w-full md:w-auto px-8 py-3 font-semibold bg-purple-600 hover:bg-purple-700 cursor-pointer transition"
-                      @click="handleBuyTicket(ticket.id)" :disabled="ticket.quota === 0">
+                      @click="handleBuyTicket(ticket)" :disabled="ticket.quota === 0">
                       <ShoppingCartIcon class="w-4 h-4 mr-2" />
                       {{ ticket.quota === 0 ? 'Sold Out' : 'Buy Ticket' }}
                     </Button>
@@ -126,6 +126,35 @@
         </CardContent>
       </Card>
       <!-- Tickets Section End -->
+
+      <!-- Success/Error Messages -->
+      <div v-if="paymentMessage.show" class="mb-8">
+        <Card :class="[
+          'shadow-lg border-0',
+          paymentMessage.type === 'success' ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+        ]">
+          <CardContent class="p-6">
+            <div class="flex items-center">
+              <CheckCircleIcon v-if="paymentMessage.type === 'success'" class="w-6 h-6 text-green-600 mr-3" />
+              <XCircleIcon v-else class="w-6 h-6 text-red-600 mr-3" />
+              <div>
+                <h3 :class="[
+                  'text-lg font-semibold',
+                  paymentMessage.type === 'success' ? 'text-green-800' : 'text-red-800'
+                ]">
+                  {{ paymentMessage.type === 'success' ? 'Payment Successful!' : 'Payment Failed' }}
+                </h3>
+                <p :class="[
+                  'text-sm',
+                  paymentMessage.type === 'success' ? 'text-green-600' : 'text-red-600'
+                ]">
+                  {{ paymentMessage.message }}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       <!-- Feedback Section -->
       <div v-if="event?.is_open === false">
@@ -303,6 +332,10 @@
       </div>
       <!-- Feedback Section End -->
     </section>
+
+    <!-- Payment Modal -->
+    <PaymentModal :is-open="paymentModal.isOpen" :selected-ticket="paymentModal.selectedTicket"
+      @close="closePaymentModal" @success="handlePaymentSuccess" />
   </ParticipantLayout>
 </template>
 
@@ -310,6 +343,7 @@
 import { computed, onMounted, ref, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import ParticipantLayout from '../../layouts/ParticipantLayout.vue'
+import PaymentModal from '@/components/PaymentModal.vue'
 import { useEventStore } from '@/stores/eventStore'
 import { formatDate, formatFeedbackDate, formatTime } from '@/utils/format'
 import { useTicketStore } from '@/stores/ticketStore'
@@ -333,10 +367,21 @@ import {
   SendIcon,
   XIcon,
   UserIcon,
-  LogInIcon
+  LogInIcon,
+  CheckCircleIcon,
+  XCircleIcon
 } from 'lucide-vue-next'
 import { useFeedbackStore } from '@/stores/feedbackStore'
 import { useUserStore } from '@/stores/userStore'
+
+interface Ticket {
+  id: string
+  name: string
+  description: string
+  price: number
+  quota: number
+  event_id: string
+}
 
 const eventStore = useEventStore()
 const ticketStore = useTicketStore()
@@ -347,7 +392,17 @@ const route = useRoute()
 const eventId = route.params.id as string
 const userId = userStore.userState.data?.id
 
-// Feedback form state
+const paymentModal = reactive({
+  isOpen: false,
+  selectedTicket: null as Ticket | null
+})
+
+const paymentMessage = reactive({
+  show: false,
+  type: 'success' as 'success' | 'error',
+  message: ''
+})
+
 const hoverRating = ref(0)
 const feedbackSubmitting = ref(false)
 const feedbackForm = reactive({
@@ -371,10 +426,40 @@ onMounted(() => {
   feedbackStore.getFeedbacks(eventId)
 })
 
-async function handleBuyTicket(ticketId: string) {
-  console.log(`Ticket ID: ${ticketId}`)
-  console.log(`User ID: ${userId}`)
-  // buy ticket logic here
+function handleBuyTicket(ticket: Ticket) {
+  if (!userStore.userState.data) {
+    showPaymentMessage('error', 'Please login to purchase tickets')
+    return
+  }
+
+  if (ticket.quota === 0) {
+    showPaymentMessage('error', 'This ticket is sold out')
+    return
+  }
+
+  paymentModal.selectedTicket = ticket
+  paymentModal.isOpen = true
+}
+
+function closePaymentModal() {
+  paymentModal.isOpen = false
+  paymentModal.selectedTicket = null
+}
+
+function handlePaymentSuccess(paymentId: string) {
+  showPaymentMessage('success', `Payment successful! Your payment ID is: ${paymentId}`)
+  ticketStore.getTickets()
+  closePaymentModal()
+}
+
+function showPaymentMessage(type: 'success' | 'error', message: string) {
+  paymentMessage.type = type
+  paymentMessage.message = message
+  paymentMessage.show = true
+
+  setTimeout(() => {
+    paymentMessage.show = false
+  }, 5000)
 }
 
 function getRatingText(rating: number): string {
@@ -395,10 +480,29 @@ function resetFeedbackForm() {
 }
 
 async function handleSubmitFeedback() {
-  console.log(`User ID: ${userId}`)
-  console.log(`Rating: ${feedbackForm.rating}`)
-  console.log(`Comment:${feedbackForm.comment}`)
+  if (!userStore.userState.data) {
+    showPaymentMessage('error', 'Please login to submit feedback')
+    return
+  }
 
-  resetFeedbackForm()
+  feedbackSubmitting.value = true
+
+  try {
+    console.log(`User ID: ${userId}`)
+    console.log(`Rating: ${feedbackForm.rating}`)
+    console.log(`Comment: ${feedbackForm.comment}`)
+
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    showPaymentMessage('success', 'Thank you for your feedback!')
+    resetFeedbackForm()
+
+    feedbackStore.getFeedbacks(eventId)
+
+  } catch (error: any) {
+    showPaymentMessage('error', 'Failed to submit feedback. Please try again.')
+  } finally {
+    feedbackSubmitting.value = false
+  }
 }
 </script>
