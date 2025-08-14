@@ -1,18 +1,46 @@
-export interface TicketInterface {
-  id: string
-  event_id: string
-  name: string
-  description?: string
-  price: number
-  quota: number
+export interface Ticket {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  quota: number;
+  event_id: string;
+  created_at: string;
+  updated_at: string;
 }
 
-export interface MyTicketInterface {
-  ticket_id: string
-  event_id: string
-  title: string
-  location: string
-  date: string
-  ticket_code: string
-  price: number
+export interface CreateTicketRequest {
+  name: string;
+  description: string;
+  price: number;
+  quota: number;
+  event_id: string;
+}
+
+export interface UpdateTicketRequest {
+  name?: string;
+  description?: string;
+  price?: number;
+  quota?: number;
+}
+
+export interface TicketPurchase {
+  id: string;
+  ticket_id: string;
+  user_id: string;
+  quantity: number;
+  total_amount: number;
+  status: TicketPurchaseStatus;
+  created_at: string;
+  updated_at: string;
+  ticket?: Ticket;
+}
+
+export type TicketPurchaseStatus = 'pending' | 'confirmed' | 'cancelled' | 'refunded';
+
+export interface TicketResponse {
+  tickets: Ticket[];
+  total: number;
+  page: number;
+  limit: number;
 }
