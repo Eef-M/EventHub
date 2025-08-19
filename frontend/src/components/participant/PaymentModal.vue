@@ -24,7 +24,7 @@
           <div v-if="selectedTicket"
             class="mb-8 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-200">
             <h4 class="text-lg font-semibold text-gray-900 mb-2">{{ selectedTicket.name }}</h4>
-            <p class="text-gray-600 text-sm mb-3">{{ selectedTicket.description }}</p>
+            <p class="text-gray-600 text-sm mb-3">{{ selectedTicket.description || 'No description available' }}</p>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <!-- Quantity Selector -->
@@ -47,13 +47,13 @@
               <!-- Price per ticket -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Price per ticket</label>
-                <p class="text-2xl font-bold text-purple-600">${{ selectedTicket.price }}</p>
+                <p class="text-2xl font-bold text-purple-600">{{ formatPrice(selectedTicket.price) }}</p>
               </div>
 
               <!-- Total price -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Total Amount</label>
-                <p class="text-2xl font-bold text-gray-900">${{ totalAmount }}</p>
+                <p class="text-2xl font-bold text-gray-900">{{ formatPrice(totalAmount) }}</p>
               </div>
             </div>
           </div>
@@ -130,16 +130,16 @@
             <div class="space-y-2">
               <div class="flex justify-between">
                 <span class="text-gray-600">{{ selectedTicket?.name }} × {{ quantity }}</span>
-                <span class="font-medium">${{ (selectedTicket?.price * quantity).toFixed(2) }}</span>
+                <span class="font-medium">{{ formatPrice(totalAmount) }}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-600">Processing Fee</span>
-                <span class="font-medium">${{ processingFee.toFixed(2) }}</span>
+                <span class="font-medium">{{ formatPrice(processingFee) }}</span>
               </div>
               <hr class="border-gray-200">
               <div class="flex justify-between text-lg font-bold">
                 <span>Total</span>
-                <span class="text-purple-600">${{ finalTotal.toFixed(2) }}</span>
+                <span class="text-purple-600">{{ formatPrice(finalTotal) }}</span>
               </div>
             </div>
           </div>
@@ -164,7 +164,7 @@
                 </div>
                 <div v-else class="flex items-center">
                   <CreditCardIcon class="w-4 h-4 mr-2" />
-                  Pay ${{ finalTotal.toFixed(2) }}
+                  Pay {{ formatPrice(finalTotal) }}
                 </div>
               </Button>
             </div>
@@ -187,6 +187,7 @@ import {
 } from 'lucide-vue-next'
 import { loadStripe } from '@/services/paymentService'
 import { usePaymentStore } from '@/stores/paymentStore'
+import { formatPrice, calculateTotalPrice, validateTicketPurchase } from '@/utils/ticketUtils'
 import type { Ticket } from '@/types/ticket'
 
 interface Props {
@@ -236,18 +237,14 @@ const paymentMethods = [
   }
 ]
 
-const totalAmount = computed(() => {
-  if (!props.selectedTicket) return 0
-  return props.selectedTicket.price * quantity.value
+const priceCalculation = computed(() => {
+  if (!props.selectedTicket) return { subtotal: 0, processingFee: 0, total: 0 }
+  return calculateTotalPrice(props.selectedTicket.price, quantity.value)
 })
 
-const processingFee = computed(() => {
-  return totalAmount.value * 0.03
-})
-
-const finalTotal = computed(() => {
-  return totalAmount.value + processingFee.value
-})
+const totalAmount = computed(() => priceCalculation.value.subtotal)
+const processingFee = computed(() => priceCalculation.value.processingFee)
+const finalTotal = computed(() => priceCalculation.value.total)
 
 const canProceedPayment = computed(() => {
   return (
@@ -275,7 +272,10 @@ function resetForm() {
 }
 
 function increaseQuantity() {
-  if (props.selectedTicket && quantity.value < props.selectedTicket.quota) {
+  if (!props.selectedTicket) return
+
+  const validation = validateTicketPurchase(props.selectedTicket, quantity.value + 1)
+  if (validation.valid) {
     quantity.value++
   }
 }
@@ -396,7 +396,6 @@ async function processCardPayment() {
   }
 }
 
-// Watchers
 watch(() => props.isOpen, (isOpen) => {
   if (isOpen && selectedPaymentMethod.value === 'card') {
     nextTick(() => {
