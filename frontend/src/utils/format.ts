@@ -31,10 +31,3 @@ export function formatFeedbackDate(dateString: string) {
 
   return date.toLocaleDateString()
 }
-
-export function formatPrice(amount: number) {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR'
-  }).format(amount / 100)
-}
