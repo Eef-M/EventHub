@@ -92,10 +92,10 @@
                     <div class="flex items-center gap-3 mb-2">
                       <h4 class="text-xl font-bold text-slate-900">{{ ticket.name }}</h4>
                       <Badge variant="outline" class="text-xs">
-                        {{ ticket.quota }} left
+                        {{ ticket.remaining_text }}
                       </Badge>
                     </div>
-                    <p class="text-gray-600 mb-2">{{ ticket.description }}</p>
+                    <p class="text-gray-600 mb-2">{{ ticket.description || 'No description available' }}</p>
                     <div class="flex items-center text-sm text-slate-500">
                       <UsersIcon class="w-4 h-4 mr-1" />
                       Quota: {{ ticket.quota }}
@@ -104,15 +104,15 @@
                   <div class="flex flex-col items-end gap-3">
                     <div class="text-right">
                       <p class="text-3xl font-bold text-primary">
-                        ${{ ticket.price }}
+                        {{ ticket.display_price }}
                       </p>
                       <p class="text-sm text-gray-500">per ticket</p>
                     </div>
                     <Button size="lg"
                       class="w-full md:w-auto px-8 py-3 font-semibold bg-purple-600 hover:bg-purple-700 cursor-pointer transition"
-                      @click="handleBuyTicket(ticket)" :disabled="ticket.quota === 0">
+                      @click="handleBuyTicket(ticket)" :disabled="ticket.is_sold_out">
                       <ShoppingCartIcon class="w-4 h-4 mr-2" />
-                      {{ ticket.quota === 0 ? 'Sold Out' : 'Buy Ticket' }}
+                      {{ ticket.is_sold_out ? 'Sold Out' : 'Buy Ticket' }}
                     </Button>
                   </div>
                 </div>
@@ -343,7 +343,7 @@
 import { computed, onMounted, ref, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import ParticipantLayout from '../../layouts/ParticipantLayout.vue'
-import PaymentModal from '@/components/PaymentModal.vue'
+import PaymentModal from '@/components/participant/PaymentModal.vue'
 import { useEventStore } from '@/stores/eventStore'
 import { formatDate, formatFeedbackDate, formatTime } from '@/utils/format'
 import { useTicketStore } from '@/stores/ticketStore'
@@ -374,14 +374,8 @@ import {
 import { useFeedbackStore } from '@/stores/feedbackStore'
 import { useUserStore } from '@/stores/userStore'
 
-interface Ticket {
-  id: string
-  name: string
-  description: string
-  price: number
-  quota: number
-  event_id: string
-}
+import { transformToTicketDisplay, validateTicketPurchase } from '@/utils/ticketUtils'
+import type { Ticket, TicketDisplay } from '@/types/ticket'
 
 const eventStore = useEventStore()
 const ticketStore = useTicketStore()
@@ -392,17 +386,20 @@ const route = useRoute()
 const eventId = route.params.id as string
 const userId = userStore.userState.data?.id
 
+// Payment modal state
 const paymentModal = reactive({
   isOpen: false,
   selectedTicket: null as Ticket | null
 })
 
+// Payment message state
 const paymentMessage = reactive({
   show: false,
   type: 'success' as 'success' | 'error',
   message: ''
 })
 
+// Feedback form state
 const hoverRating = ref(0)
 const feedbackSubmitting = ref(false)
 const feedbackForm = reactive({
@@ -415,8 +412,10 @@ const isFeedbacksLoaded = computed(() => feedbackStore.feedbacksState.loading)
 
 const event = computed(() => eventStore?.singleEventState?.data)
 const tickets = computed(() => {
-  const allTickets = ticketStore.ticketsState?.data || []
-  return allTickets.filter(ticket => ticket.event_id === eventId)
+  const allTickets = (ticketStore.ticketsState?.data as Ticket[]) || []
+  return allTickets
+    .filter((ticket: Ticket) => ticket.event_id === eventId)
+    .map((ticket: Ticket) => transformToTicketDisplay(ticket))
 })
 const feedbacks = computed(() => feedbackStore.feedbacksState?.data)
 
@@ -426,14 +425,27 @@ onMounted(() => {
   feedbackStore.getFeedbacks(eventId)
 })
 
-function handleBuyTicket(ticket: Ticket) {
+function handleBuyTicket(ticketDisplay: TicketDisplay) {
   if (!userStore.userState.data) {
     showPaymentMessage('error', 'Please login to purchase tickets')
     return
   }
 
-  if (ticket.quota === 0) {
-    showPaymentMessage('error', 'This ticket is sold out')
+  const ticket: Ticket = {
+    id: ticketDisplay.id,
+    event_id: ticketDisplay.event_id,
+    name: ticketDisplay.name,
+    description: ticketDisplay.description,
+    price: ticketDisplay.price,
+    quota: ticketDisplay.quota,
+    ticket_code: ticketDisplay.ticket_code,
+    created_at: ticketDisplay.created_at,
+    updated_at: ticketDisplay.updated_at
+  }
+
+  const validation = validateTicketPurchase(ticket, 1)
+  if (!validation.valid) {
+    showPaymentMessage('error', validation.message || 'Cannot purchase this ticket')
     return
   }
 
