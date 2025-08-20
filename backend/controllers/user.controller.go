@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/Eef-M/EventHub/backend/config"
 	"github.com/Eef-M/EventHub/backend/handlers"
-	"github.com/Eef-M/EventHub/backend/initializers"
 	"github.com/Eef-M/EventHub/backend/models"
 	"github.com/Eef-M/EventHub/backend/utils"
 	"github.com/gin-gonic/gin"
@@ -82,7 +82,7 @@ func UpdateMyProfile(c *gin.Context) {
 		updates.AvatarURL = newAvatarURL
 	}
 
-	if err := initializers.DB.Model(&currentUser).Updates(updates).Error; err != nil {
+	if err := config.DB.Model(&currentUser).Updates(updates).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to update user",
 		})
@@ -117,7 +117,7 @@ func DeleteMyAccount(c *gin.Context) {
 		}
 	}
 
-	if err := initializers.DB.Delete(&currentUser).Error; err != nil {
+	if err := config.DB.Delete(&currentUser).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to delete account",
 		})

@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/Eef-M/EventHub/backend/initializers"
+	"github.com/Eef-M/EventHub/backend/config"
 	"github.com/Eef-M/EventHub/backend/models"
 	"github.com/Eef-M/EventHub/backend/utils"
 	"github.com/google/uuid"
@@ -112,7 +112,7 @@ func SeedEvents(user []models.User) []models.Event {
 	}
 
 	for _, event := range events {
-		initializers.DB.Create(&event)
+		config.DB.Create(&event)
 	}
 
 	return events

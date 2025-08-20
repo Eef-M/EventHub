@@ -3,7 +3,7 @@ package seeders
 import (
 	"time"
 
-	"github.com/Eef-M/EventHub/backend/initializers"
+	"github.com/Eef-M/EventHub/backend/config"
 	"github.com/Eef-M/EventHub/backend/models"
 	"github.com/google/uuid"
 )
@@ -93,6 +93,6 @@ func SeedEventRegistrations(users []models.User, events []models.Event, tickets 
 	}
 
 	for _, registration := range registrations {
-		initializers.DB.Create(&registration)
+		config.DB.Create(&registration)
 	}
 }

@@ -3,7 +3,7 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/Eef-M/EventHub/backend/initializers"
+	"github.com/Eef-M/EventHub/backend/config"
 	"github.com/Eef-M/EventHub/backend/models"
 	"github.com/Eef-M/EventHub/backend/repository"
 	"github.com/gin-gonic/gin"
@@ -55,7 +55,7 @@ func RegisterEvent(c *gin.Context) {
 		Status:   "registered",
 	}
 
-	if err := initializers.DB.Create(&registration).Error; err != nil {
+	if err := config.DB.Create(&registration).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to register event",
 		})
@@ -84,7 +84,7 @@ func MyRegistrations(c *gin.Context) {
 		return
 	}
 
-	registrations, err := repository.GetMyRegistrations(initializers.DB, user.ID)
+	registrations, err := repository.GetMyRegistrations(config.DB, user.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to fetch my registrations: " + err.Error(),
@@ -108,7 +108,7 @@ func EventAttendees(c *gin.Context) {
 	}
 
 	var attendees []models.EventRegistration
-	if err := initializers.DB.Where("event_id = ?", eventID).Find(&attendees).Error; err != nil {
+	if err := config.DB.Where("event_id = ?", eventID).Find(&attendees).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -131,7 +131,7 @@ func CancelRegistration(c *gin.Context) {
 	}
 
 	var registration models.EventRegistration
-	if err := initializers.DB.First(&registration, "id = ?", registrationID).Error; err != nil {
+	if err := config.DB.First(&registration, "id = ?", registrationID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": "Record not found",
 		})
@@ -140,7 +140,7 @@ func CancelRegistration(c *gin.Context) {
 
 	registration.Status = "cancelled"
 
-	if err := initializers.DB.Save(&registration).Error; err != nil {
+	if err := config.DB.Save(&registration).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})

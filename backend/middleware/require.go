@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/Eef-M/EventHub/backend/initializers"
+	"github.com/Eef-M/EventHub/backend/config"
 	"github.com/Eef-M/EventHub/backend/models"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -68,7 +68,7 @@ func RequireAuth(c *gin.Context) {
 	}
 
 	var user models.User
-	result := initializers.DB.First(&user, "id = ?", userID)
+	result := config.DB.First(&user, "id = ?", userID)
 	if result.Error != nil || user.ID == uuid.Nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"message": "Unauthorized: User not found",

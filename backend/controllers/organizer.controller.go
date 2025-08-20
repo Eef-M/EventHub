@@ -3,8 +3,8 @@ package controllers
 import (
 	"net/http"
 
+	"github.com/Eef-M/EventHub/backend/config"
 	"github.com/Eef-M/EventHub/backend/dto"
-	"github.com/Eef-M/EventHub/backend/initializers"
 	"github.com/Eef-M/EventHub/backend/models"
 	"github.com/Eef-M/EventHub/backend/repository"
 	"github.com/gin-gonic/gin"
@@ -22,7 +22,7 @@ func OrganizerDashboard(c *gin.Context) {
 
 	organizer := user.(models.User)
 
-	totalEvents, totalRegistrations, registered, cancelledRegistrations, totalFeedbacks, err := repository.GetDashboardStatsByOrganizerID(initializers.DB, organizer.ID)
+	totalEvents, totalRegistrations, registered, cancelledRegistrations, totalFeedbacks, err := repository.GetDashboardStatsByOrganizerID(config.DB, organizer.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to fetch stats. | " + err.Error(),
@@ -30,7 +30,7 @@ func OrganizerDashboard(c *gin.Context) {
 		return
 	}
 
-	recentRegistrations, err := repository.GetRecentRegistrationsByOrganizerID(initializers.DB, organizer.ID, 5)
+	recentRegistrations, err := repository.GetRecentRegistrationsByOrganizerID(config.DB, organizer.ID, 5)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to fetch recent registrations. | " + err.Error(),
@@ -74,7 +74,7 @@ func GetMyEventsHandler(c *gin.Context) {
 		return
 	}
 
-	events, err := repository.GetEventsByOrganizerID(initializers.DB, uid)
+	events, err := repository.GetEventsByOrganizerID(config.DB, uid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to get events. | " + err.Error(),
@@ -112,7 +112,7 @@ func GetAllRegistrationsHandler(c *gin.Context) {
 		return
 	}
 
-	registrations, err := repository.GetAllRegistrationsByOrganizerID(initializers.DB, uid)
+	registrations, err := repository.GetAllRegistrationsByOrganizerID(config.DB, uid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to fetch registrations. | " + err.Error(),
@@ -163,7 +163,7 @@ func GetAllFeedbackHandler(c *gin.Context) {
 		return
 	}
 
-	feedbacks, err := repository.GetAllFeedbackByOrganizerID(initializers.DB, uid)
+	feedbacks, err := repository.GetAllFeedbackByOrganizerID(config.DB, uid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to fetch feedbacks" + err.Error(),
@@ -201,7 +201,7 @@ func GetAllTicketsHandler(c *gin.Context) {
 		return
 	}
 
-	tickets, err := repository.GetAllTicketsByOrganizerID(initializers.DB, uid)
+	tickets, err := repository.GetAllTicketsByOrganizerID(config.DB, uid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to fetch tickets. | " + err.Error(),

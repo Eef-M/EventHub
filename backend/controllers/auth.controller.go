@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/Eef-M/EventHub/backend/initializers"
+	"github.com/Eef-M/EventHub/backend/config"
 	"github.com/Eef-M/EventHub/backend/models"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -42,7 +42,7 @@ func Register(c *gin.Context) {
 
 	defaultAvatar := fmt.Sprintf(
 		"%s/uploads/avatars/default_avatar.png",
-		initializers.BaseURL,
+		config.BaseURL,
 	)
 	user := models.User{
 		Username:  body.Username,
@@ -54,7 +54,7 @@ func Register(c *gin.Context) {
 		AvatarURL: defaultAvatar,
 	}
 
-	result := initializers.DB.Create(&user)
+	result := config.DB.Create(&user)
 
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -82,7 +82,7 @@ func Login(c *gin.Context) {
 	}
 
 	var user models.User
-	initializers.DB.First(&user, "email = ?", body.Email)
+	config.DB.First(&user, "email = ?", body.Email)
 
 	if user.ID == uuid.Nil {
 		c.JSON(http.StatusBadRequest, gin.H{

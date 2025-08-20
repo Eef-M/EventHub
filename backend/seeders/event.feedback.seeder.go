@@ -1,7 +1,7 @@
 package seeders
 
 import (
-	"github.com/Eef-M/EventHub/backend/initializers"
+	"github.com/Eef-M/EventHub/backend/config"
 	"github.com/Eef-M/EventHub/backend/models"
 	"github.com/google/uuid"
 )
@@ -46,6 +46,6 @@ func SeedEventFeedbacks(users []models.User, events []models.Event) {
 	}
 
 	for _, feedback := range feedbacks {
-		initializers.DB.Create(&feedback)
+		config.DB.Create(&feedback)
 	}
 }

@@ -3,7 +3,7 @@ package seeders
 import (
 	"fmt"
 
-	"github.com/Eef-M/EventHub/backend/initializers"
+	"github.com/Eef-M/EventHub/backend/config"
 	"github.com/Eef-M/EventHub/backend/models"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -67,7 +67,7 @@ func SeedUsers() []models.User {
 
 		defaultAvatar := fmt.Sprintf(
 			"%s/uploads/avatars/default_avatar.png",
-			initializers.BaseURL,
+			config.BaseURL,
 		)
 
 		user := models.User{
@@ -81,7 +81,7 @@ func SeedUsers() []models.User {
 			AvatarURL: defaultAvatar,
 		}
 
-		initializers.DB.Create(&user)
+		config.DB.Create(&user)
 		users = append(users, user)
 	}
 

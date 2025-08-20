@@ -3,7 +3,7 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/Eef-M/EventHub/backend/initializers"
+	"github.com/Eef-M/EventHub/backend/config"
 	"github.com/Eef-M/EventHub/backend/models"
 	"github.com/Eef-M/EventHub/backend/repository"
 	"github.com/Eef-M/EventHub/backend/utils"
@@ -54,7 +54,7 @@ func SendFeedback(c *gin.Context) {
 		Comment: comment,
 	}
 
-	if err := initializers.DB.Create(&feedback).Error; err != nil {
+	if err := config.DB.Create(&feedback).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to send feedback",
 		})
@@ -76,7 +76,7 @@ func GetFeedbacks(c *gin.Context) {
 		return
 	}
 
-	feedbacks, err := repository.GetAllFeedback(initializers.DB, eventID)
+	feedbacks, err := repository.GetAllFeedback(config.DB, eventID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to fetch feedbacks: " + err.Error(),

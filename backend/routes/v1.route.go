@@ -1,9 +1,9 @@
 package routes
 
 import (
+	"github.com/Eef-M/EventHub/backend/config"
 	"github.com/Eef-M/EventHub/backend/controllers"
 	"github.com/Eef-M/EventHub/backend/handlers"
-	"github.com/Eef-M/EventHub/backend/initializers"
 	"github.com/Eef-M/EventHub/backend/middleware"
 	"github.com/Eef-M/EventHub/backend/services"
 	"github.com/gin-gonic/gin"
@@ -14,7 +14,7 @@ func InitRoute(app *gin.Engine) {
 	api := router.Group("/api/v1")
 
 	// Initialize services
-	stripeService := services.NewStripeService(initializers.DB)
+	stripeService := services.NewStripeService(config.DB)
 
 	// Auth Group
 	auth := api.Group("/auth")
@@ -79,7 +79,7 @@ func InitRoute(app *gin.Engine) {
 		payment.POST("/create", middleware.RequireAuth, handlers.CreatePaymentHandler(stripeService))
 		payment.GET("/history", middleware.RequireAuth, handlers.GetPaymentHistoryHandler(stripeService))
 		payment.GET("/:id", middleware.RequireAuth, handlers.GetPaymentHandler(stripeService))
-		payment.POST("/webhook", handlers.StripeWebhookHandler(initializers.DB, stripeService))
+		payment.POST("/webhook", handlers.StripeWebhookHandler(config.DB, stripeService))
 		payment.GET("/organizer/all", middleware.RequireAuth, middleware.RequireRole("organizer"), handlers.GetAllPaymentsHandler(stripeService))
 		payment.GET("/organizer/:id", middleware.RequireAuth, middleware.RequireRole("organizer"), handlers.GetPaymentDetailsHandler(stripeService))
 	}

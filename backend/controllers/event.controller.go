@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/Eef-M/EventHub/backend/config"
 	"github.com/Eef-M/EventHub/backend/handlers"
-	"github.com/Eef-M/EventHub/backend/initializers"
 	"github.com/Eef-M/EventHub/backend/models"
 	"github.com/Eef-M/EventHub/backend/utils"
 	"github.com/gin-gonic/gin"
@@ -30,7 +30,7 @@ func GetEvents(c *gin.Context) {
 	}
 	offset := (page - 1) * limit
 
-	if err := initializers.DB.Limit(limit).Offset(offset).Where("is_open = ?", true).Find(&events).Error; err != nil {
+	if err := config.DB.Limit(limit).Offset(offset).Where("is_open = ?", true).Find(&events).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -52,7 +52,7 @@ func GetEvent(c *gin.Context) {
 	}
 
 	var event models.Event
-	if err := initializers.DB.Where("id = ?", id).First(&event).Error; err != nil {
+	if err := config.DB.Where("id = ?", id).First(&event).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": "Record not found!",
 		})
@@ -148,7 +148,7 @@ func CreateEvent(c *gin.Context) {
 		IsOpen:      true,
 	}
 
-	if err := initializers.DB.Create(&event).Error; err != nil {
+	if err := config.DB.Create(&event).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -179,7 +179,7 @@ func UpdateEvent(c *gin.Context) {
 	user := userInterface.(models.User)
 
 	var event models.Event
-	if err := initializers.DB.Where("id = ? AND organizer_id = ?", id, user.ID).First(&event).Error; err != nil {
+	if err := config.DB.Where("id = ? AND organizer_id = ?", id, user.ID).First(&event).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": "You are not allowed to update this event / " + err.Error(),
 		})
@@ -253,7 +253,7 @@ func UpdateEvent(c *gin.Context) {
 		event.BannerURL = filename
 	}
 
-	if err := initializers.DB.Save(&event).Error; err != nil {
+	if err := config.DB.Save(&event).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -286,7 +286,7 @@ func DeleteEvent(c *gin.Context) {
 	user := userInterface.(models.User)
 
 	var event models.Event
-	if err := initializers.DB.Where("id = ? AND organizer_id = ?", id, user.ID).First(&event).Error; err != nil {
+	if err := config.DB.Where("id = ? AND organizer_id = ?", id, user.ID).First(&event).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": "You are not allowed to delete this event / " + err.Error(),
 		})
@@ -303,7 +303,7 @@ func DeleteEvent(c *gin.Context) {
 		}
 	}
 
-	if err := initializers.DB.Delete(&event).Error; err != nil {
+	if err := config.DB.Delete(&event).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -347,7 +347,7 @@ func IsPublicAndIsOpenHandler(c *gin.Context) {
 	}
 
 	var event models.Event
-	if err := initializers.DB.Where("id = ? AND organizer_id = ?", parsedID, user.ID).First(&event).Error; err != nil {
+	if err := config.DB.Where("id = ? AND organizer_id = ?", parsedID, user.ID).First(&event).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": "You are not allowed to update event status / " + err.Error(),
 		})
@@ -357,7 +357,7 @@ func IsPublicAndIsOpenHandler(c *gin.Context) {
 	event.IsPublic = body.IsPublic
 	event.IsOpen = body.IsOpen
 
-	if err := initializers.DB.Save(&event).Error; err != nil {
+	if err := config.DB.Save(&event).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to update event status: " + err.Error(),
 		})
