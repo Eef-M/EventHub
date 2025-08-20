@@ -3,7 +3,7 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/Eef-M/EventHub/backend/initializers"
+	"github.com/Eef-M/EventHub/backend/config"
 	"github.com/Eef-M/EventHub/backend/models"
 	"github.com/Eef-M/EventHub/backend/repository"
 	"github.com/Eef-M/EventHub/backend/utils"
@@ -14,7 +14,7 @@ import (
 func GetTickets(c *gin.Context) {
 	var tickets []models.Ticket
 
-	if err := initializers.DB.Find(&tickets).Error; err != nil {
+	if err := config.DB.Find(&tickets).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -37,7 +37,7 @@ func GetMyTickets(c *gin.Context) {
 
 	user := userInterface.(models.User)
 
-	tickets, err := repository.GetMyTickets(initializers.DB, user.ID)
+	tickets, err := repository.GetMyTickets(config.DB, user.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to fetch my tickets: " + err.Error(),
@@ -60,7 +60,7 @@ func GetTicket(c *gin.Context) {
 	}
 
 	var ticket models.Ticket
-	if err := initializers.DB.Where("id = ?", id).First(&ticket).Error; err != nil {
+	if err := config.DB.Where("id = ?", id).First(&ticket).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": "Record not found",
 		})
@@ -93,7 +93,7 @@ func CreateTicket(c *gin.Context) {
 	user := userInterface.(models.User)
 
 	var event models.Event
-	if err := initializers.DB.First(&event, "id = ?", eventID).Error; err != nil {
+	if err := config.DB.First(&event, "id = ?", eventID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": "Event not found",
 		})
@@ -135,7 +135,7 @@ func CreateTicket(c *gin.Context) {
 		TicketCode:  ticketCode,
 	}
 
-	if err := initializers.DB.Create(&ticket).Error; err != nil {
+	if err := config.DB.Create(&ticket).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -159,7 +159,7 @@ func UpdateTicket(c *gin.Context) {
 	}
 
 	var ticket models.Ticket
-	if err := initializers.DB.First(&ticket, "id = ?", ticketID).Error; err != nil {
+	if err := config.DB.First(&ticket, "id = ?", ticketID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": "Record not found",
 		})
@@ -177,7 +177,7 @@ func UpdateTicket(c *gin.Context) {
 	user := userInterface.(models.User)
 
 	var event models.Event
-	if err := initializers.DB.First(&event, "id = ?", ticket.EventID).Error; err != nil {
+	if err := config.DB.First(&event, "id = ?", ticket.EventID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": "Event not found",
 		})
@@ -212,7 +212,7 @@ func UpdateTicket(c *gin.Context) {
 	ticket.Price = price
 	ticket.Quota = quota
 
-	if err := initializers.DB.Save(&ticket).Error; err != nil {
+	if err := config.DB.Save(&ticket).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -235,7 +235,7 @@ func DeleteTicket(c *gin.Context) {
 	}
 
 	var ticket models.Ticket
-	if err := initializers.DB.First(&ticket, "id = ?", id).Error; err != nil {
+	if err := config.DB.First(&ticket, "id = ?", id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": "Record not found",
 		})
@@ -253,7 +253,7 @@ func DeleteTicket(c *gin.Context) {
 	user := userInterface.(models.User)
 
 	var event models.Event
-	if err := initializers.DB.First(&event, "id = ?", ticket.EventID).Error; err != nil {
+	if err := config.DB.First(&event, "id = ?", ticket.EventID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": "Event not found",
 		})
@@ -266,7 +266,7 @@ func DeleteTicket(c *gin.Context) {
 		return
 	}
 
-	if err := initializers.DB.Delete(&ticket).Error; err != nil {
+	if err := config.DB.Delete(&ticket).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})

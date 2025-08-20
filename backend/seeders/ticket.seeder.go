@@ -1,7 +1,7 @@
 package seeders
 
 import (
-	"github.com/Eef-M/EventHub/backend/initializers"
+	"github.com/Eef-M/EventHub/backend/config"
 	"github.com/Eef-M/EventHub/backend/models"
 	"github.com/Eef-M/EventHub/backend/utils"
 	"github.com/google/uuid"
@@ -75,7 +75,7 @@ func SeedTickets(events []models.Event) []models.Ticket {
 	}
 
 	for _, ticket := range tickets {
-		initializers.DB.Create(&ticket)
+		config.DB.Create(&ticket)
 	}
 
 	return tickets

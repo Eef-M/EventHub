@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Eef-M/EventHub/backend/initializers"
+	"github.com/Eef-M/EventHub/backend/config"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
@@ -26,7 +26,7 @@ func SaveImage(c *gin.Context, file *multipart.FileHeader) (string, error) {
 		return "", err
 	}
 
-	fullURL := initializers.BaseURL + "/" + dst
+	fullURL := config.BaseURL + "/" + dst
 	return fullURL, nil
 }
 
@@ -54,6 +54,6 @@ func SaveAvatarImage(c *gin.Context, file *multipart.FileHeader, oldAvatarURL st
 		return "", err
 	}
 
-	baseURL := initializers.BaseURL
+	baseURL := config.BaseURL
 	return fmt.Sprintf("%s/uploads/avatars/%s", baseURL, newFilename), nil
 }

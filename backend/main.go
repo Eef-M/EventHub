@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Eef-M/EventHub/backend/initializers"
+	"github.com/Eef-M/EventHub/backend/config"
 	"github.com/Eef-M/EventHub/backend/middleware"
 	"github.com/Eef-M/EventHub/backend/routes"
 	"github.com/Eef-M/EventHub/backend/seeders"
@@ -12,9 +12,9 @@ import (
 )
 
 func init() {
-	initializers.LoadEnvVariables()
-	initializers.ConnectDB()
-	initializers.SyncDB()
+	config.LoadEnv()
+	config.ConnectDatabase()
+	config.SyncDB()
 }
 
 func main() {
