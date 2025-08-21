@@ -21,15 +21,15 @@ func InitRoute(app *gin.Engine) {
 	{
 		auth.POST("/register", controllers.Register)
 		auth.POST("/login", controllers.Login)
-		auth.POST("/logout", middleware.RequireAuth, controllers.Logout)
+		auth.POST("/logout", middleware.AuthMiddleware(), controllers.Logout)
 	}
 
 	// User Group
 	user := api.Group("/user")
 	{
-		user.GET("/me", middleware.RequireAuth, controllers.GetMyProfile)
-		user.PUT("/update", middleware.RequireAuth, controllers.UpdateMyProfile)
-		user.DELETE("/delete", middleware.RequireAuth, controllers.DeleteMyAccount)
+		user.GET("/me", middleware.AuthMiddleware(), controllers.GetMyProfile)
+		user.PUT("/update", middleware.AuthMiddleware(), controllers.UpdateMyProfile)
+		user.DELETE("/delete", middleware.AuthMiddleware(), controllers.DeleteMyAccount)
 	}
 
 	// Events Group
@@ -37,50 +37,50 @@ func InitRoute(app *gin.Engine) {
 	{
 		events.GET("", controllers.GetEvents)
 		events.GET("/:id", controllers.GetEvent)
-		events.POST("", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.CreateEvent)
-		events.PUT("/:id", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.UpdateEvent)
-		events.DELETE("/:id", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.DeleteEvent)
+		events.POST("", middleware.AuthMiddleware(), middleware.RoleAccess("organizer"), controllers.CreateEvent)
+		events.PUT("/:id", middleware.AuthMiddleware(), middleware.RoleAccess("organizer"), controllers.UpdateEvent)
+		events.DELETE("/:id", middleware.AuthMiddleware(), middleware.RoleAccess("organizer"), controllers.DeleteEvent)
 
-		events.POST("/:id/register", middleware.RequireAuth, controllers.RegisterEvent)
-		events.GET("/my-registrations", middleware.RequireAuth, controllers.MyRegistrations)
-		events.GET("/:id/attendees", middleware.RequireAuth, controllers.EventAttendees)
-		events.PUT("/:id/cancel", middleware.RequireAuth, controllers.CancelRegistration)
+		events.POST("/:id/register", middleware.AuthMiddleware(), controllers.RegisterEvent)
+		events.GET("/my-registrations", middleware.AuthMiddleware(), controllers.MyRegistrations)
+		events.GET("/:id/attendees", middleware.AuthMiddleware(), controllers.EventAttendees)
+		events.PUT("/:id/cancel", middleware.AuthMiddleware(), controllers.CancelRegistration)
 
-		events.POST("/:id/feedbacks", middleware.RequireAuth, controllers.SendFeedback)
+		events.POST("/:id/feedbacks", middleware.AuthMiddleware(), controllers.SendFeedback)
 		events.GET("/:id/feedbacks", controllers.GetFeedbacks)
 
-		events.PATCH("/:id/availability", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.IsPublicAndIsOpenHandler)
+		events.PATCH("/:id/availability", middleware.AuthMiddleware(), middleware.RoleAccess("organizer"), controllers.IsPublicAndIsOpenHandler)
 	}
 
 	// Ticket Group
 	ticket := api.Group("/tickets")
 	{
 		ticket.GET("", controllers.GetTickets)
-		ticket.GET("/my-tickets", middleware.RequireAuth, controllers.GetMyTickets)
-		ticket.GET("/:id", middleware.RequireAuth, controllers.GetTicket)
-		ticket.POST("", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.CreateTicket)
-		ticket.PUT("/:id", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.UpdateTicket)
-		ticket.DELETE("/:id", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.DeleteTicket)
+		ticket.GET("/my-tickets", middleware.AuthMiddleware(), controllers.GetMyTickets)
+		ticket.GET("/:id", middleware.AuthMiddleware(), controllers.GetTicket)
+		ticket.POST("", middleware.AuthMiddleware(), middleware.RoleAccess("organizer"), controllers.CreateTicket)
+		ticket.PUT("/:id", middleware.AuthMiddleware(), middleware.RoleAccess("organizer"), controllers.UpdateTicket)
+		ticket.DELETE("/:id", middleware.AuthMiddleware(), middleware.RoleAccess("organizer"), controllers.DeleteTicket)
 	}
 
 	// Organizer Group
 	organizer := api.Group("/organizer")
 	{
-		organizer.GET("/dashboard", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.OrganizerDashboard)
-		organizer.GET("/events", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.GetMyEventsHandler)
-		organizer.GET("/tickets", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.GetAllTicketsHandler)
-		organizer.GET("/registrations", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.GetAllRegistrationsHandler)
-		organizer.GET("/feedbacks", middleware.RequireAuth, middleware.RequireRole("organizer"), controllers.GetAllFeedbackHandler)
+		organizer.GET("/dashboard", middleware.AuthMiddleware(), middleware.RoleAccess("organizer"), controllers.OrganizerDashboard)
+		organizer.GET("/events", middleware.AuthMiddleware(), middleware.RoleAccess("organizer"), controllers.GetMyEventsHandler)
+		organizer.GET("/tickets", middleware.AuthMiddleware(), middleware.RoleAccess("organizer"), controllers.GetAllTicketsHandler)
+		organizer.GET("/registrations", middleware.AuthMiddleware(), middleware.RoleAccess("organizer"), controllers.GetAllRegistrationsHandler)
+		organizer.GET("/feedbacks", middleware.AuthMiddleware(), middleware.RoleAccess("organizer"), controllers.GetAllFeedbackHandler)
 	}
 
 	// Payment Group
 	payment := api.Group("/payments")
 	{
-		payment.POST("/create", middleware.RequireAuth, handlers.CreatePaymentHandler(stripeService))
-		payment.GET("/history", middleware.RequireAuth, handlers.GetPaymentHistoryHandler(stripeService))
-		payment.GET("/:id", middleware.RequireAuth, handlers.GetPaymentHandler(stripeService))
+		payment.POST("/create", middleware.AuthMiddleware(), handlers.CreatePaymentHandler(stripeService))
+		payment.GET("/history", middleware.AuthMiddleware(), handlers.GetPaymentHistoryHandler(stripeService))
+		payment.GET("/:id", middleware.AuthMiddleware(), handlers.GetPaymentHandler(stripeService))
 		payment.POST("/webhook", handlers.StripeWebhookHandler(config.DB, stripeService))
-		payment.GET("/organizer/all", middleware.RequireAuth, middleware.RequireRole("organizer"), handlers.GetAllPaymentsHandler(stripeService))
-		payment.GET("/organizer/:id", middleware.RequireAuth, middleware.RequireRole("organizer"), handlers.GetPaymentDetailsHandler(stripeService))
+		payment.GET("/organizer/all", middleware.AuthMiddleware(), middleware.RoleAccess("organizer"), handlers.GetAllPaymentsHandler(stripeService))
+		payment.GET("/organizer/:id", middleware.AuthMiddleware(), middleware.RoleAccess("organizer"), handlers.GetPaymentDetailsHandler(stripeService))
 	}
 }
