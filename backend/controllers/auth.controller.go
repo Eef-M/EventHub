@@ -3,38 +3,39 @@ package controllers
 import (
 	"fmt"
 	"net/http"
-	"os"
-	"time"
 
 	"github.com/Eef-M/EventHub/backend/config"
 	"github.com/Eef-M/EventHub/backend/models"
+	"github.com/Eef-M/EventHub/backend/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
-	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
-func Register(c *gin.Context) {
-	var body struct {
-		Username  string `json:"username"`
-		FirstName string `json:"first_name"`
-		LastName  string `json:"last_name"`
-		Email     string `json:"email"`
-		Role      string `json:"role"`
-		Password  string `json:"password"`
-	}
+type RegisterInput struct {
+	Username  string `json:"username" binding:"required"`
+	FirstName string `json:"first_name" binding:"required"`
+	LastName  string `json:"last_name" binding:"required"`
+	Email     string `json:"email" binding:"required,email"`
+	Role      string `json:"role" binding:"required,oneof=participant organizer"`
+	Password  string `json:"password" binding:"required"`
+}
 
-	if c.Bind(&body) != nil {
+type LoginInput struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required"`
+}
+
+func Register(c *gin.Context) {
+	var input RegisterInput
+	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Failed to read body",
+			"error": err.Error(),
 		})
 		return
 	}
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(body.Password), 10)
-
+	hashedpassword, err := utils.HashPassword(input.Password)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to hash password",
 		})
 		return
@@ -45,87 +46,125 @@ func Register(c *gin.Context) {
 		config.BaseURL,
 	)
 	user := models.User{
-		Username:  body.Username,
-		FirstName: body.FirstName,
-		LastName:  body.LastName,
-		Email:     body.Email,
-		Role:      models.Roles(body.Role),
-		Password:  string(hash),
+		Username:  input.Username,
+		FirstName: input.FirstName,
+		LastName:  input.LastName,
+		Email:     input.Email,
+		Role:      models.Roles(input.Role),
+		Password:  hashedpassword,
 		AvatarURL: defaultAvatar,
 	}
 
 	result := config.DB.Create(&user)
-
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Failed to create user",
+			"error": "Failed to create user: " + result.Error.Error(),
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Register successfully",
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "User registered successfully",
 	})
 }
 
 func Login(c *gin.Context) {
-	var body struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
-
-	if c.Bind(&body) != nil {
+	var input LoginInput
+	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Failed to read body",
+			"error": err.Error(),
 		})
 		return
 	}
 
 	var user models.User
-	config.DB.First(&user, "email = ?", body.Email)
-
-	if user.ID == uuid.Nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+	if err := config.DB.Where("email = ?", input.Email).First(&user).Error; err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "Invalid email or password",
 		})
 		return
 	}
 
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+	if !utils.CheckPasswordHash(input.Password, user.Password) {
+		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "Invalid email or password",
 		})
 		return
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": user.ID.String(),
-		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
-	})
-
-	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
-
+	accessToken, err := utils.GenerateAccessToken(user.ID.String(), string(user.Role))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid to create token",
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not generate access token",
 		})
 		return
 	}
 
-	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("Authorization", tokenString, 3600*24*30, "", "", false, true)
+	refreshToken, err := utils.CreateRefreshToken(user.ID.String())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not generate refresh token",
+		})
+		return
+	}
+
+	c.SetCookie("access_token", accessToken, 60*15, "/", "", false, true)
+	c.SetCookie("refresh_token", refreshToken, 60*60*24*7, "/", "", false, true)
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Login successfully",
+		"message": "Login success",
 	})
 }
 
 func Logout(c *gin.Context) {
-	c.SetCookie("Authorization", "", -1, "", "", false, true)
+	refreshToken, _ := c.Cookie("refresh_token")
+	if refreshToken != "" {
+		_ = utils.DeleteRefreshToken(refreshToken)
+	}
+
+	c.SetCookie("access_token", "", -1, "/", "", false, true)
+	c.SetCookie("refresh_token", "", -1, "/", "", false, true)
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Logout successfully",
+		"message": "Logged out successfully",
+	})
+}
+
+func RefreshToken(c *gin.Context) {
+	rt, err := c.Cookie("refresh_token")
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "No refresh token",
+		})
+		return
+	}
+
+	userID, err := utils.ValidateRefreshToken(rt)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Invalid or expired refresh token",
+		})
+		return
+	}
+
+	var user models.User
+	if err := config.DB.First(&user, "id = ?", userID).Error; err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "User not found",
+		})
+		return
+	}
+
+	accessToken, err := utils.GenerateAccessToken(user.ID.String(), string(user.Role))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not generate access token",
+		})
+		return
+	}
+
+	c.SetCookie("access_token", accessToken, 60*15, "/", "", false, true)
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Token refreshed",
 	})
 }
