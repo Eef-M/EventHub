@@ -10,6 +10,16 @@ export interface Ticket {
   updated_at: string;
 }
 
+export interface MyTicket {
+  ticket_id: string;
+  event_id: string;
+  title: string;
+  location: string;
+  date: string;
+  ticket_code: string;
+  price: number;
+}
+
 export interface CreateTicketRequest {
   event_id: string;
   name: string;

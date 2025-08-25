@@ -1,12 +1,12 @@
 import { fetchCreateTicket, fetchDeleteTicket, fetchMyTickets, fetchTickets, fetchUpdateTicket } from "@/services/ticketService";
-import type { MyTicketInterface, TicketInterface } from "@/types/ticket";
+import type { MyTicket, Ticket } from "@/types/ticket";
 import { createAsyncState } from "@/utils/asyncState";
 import { defineStore } from "pinia";
 
 export const useTicketStore = defineStore('ticket', {
   state: () => ({
-    ticketsState: createAsyncState<TicketInterface[]>([]),
-    myTicketState: createAsyncState<MyTicketInterface[]>([]),
+    ticketsState: createAsyncState<Ticket[]>([]),
+    myTicketState: createAsyncState<MyTicket[]>([]),
     createState: createAsyncState(null),
     updateState: createAsyncState(null),
     deleteState: createAsyncState(null),

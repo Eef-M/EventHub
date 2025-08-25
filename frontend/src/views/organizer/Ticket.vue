@@ -32,7 +32,7 @@ import { Plus } from "lucide-vue-next";
 import { toast } from "vue-sonner";
 import { useOrganizerStore } from "@/stores/organizerStore";
 import { useTicketStore } from "@/stores/ticketStore";
-import type { TicketInterface } from "@/types/ticket";
+import type { Ticket } from "@/types/ticket";
 import { Button } from "@/components/ui/button";
 
 const organizerStore = useOrganizerStore()
@@ -41,7 +41,7 @@ const ticketStore = useTicketStore()
 const showFormModal = ref(false);
 const showDeleteModal = ref(false);
 const isEditing = ref(false);
-const selectedTicket = ref<TicketInterface | null>(null);
+const selectedTicket = ref<Ticket | null>(null);
 
 onMounted(() => {
   organizerStore.getOrganizerTickets()
@@ -54,13 +54,13 @@ function openCreateModal() {
   showFormModal.value = true;
 }
 
-function openEditModal(ticket: TicketInterface) {
+function openEditModal(ticket: Ticket) {
   isEditing.value = true;
   selectedTicket.value = ticket;
   showFormModal.value = true;
 }
 
-function openDeleteModal(ticket: TicketInterface) {
+function openDeleteModal(ticket: Ticket) {
   selectedTicket.value = ticket;
   showDeleteModal.value = true;
 }
