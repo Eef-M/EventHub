@@ -10,6 +10,15 @@ export interface Ticket {
   updated_at: string;
 }
 
+export interface TicketTable {
+  id: string
+  event_id: string
+  name: string
+  description?: string
+  price: number
+  quota: number
+}
+
 export interface MyTicket {
   ticket_id: string;
   event_id: string;

@@ -65,13 +65,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import type { Ticket } from "@/types/ticket";
+import type { TicketTable } from "@/types/ticket";
 import type { EventInterface } from "@/types/event";
 
 interface Props {
   isOpen: boolean
   isEditing: boolean
-  ticketData?: Ticket | null
+  ticketData?: TicketTable | null
   events: EventInterface[]
   isLoading?: boolean
 }
