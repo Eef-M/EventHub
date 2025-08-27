@@ -64,19 +64,19 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label for="customerName" class="block text-sm font-medium text-gray-700 mb-2">
-                  Full Name *
+                  Full Name
                 </label>
-                <input id="customerName" v-model="customerInfo.name" type="text" required
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                  placeholder="Enter your full name" />
+                <input id="customerName" v-model="customerInfo.name" type="text" required readonly
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed"
+                  :placeholder="customerInfo.name || 'Enter your full name'" />
               </div>
               <div>
                 <label for="customerEmail" class="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address *
+                  Email Address
                 </label>
-                <input id="customerEmail" v-model="customerInfo.email" type="email" required
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                  placeholder="Enter your email" />
+                <input id="customerEmail" v-model="customerInfo.email" type="email" required readonly
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed"
+                  :placeholder="customerInfo.email || 'Enter your email'" />
               </div>
             </div>
 
@@ -189,10 +189,12 @@ import { loadStripe } from '@/services/paymentService'
 import { usePaymentStore } from '@/stores/paymentStore'
 import { formatPrice, calculateTotalPrice, validateTicketPurchase } from '@/utils/ticketUtils'
 import type { Ticket } from '@/types/ticket'
+import type { UserInterface } from '@/types/user'
 
 interface Props {
   isOpen: boolean
   selectedTicket: Ticket | null
+  user: UserInterface | null
 }
 
 interface Emits {
@@ -211,9 +213,17 @@ const isProcessing = ref(false)
 const stripe = ref<any>(null)
 const cardElement = ref<any>(null)
 
-const customerInfo = ref({
-  name: '',
-  email: ''
+const customerInfo = computed(() => {
+  if (props.user) {
+    return {
+      name: `${props.user.first_name} ${props.user.last_name}`.trim(),
+      email: props.user.email
+    }
+  }
+  return {
+    name: '',
+    email: ''
+  }
 })
 
 const paymentMethods = [
@@ -252,7 +262,8 @@ const canProceedPayment = computed(() => {
     customerInfo.value.email.trim() &&
     selectedPaymentMethod.value &&
     quantity.value > 0 &&
-    props.selectedTicket
+    props.selectedTicket &&
+    props.user
   )
 })
 
@@ -264,7 +275,6 @@ function closeModal() {
 function resetForm() {
   quantity.value = 1
   selectedPaymentMethod.value = 'card'
-  customerInfo.value = { name: '', email: '' }
   isProcessing.value = false
   if (cardElement.value) {
     cardElement.value.clear()
@@ -344,7 +354,7 @@ async function setupCardElement() {
 }
 
 async function processPayment() {
-  if (!canProceedPayment.value || !props.selectedTicket) return
+  if (!canProceedPayment.value || !props.selectedTicket || !props.user) return
 
   isProcessing.value = true
 
@@ -363,7 +373,7 @@ async function processPayment() {
 }
 
 async function processCardPayment() {
-  if (!stripe.value || !cardElement.value || !props.selectedTicket) return
+  if (!stripe.value || !cardElement.value || !props.selectedTicket || !props.user) return
 
   const paymentData = {
     ticket_id: props.selectedTicket.id,

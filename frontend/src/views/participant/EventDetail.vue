@@ -335,13 +335,13 @@
 
     <!-- Payment Modal -->
     <PaymentModal :is-open="paymentModal.isOpen" :selected-ticket="paymentModal.selectedTicket"
-      @close="closePaymentModal" @success="handlePaymentSuccess" />
+      :user="userStore.userState.data" @close="closePaymentModal" @success="handlePaymentSuccess" />
   </ParticipantLayout>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref, reactive } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import ParticipantLayout from '../../layouts/ParticipantLayout.vue'
 import PaymentModal from '@/components/participant/PaymentModal.vue'
 import { useEventStore } from '@/stores/eventStore'
@@ -382,6 +382,7 @@ const ticketStore = useTicketStore()
 const feedbackStore = useFeedbackStore()
 const userStore = useUserStore()
 
+const router = useRouter()
 const route = useRoute()
 const eventId = route.params.id as string
 const userId = userStore.userState.data?.id
@@ -427,7 +428,10 @@ onMounted(() => {
 
 function handleBuyTicket(ticketDisplay: TicketDisplay) {
   if (!userStore.userState.data) {
-    showPaymentMessage('error', 'Please login to purchase tickets')
+    router.push({
+      path: '/login',
+      query: { redirect: route.fullPath }
+    })
     return
   }
 
