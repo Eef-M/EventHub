@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/Eef-M/EventHub/backend/models"
 	"github.com/Eef-M/EventHub/backend/services"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -42,35 +43,23 @@ func CreatePaymentHandler(stripeService *services.StripeService) gin.HandlerFunc
 			return
 		}
 
-		userIDVal, exists := c.Get("user_id")
+		userInterface, exists := c.Get("user")
 		if !exists {
 			c.JSON(http.StatusUnauthorized, gin.H{
-				"error": "Unauthorized",
+				"message": "User not found in context",
 			})
 			return
 		}
 
-		var userID uuid.UUID
-		switch v := userIDVal.(type) {
-		case uuid.UUID:
-			userID = v
-		case string:
-			parsed, err := uuid.Parse(v)
-			if err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{
-					"error": "Invalid user ID format",
-				})
-				return
-			}
-			userID = parsed
-		default:
+		user, ok := userInterface.(models.User)
+		if !ok {
 			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": "Invalid user ID type",
+				"message": "Failed to cast user",
 			})
 			return
 		}
 
-		pi, err := stripeService.CreatePaymentIntent(c.Request.Context(), userID, req.TicketID, req.Quantity)
+		pi, err := stripeService.CreatePaymentIntent(c.Request.Context(), user.ID, req.TicketID, req.Quantity)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": "Failed to create payment: " + err.Error(),
@@ -91,30 +80,18 @@ func CreatePaymentHandler(stripeService *services.StripeService) gin.HandlerFunc
 
 func GetPaymentHistoryHandler(stripeService *services.StripeService) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		userIDVal, exists := c.Get("user_id")
+		userInterface, exists := c.Get("user")
 		if !exists {
 			c.JSON(http.StatusUnauthorized, gin.H{
-				"error": "Unauthorized",
+				"message": "User not found in context",
 			})
 			return
 		}
 
-		var userID uuid.UUID
-		switch v := userIDVal.(type) {
-		case uuid.UUID:
-			userID = v
-		case string:
-			parsed, err := uuid.Parse(v)
-			if err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{
-					"error": "Invalid user ID",
-				})
-				return
-			}
-			userID = parsed
-		default:
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "Invalid user ID",
+		user, ok := userInterface.(models.User)
+		if !ok {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Failed to cast user",
 			})
 			return
 		}
@@ -122,7 +99,7 @@ func GetPaymentHistoryHandler(stripeService *services.StripeService) gin.Handler
 		page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 		limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
 
-		payments, total, err := stripeService.GetUserPayments(userID, page, limit)
+		payments, total, err := stripeService.GetUserPayments(user.ID, page, limit)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": err.Error(),
@@ -157,35 +134,23 @@ func GetPaymentHandler(stripeService *services.StripeService) gin.HandlerFunc {
 			return
 		}
 
-		userIDVal, exists := c.Get("user_id")
+		userInterface, exists := c.Get("user")
 		if !exists {
 			c.JSON(http.StatusUnauthorized, gin.H{
-				"error": "Unauthorized",
+				"message": "User not found in context",
 			})
 			return
 		}
 
-		var userID uuid.UUID
-		switch v := userIDVal.(type) {
-		case uuid.UUID:
-			userID = v
-		case string:
-			parsed, err := uuid.Parse(v)
-			if err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{
-					"error": "Invalid user ID",
-				})
-				return
-			}
-			userID = parsed
-		default:
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "Invalid user ID",
+		user, ok := userInterface.(models.User)
+		if !ok {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Failed to cast user",
 			})
 			return
 		}
 
-		payment, err := stripeService.GetPaymentByID(paymentUUID, userID)
+		payment, err := stripeService.GetPaymentByID(paymentUUID, user.ID)
 		if err != nil {
 			c.JSON(http.StatusNotFound, gin.H{
 				"error": "Payment not found",
