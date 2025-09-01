@@ -10,7 +10,7 @@ const api = axios.create({
 export class PaymentService {
   static async createPaymentIntent(data: CreatePaymentRequest): Promise<CreatePaymentResponse> {
     try {
-      const response = await api.post('/payments/create', data)
+      const response = await api.post('/payments/create', data, { withCredentials: true })
       return response.data
     } catch (error: any) {
       throw new Error(error.response?.data?.error || 'Failed to create payment')
@@ -20,7 +20,8 @@ export class PaymentService {
   static async getPaymentHistory(page = 1, limit = 10): Promise<PaymentHistoryResponse> {
     try {
       const response = await api.get('/payments/history', {
-        params: { page, limit }
+        params: { page, limit },
+        withCredentials: true
       });
       return response.data
     } catch (error: any) {
@@ -30,7 +31,7 @@ export class PaymentService {
 
   static async getPayment(paymentId: string): Promise<Payment> {
     try {
-      const response = await api.get(`/payments/${paymentId}`)
+      const response = await api.get(`/payments/${paymentId}`, { withCredentials: true })
       return response.data.payment
     } catch (error: any) {
       throw new Error(error.response?.data?.error || 'Failed to get payment details');

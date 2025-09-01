@@ -84,7 +84,7 @@
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-3">Payment Method</label>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <button v-for="method in paymentMethods" :key="method.id" @click="selectedPaymentMethod = method.id"
+                <button v-for="method in paymentMethods" :key="method.id" @click="selectPaymentMethod(method.id)"
                   :class="[
                     'flex items-center space-x-3 p-4 border-2 rounded-xl transition-all duration-200',
                     selectedPaymentMethod === method.id
@@ -102,12 +102,42 @@
 
             <!-- Stripe Card Element -->
             <div v-if="selectedPaymentMethod === 'card'" class="space-y-4">
-              <label class="block text-sm font-medium text-gray-700">Card Information</label>
-              <div id="card-element"
-                class="p-4 border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-purple-500 focus-within:border-transparent transition-all min-h-[50px] flex items-center">
-                <!-- Stripe Elements will mount here -->
+              <div class="flex items-center justify-between">
+                <label class="block text-sm font-medium text-gray-700">Card Information</label>
+                <div v-if="cardElementMounted" class="flex items-center space-x-2">
+                  <div v-if="cardComplete" class="flex items-center text-green-600 text-xs">
+                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"></path>
+                    </svg>
+                    Complete
+                  </div>
+                  <div v-else-if="!cardValid" class="text-orange-600 text-xs">
+                    Enter card details
+                  </div>
+                </div>
               </div>
-              <div id="card-errors" class="text-red-500 text-sm"></div>
+
+              <!-- Loading state -->
+              <div v-if="!cardElementMounted"
+                class="p-4 border border-gray-300 rounded-lg min-h-[50px] flex items-center justify-center">
+                <div class="flex items-center space-x-2 text-gray-400 text-sm">
+                  <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
+                  <span>Loading payment form...</span>
+                </div>
+              </div>
+
+              <!-- Stripe card element container -->
+              <div v-show="cardElementMounted" id="card-element" :class="[
+                'p-4 border rounded-lg transition-all min-h-[50px]',
+                cardComplete
+                  ? 'border-green-300 focus-within:ring-2 focus-within:ring-green-500 focus-within:border-transparent'
+                  : 'border-gray-300 focus-within:ring-2 focus-within:ring-purple-500 focus-within:border-transparent'
+              ]">
+              </div>
+
+              <div id="card-errors" class="text-red-500 text-sm" role="alert"></div>
             </div>
 
             <!-- Other payment methods placeholder -->
@@ -153,11 +183,11 @@
               <span>Secure payment powered by Stripe</span>
             </div>
             <div class="flex space-x-3">
-              <Button variant="outline" @click="closeModal" :disabled="isProcessing" class="px-6 py-2">
+              <Button variant="outline" @click="closeModal" :disabled="isProcessing" class="px-6 py-2 cursor-pointer">
                 Cancel
               </Button>
               <Button @click="processPayment" :disabled="!canProceedPayment || isProcessing"
-                class="px-8 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                class="px-8 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
                 <div v-if="isProcessing" class="flex items-center">
                   <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                   Processing...
@@ -176,7 +206,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, onMounted, nextTick } from 'vue'
+import { computed, ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { Button } from '@/components/ui/button'
 import {
   CreditCardIcon,
@@ -212,6 +242,10 @@ const selectedPaymentMethod = ref('card')
 const isProcessing = ref(false)
 const stripe = ref<any>(null)
 const cardElement = ref<any>(null)
+const cardElementMounted = ref(false)
+const stripeInitialized = ref(false)
+const cardValid = ref(false)
+const cardComplete = ref(false)
 
 const customerInfo = computed(() => {
   if (props.user) {
@@ -257,7 +291,7 @@ const processingFee = computed(() => priceCalculation.value.processingFee)
 const finalTotal = computed(() => priceCalculation.value.total)
 
 const canProceedPayment = computed(() => {
-  return (
+  const basicValidation = (
     customerInfo.value.name.trim() &&
     customerInfo.value.email.trim() &&
     selectedPaymentMethod.value &&
@@ -265,9 +299,17 @@ const canProceedPayment = computed(() => {
     props.selectedTicket &&
     props.user
   )
+
+  // Additional validation for card payments
+  if (selectedPaymentMethod.value === 'card') {
+    return basicValidation && cardElementMounted.value && cardElement.value && cardValid.value && cardComplete.value
+  }
+
+  return basicValidation
 })
 
 function closeModal() {
+  cleanupStripeElements()
   emit('close')
   resetForm()
 }
@@ -276,8 +318,38 @@ function resetForm() {
   quantity.value = 1
   selectedPaymentMethod.value = 'card'
   isProcessing.value = false
+  cardValid.value = false
+  cardComplete.value = false
+}
+
+function cleanupStripeElements() {
   if (cardElement.value) {
-    cardElement.value.clear()
+    try {
+      cardElement.value.off('change')
+      cardElement.value.off('ready')
+      cardElement.value.off('focus')
+      cardElement.value.off('blur')
+      cardElement.value.unmount()
+      cardElement.value.destroy()
+    } catch (error) {
+      console.warn('Error cleaning up Stripe element:', error)
+    } finally {
+      cardElement.value = null
+      cardElementMounted.value = false
+      cardValid.value = false
+      cardComplete.value = false
+    }
+  }
+}
+
+async function selectPaymentMethod(methodId: string) {
+  selectedPaymentMethod.value = methodId
+
+  if (methodId === 'card' && props.isOpen) {
+    await nextTick()
+    if (!cardElementMounted.value) {
+      await setupCardElement()
+    }
   }
 }
 
@@ -297,50 +369,77 @@ function decreaseQuantity() {
 }
 
 async function initializeStripe() {
+  if (stripeInitialized.value) return
+
   try {
     stripe.value = await loadStripe()
-    await setupCardElement()
+    stripeInitialized.value = true
+
+    // Setup card element if modal is open and card method is selected
+    if (props.isOpen && selectedPaymentMethod.value === 'card') {
+      await nextTick()
+      await setupCardElement()
+    }
   } catch (error) {
     console.error('Failed to load Stripe:', error)
   }
 }
 
 async function setupCardElement() {
-  if (!stripe.value) return
+  if (!stripe.value || cardElementMounted.value) return
 
-  const elements = stripe.value.elements({
-    appearance: {
-      theme: 'stripe',
-      variables: {
-        colorPrimary: '#7c3aed',
-        colorBackground: '#ffffff',
-        colorText: '#374151',
-        colorDanger: '#ef4444',
-        fontFamily: 'system-ui, sans-serif',
-        spacingUnit: '4px',
-        borderRadius: '8px',
-      }
+  try {
+    // Clean up existing element first
+    cleanupStripeElements()
+
+    // Wait for DOM to be ready
+    await nextTick()
+
+    const cardContainer = document.getElementById('card-element')
+    if (!cardContainer) {
+      console.warn('Card element container not found')
+      return
     }
-  })
 
-  cardElement.value = elements.create('card', {
-    style: {
-      base: {
-        fontSize: '16px',
-        color: '#374151',
-        '::placeholder': {
-          color: '#9ca3af',
+    // Ensure container is empty before mounting
+    cardContainer.innerHTML = ''
+
+    const elements = stripe.value.elements({
+      appearance: {
+        theme: 'stripe',
+        variables: {
+          colorPrimary: '#7c3aed',
+          colorBackground: '#ffffff',
+          colorText: '#374151',
+          colorDanger: '#ef4444',
+          fontFamily: 'system-ui, sans-serif',
+          spacingUnit: '4px',
+          borderRadius: '8px',
+        }
+      }
+    })
+
+    cardElement.value = elements.create('card', {
+      style: {
+        base: {
+          fontSize: '16px',
+          color: '#374151',
+          '::placeholder': {
+            color: '#9ca3af',
+          },
         },
       },
-    },
-  })
+    })
 
-  await nextTick()
-  const cardElementContainer = document.getElementById('card-element')
-  if (cardElementContainer) {
-    cardElement.value.mount('#card-element')
+    // Mount the element
+    cardElement.value.mount(cardContainer)
 
+    // Set up event listeners
     cardElement.value.on('change', (event: any) => {
+      // Update card validity and completeness
+      cardValid.value = !event.error && event.complete
+      cardComplete.value = event.complete
+
       const displayError = document.getElementById('card-errors')
       if (displayError) {
         if (event.error) {
@@ -350,6 +449,23 @@ async function setupCardElement() {
         }
       }
     })
+
+    cardElement.value.on('ready', () => {
+      cardElementMounted.value = true
+      // console.log('Stripe card element is ready')
+    })
+
+    // cardElement.value.on('focus', () => {
+    //   console.log('Card element focused')
+    // })
+
+    // cardElement.value.on('blur', () => {
+    //   console.log('Card element blurred')
+    // })
+
+  } catch (error) {
+    console.error('Failed to setup card element:', error)
+    cardElementMounted.value = false
   }
 }
 
@@ -373,26 +489,49 @@ async function processPayment() {
 }
 
 async function processCardPayment() {
-  if (!stripe.value || !cardElement.value || !props.selectedTicket || !props.user) return
+  if (!stripe.value || !cardElement.value || !props.selectedTicket || !props.user) {
+    throw new Error('Payment system not ready')
+  }
 
+  // Verify card element is still mounted and valid
+  if (!cardElementMounted.value) {
+    throw new Error('Payment form not ready. Please try again.')
+  }
+
+  // First, create a payment method to validate the card without creating payment intent
+  const { error: paymentMethodError, paymentMethod } = await stripe.value.createPaymentMethod({
+    type: 'card',
+    card: cardElement.value,
+    billing_details: {
+      name: customerInfo.value.name,
+      email: customerInfo.value.email,
+    },
+  })
+
+  if (paymentMethodError) {
+    throw new Error(paymentMethodError.message)
+  }
+
+  if (!paymentMethod) {
+    throw new Error('Failed to create payment method')
+  }
+
+  // Only create payment intent after card validation succeeds
   const paymentData = {
     ticket_id: props.selectedTicket.id,
     quantity: quantity.value
   }
 
   const response = await paymentStore.createPaymentIntent(paymentData)
-  if (!response) throw new Error('Failed to create payment intent')
+  if (!response) {
+    throw new Error('Failed to create payment intent')
+  }
 
+  // Confirm payment with the validated payment method
   const { error, paymentIntent } = await stripe.value.confirmCardPayment(
     response.client_secret,
     {
-      payment_method: {
-        card: cardElement.value,
-        billing_details: {
-          name: customerInfo.value.name,
-          email: customerInfo.value.email,
-        },
-      }
+      payment_method: paymentMethod.id
     }
   )
 
@@ -403,20 +542,56 @@ async function processCardPayment() {
   if (paymentIntent && paymentIntent.status === 'succeeded') {
     emit('success', paymentIntent.id)
     closeModal()
+  } else {
+    throw new Error('Payment was not completed successfully')
   }
 }
 
-watch(() => props.isOpen, (isOpen) => {
-  if (isOpen && selectedPaymentMethod.value === 'card') {
-    nextTick(() => {
-      if (!cardElement.value) {
-        setupCardElement()
-      }
-    })
+// Watch for modal open/close
+watch(() => props.isOpen, async (isOpen) => {
+  if (isOpen) {
+    // Reset form state
+    resetForm()
+
+    // Initialize Stripe if not already done
+    if (!stripeInitialized.value) {
+      await initializeStripe()
+    }
+
+    // Setup card element if card method is selected
+    if (selectedPaymentMethod.value === 'card') {
+      // Add small delay to ensure DOM is ready
+      setTimeout(async () => {
+        await setupCardElement()
+      }, 100)
+    }
+  } else {
+    // Clean up when modal closes
+    cleanupStripeElements()
+  }
+})
+
+// Watch for payment method changes
+watch(selectedPaymentMethod, async (newMethod, oldMethod) => {
+  if (props.isOpen) {
+    if (oldMethod === 'card') {
+      cleanupStripeElements()
+    }
+
+    if (newMethod === 'card' && stripe.value) {
+      // Add small delay to ensure DOM is ready
+      setTimeout(async () => {
+        await setupCardElement()
+      }, 100)
+    }
   }
 })
 
 onMounted(() => {
   initializeStripe()
+})
+
+onUnmounted(() => {
+  cleanupStripeElements()
 })
 </script>
