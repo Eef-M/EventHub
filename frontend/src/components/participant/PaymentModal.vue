@@ -220,11 +220,13 @@ import { usePaymentStore } from '@/stores/paymentStore'
 import { formatPrice, calculateTotalPrice, validateTicketPurchase } from '@/utils/ticketUtils'
 import type { Ticket } from '@/types/ticket'
 import type { UserInterface } from '@/types/user'
+import { useEventRegistrationsStore } from '@/stores/eventRegistrationsStore'
 
 interface Props {
   isOpen: boolean
   selectedTicket: Ticket | null
   user: UserInterface | null
+  eventID: string
 }
 
 interface Emits {
@@ -236,6 +238,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const paymentStore = usePaymentStore()
+const eventRegistrationStore = useEventRegistrationsStore()
 
 const quantity = ref(1)
 const selectedPaymentMethod = ref('card')
@@ -475,8 +478,13 @@ async function processPayment() {
   isProcessing.value = true
 
   try {
+    const formDataToSend = new FormData()
+    formDataToSend.append('user_id', props.user?.id)
+    formDataToSend.append('ticket_id', props.selectedTicket?.id)
+
     if (selectedPaymentMethod.value === 'card') {
       await processCardPayment()
+      await eventRegistrationStore.registerEvent(props.eventID, formDataToSend)
     } else {
       throw new Error('Payment method not implemented yet')
     }
@@ -594,4 +602,5 @@ onMounted(() => {
 onUnmounted(() => {
   cleanupStripeElements()
 })
+
 </script>
