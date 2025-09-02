@@ -335,7 +335,7 @@
 
     <!-- Payment Modal -->
     <PaymentModal :is-open="paymentModal.isOpen" :selected-ticket="paymentModal.selectedTicket"
-      :user="userStore.userState.data" @close="closePaymentModal" @success="handlePaymentSuccess" />
+      :user="userStore.userState.data" :eventID="eventId" @close="closePaymentModal" @success="handlePaymentSuccess" />
   </ParticipantLayout>
 </template>
 
