@@ -9,6 +9,7 @@ import (
 	"github.com/Eef-M/EventHub/backend/config"
 	"github.com/Eef-M/EventHub/backend/handlers"
 	"github.com/Eef-M/EventHub/backend/models"
+	"github.com/Eef-M/EventHub/backend/repository"
 	"github.com/Eef-M/EventHub/backend/utils"
 	"github.com/gin-gonic/gin"
 )
@@ -22,8 +23,10 @@ func GetMyProfile(c *gin.Context) {
 		return
 	}
 
+	currentUser := user.(models.User)
+
 	c.JSON(http.StatusOK, gin.H{
-		"data": user,
+		"data": repository.GetMe(currentUser),
 	})
 }
 
@@ -89,9 +92,16 @@ func UpdateMyProfile(c *gin.Context) {
 		return
 	}
 
+	if err := config.DB.First(&currentUser, "id = ?", currentUser.ID).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to fetch updated user",
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Profile updated successfully",
-		"data":    currentUser,
+		"data":    repository.GetMe(currentUser),
 	})
 }
 
