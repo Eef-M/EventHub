@@ -36,3 +36,15 @@ export async function fetchMyProfile(): Promise<UserInterface> {
     throw error
   }
 }
+
+export async function fetchUpdateProfile(payload: FormData): Promise<UserInterface> {
+  try {
+    const response = await apiClient.put('/user/update', payload, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      withCredentials: true
+    })
+    return response.data.data
+  } catch (error: any) {
+    throw error
+  }
+}

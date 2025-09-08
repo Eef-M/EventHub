@@ -1,11 +1,12 @@
 import { defineStore } from "pinia";
 import type { UserInterface } from "@/types/user";
-import { fetchMyProfile } from "@/services/userService";
+import { fetchMyProfile, fetchUpdateProfile } from "@/services/userService";
 import { createAsyncState } from "@/utils/asyncState";
 
 export const useUserStore = defineStore('user', {
   state: () => ({
     userState: createAsyncState<UserInterface | null>(null),
+    userUpdateState: createAsyncState(null),
     isAuthenticated: false
   }),
 
@@ -13,7 +14,11 @@ export const useUserStore = defineStore('user', {
     user: (state) => state.userState.data,
     isLoading: (state) => state.userState.loading,
     hasError: (state) => state.userState.error,
-    isLoggedIn: (state) => state.isAuthenticated && !!state.userState.data
+    isLoggedIn: (state) => state.isAuthenticated && !!state.userState.data,
+    updateUser: (state) => state.userUpdateState.data,
+    updateLoading: (state) => state.userUpdateState.loading,
+    updateError: (state) => state.userUpdateState.error,
+    updateLoggedIn: (state) => state.isAuthenticated && !!state.userUpdateState.data
   },
 
   actions: {
@@ -28,10 +33,27 @@ export const useUserStore = defineStore('user', {
         this.userState.data = data
         this.isAuthenticated = true
       } catch (err: any) {
-        this.userState.error = 'Failed to get Tickets'
+        this.userState.error = 'Failed to get profile'
         throw err
       } finally {
         this.userState.loading = false
+      }
+    },
+
+    async updateMyProfile(payload: FormData) {
+      if (this.userUpdateState.loading) return
+
+      this.userUpdateState.loading = true
+      this.userState.error = null
+
+      try {
+        await fetchUpdateProfile(payload)
+        this.isAuthenticated = true
+      } catch (err: any) {
+        this.userUpdateState.error = 'Failed to update profile'
+        throw err
+      } finally {
+        this.userUpdateState.loading = false
       }
     },
 
