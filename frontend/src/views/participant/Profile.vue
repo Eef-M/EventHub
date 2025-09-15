@@ -18,10 +18,11 @@
 
                 <div class="flex flex-col sm:flex-row gap-3 mt-4">
                   <Button
-                    class="bg-purple-600 text-white hover:bg-purple-700 px-6 py-2 rounded-full trasnsition cursor-pointer">
+                    class="bg-purple-600 text-white hover:bg-purple-700 px-6 py-2 rounded-full transition cursor-pointer">
                     Get in touch
                   </Button>
-                  <Button variant="outline" class="px-6 py-2 rounded-full border-slate-300 cursor-pointer">
+                  <Button variant="outline" class="px-6 py-2 rounded-full border-slate-300 cursor-pointer"
+                    @click="goToEditProfile">
                     Edit Profile
                   </Button>
                   <Button variant="ghost" size="icon" class="w-10 h-10 rounded-full">
@@ -71,7 +72,7 @@
               </div>
               <CardHeader>
                 <CardTitle class="text-lg">{{ myReg.title }}</CardTitle>
-                <p class="text-sm text-gray-600">{{ formatDate(myReg.date) }} • {{ myReg.location }}</p>
+                <p class="text-sm text-gray-600">{{ formatDate(myReg.date) }} â€¢ {{ myReg.location }}</p>
               </CardHeader>
               <CardContent>
                 <p class="text-gray-700 text-sm">{{ myReg.description }}</p>
@@ -104,7 +105,7 @@
                     </div>
                     <div>
                       <h3 class="font-semibold text-lg">{{ ticket.title }}</h3>
-                      <p class="text-gray-600">{{ formatDate(ticket.date) }} • {{ ticket.location }}</p>
+                      <p class="text-gray-600">{{ formatDate(ticket.date) }} â€¢ {{ ticket.location }}</p>
                       <p class="text-sm text-gray-500">Ticket Code: {{ ticket.ticket_code }}</p>
                     </div>
                   </div>
@@ -186,7 +187,7 @@
                       <div class="flex items-center space-x-2 mt-2 text-gray-500">
                         <Clock class="w-4 h-4" />
                         <span class="text-sm">{{ formatDate(event.date) }}</span>
-                        <span class="text-xs">•</span>
+                        <span class="text-xs">â€¢</span>
                         <span class="text-sm">{{ formatTime(event.time) || 'Time TBD' }}</span>
                       </div>
                     </div>
@@ -224,6 +225,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -235,6 +237,7 @@ import { useOrganizerStore } from '@/stores/organizerStore'
 import { formatDate, formatTime } from '@/utils/format'
 import { useTicketStore } from '@/stores/ticketStore'
 
+const router = useRouter()
 const userStore = useUserStore()
 const eventRegStore = useEventRegistrationsStore()
 const ticketStore = useTicketStore()
@@ -272,4 +275,8 @@ const tabs = computed(() => {
 
   return baseTabs
 })
+
+const goToEditProfile = () => {
+  router.push('/profile/edit')
+}
 </script>

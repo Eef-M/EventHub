@@ -12,6 +12,7 @@ import Ticket from "@/views/organizer/Ticket.vue";
 import Registrations from "@/views/organizer/Registrations.vue";
 import Feedback from "@/views/organizer/Feedback.vue";
 import Profile from "@/views/participant/Profile.vue";
+import EditProfile from "@/views/participant/EditProfile.vue";
 import Forbidden from "@/views/error/Forbidden.vue";
 import NotFound from "@/views/error/NotFound.vue";
 
@@ -85,6 +86,13 @@ const routes = [
   {
     path: '/profile',
     component: Profile,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/profile/edit',
+    component: EditProfile,
     meta: {
       requiresAuth: true
     }
