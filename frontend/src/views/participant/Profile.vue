@@ -99,7 +99,8 @@
                   <div class="text-right">
                     <p class="text-lg font-bold mt-2">${{ ticket.price }}</p>
                     <Button variant="outline" size="sm"
-                      class="mt-2 hover:bg-purple-50 hover:border-purple-300 cursor-pointer">
+                      class="mt-2 hover:bg-purple-50 hover:border-purple-300 cursor-pointer"
+                      @click="openQRModal(ticket)">
                       <QrCode class="w-4 h-4 mr-1" />
                       Show QR
                     </Button>
@@ -203,6 +204,7 @@
       </div>
     </div>
   </ParticipantLayout>
+  <QRCodeModal :isOpen="showQRModal" :ticket="selectedTicket" @close="closeQRModal" />
 </template>
 
 <script setup lang="ts">
@@ -218,6 +220,10 @@ import { useEventRegistrationsStore } from '@/stores/eventRegistrationsStore'
 import { useOrganizerStore } from '@/stores/organizerStore'
 import { formatDate, formatTime } from '@/utils/format'
 import { useTicketStore } from '@/stores/ticketStore'
+import QRCodeModal from '@/components/participant/QRCodeModal.vue'
+
+const showQRModal = ref(false)
+const selectedTicket = ref(null)
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -240,6 +246,16 @@ onMounted(() => {
     organizerStore.getMyEvents()
   }
 })
+
+const openQRModal = (ticket: any) => {
+  selectedTicket.value = ticket
+  showQRModal.value = true
+}
+
+const closeQRModal = () => {
+  showQRModal.value = false
+  selectedTicket.value = null
+}
 
 const activeTab = ref('registrations')
 
