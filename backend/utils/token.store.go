@@ -38,6 +38,8 @@ func CreateRefreshToken(userID string) (string, error) {
 	return newToken, nil
 }
 
+var CreateRefreshTokenFunc = CreateRefreshToken
+
 func ValidateRefreshToken(token string) (string, error) {
 	ctx := context.Background()
 	tokenKey := fmt.Sprintf("refresh_token:%s", token)
