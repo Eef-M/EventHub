@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -55,6 +56,7 @@ func setupTestEnvironment() {
 	}
 }
 
+// Login
 func TestLogin_Success(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	setupTestEnvironment()
@@ -284,6 +286,7 @@ func TestLogin_All(t *testing.T) {
 	t.Run("TokenGenerationError", TestLogin_TokenGenerationError)
 }
 
+// Register
 func TestRegister_Success(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	mock, cleanup := setupMockDB(t)
@@ -656,4 +659,330 @@ func TestRegister_All(t *testing.T) {
 	t.Run("MissingFields", TestRegister_MissingFields)
 	t.Run("InvalidJSON", TestRegister_InvalidJSON)
 	t.Run("DatabaseError", TestRegister_DatabaseError)
+}
+
+// Logout
+func TestLogout_Success_WithRefreshToken(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	setupTestEnvironment()
+
+	_, cleanup := setupMockDB(t)
+	defer cleanup()
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	req, _ := http.NewRequest("POST", "/logout", nil)
+	req.AddCookie(&http.Cookie{
+		Name:  "refresh_token",
+		Value: "valid-refresh-token",
+	})
+	c.Request = req
+
+	originalDeleteRefreshToken := utils.DeleteRefreshTokenFunc
+	mockDeleteCalled := false
+	utils.DeleteRefreshTokenFunc = func(token string) error {
+		mockDeleteCalled = true
+		assert.Equal(t, "valid-refresh-token", token)
+		return nil
+	}
+	defer func() {
+		utils.DeleteRefreshTokenFunc = originalDeleteRefreshToken
+	}()
+
+	controllers.Logout(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.True(t, mockDeleteCalled)
+
+	var response map[string]interface{}
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.Equal(t, "Logged out successfully", response["message"])
+
+	cookies := w.Result().Cookies()
+	var accessTokenCookie, refreshTokenCookie *http.Cookie
+	for _, cookie := range cookies {
+		if cookie.Name == "access_token" {
+			accessTokenCookie = cookie
+		}
+		if cookie.Name == "refresh_token" {
+			refreshTokenCookie = cookie
+		}
+	}
+
+	assert.NotNil(t, accessTokenCookie)
+	assert.NotNil(t, refreshTokenCookie)
+	assert.Equal(t, "", accessTokenCookie.Value)
+	assert.Equal(t, "", refreshTokenCookie.Value)
+	assert.Equal(t, -1, accessTokenCookie.MaxAge)
+	assert.Equal(t, -1, refreshTokenCookie.MaxAge)
+}
+
+func TestLogout_Success_WithoutRefreshToken(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	setupTestEnvironment()
+
+	_, cleanup := setupMockDB(t)
+	defer cleanup()
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	req, _ := http.NewRequest("POST", "/logout", nil)
+	c.Request = req
+
+	originalDeleteRefreshToken := utils.DeleteRefreshTokenFunc
+	mockDeleteCalled := false
+	utils.DeleteRefreshTokenFunc = func(token string) error {
+		mockDeleteCalled = true
+		return nil
+	}
+	defer func() {
+		utils.DeleteRefreshTokenFunc = originalDeleteRefreshToken
+	}()
+
+	controllers.Logout(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.False(t, mockDeleteCalled)
+
+	var response map[string]interface{}
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.Equal(t, "Logged out successfully", response["message"])
+
+	cookies := w.Result().Cookies()
+	var accessTokenCookie, refreshTokenCookie *http.Cookie
+	for _, cookie := range cookies {
+		if cookie.Name == "access_token" {
+			accessTokenCookie = cookie
+		}
+		if cookie.Name == "refresh_token" {
+			refreshTokenCookie = cookie
+		}
+	}
+
+	assert.NotNil(t, accessTokenCookie)
+	assert.NotNil(t, refreshTokenCookie)
+	assert.Equal(t, "", accessTokenCookie.Value)
+	assert.Equal(t, "", refreshTokenCookie.Value)
+}
+
+func TestLogout_Success_EmptyRefreshToken(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	setupTestEnvironment()
+
+	_, cleanup := setupMockDB(t)
+	defer cleanup()
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	req, _ := http.NewRequest("POST", "/logout", nil)
+	req.AddCookie(&http.Cookie{
+		Name:  "refresh_token",
+		Value: "",
+	})
+	c.Request = req
+
+	originalDeleteRefreshToken := utils.DeleteRefreshToken
+	mockDeleteCalled := false
+	utils.DeleteRefreshTokenFunc = func(token string) error {
+		mockDeleteCalled = true
+		return nil
+	}
+	defer func() {
+		utils.DeleteRefreshTokenFunc = originalDeleteRefreshToken
+	}()
+
+	controllers.Logout(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.False(t, mockDeleteCalled)
+
+	var response map[string]interface{}
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.Equal(t, "Logged out successfully", response["message"])
+}
+
+func TestLogout_DeleteRefreshTokenFailure(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	setupTestEnvironment()
+
+	_, cleanup := setupMockDB(t)
+	defer cleanup()
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	req, _ := http.NewRequest("POST", "/logout", nil)
+	req.AddCookie(&http.Cookie{
+		Name:  "refresh_token",
+		Value: "valid-refresh-token",
+	})
+	c.Request = req
+
+	originalDeleteRefreshToken := utils.DeleteRefreshTokenFunc
+	utils.DeleteRefreshTokenFunc = func(token string) error {
+		return errors.New("database error")
+	}
+	defer func() {
+		utils.DeleteRefreshTokenFunc = originalDeleteRefreshToken
+	}()
+
+	controllers.Logout(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var response map[string]interface{}
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.Equal(t, "Logged out successfully", response["message"])
+
+	cookies := w.Result().Cookies()
+	assert.Len(t, cookies, 2)
+}
+
+func TestLogout_WithMultipleCookies(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	setupTestEnvironment()
+
+	_, cleanup := setupMockDB(t)
+	defer cleanup()
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	req, _ := http.NewRequest("POST", "/logout", nil)
+	req.AddCookie(&http.Cookie{Name: "access_token", Value: "some-access-token"})
+	req.AddCookie(&http.Cookie{Name: "refresh_token", Value: "some-refresh-token"})
+	req.AddCookie(&http.Cookie{Name: "other_cookie", Value: "other-value"})
+	c.Request = req
+
+	originalDeleteRefreshToken := utils.DeleteRefreshTokenFunc
+	mockDeleteCalled := false
+	utils.DeleteRefreshTokenFunc = func(token string) error {
+		mockDeleteCalled = true
+		assert.Equal(t, "some-refresh-token", token)
+		return nil
+	}
+	defer func() {
+		utils.DeleteRefreshTokenFunc = originalDeleteRefreshToken
+	}()
+
+	controllers.Logout(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.True(t, mockDeleteCalled)
+
+	var response map[string]interface{}
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.Equal(t, "Logged out successfully", response["message"])
+
+	cookies := w.Result().Cookies()
+	authCookiesCleared := 0
+	for _, cookie := range cookies {
+		if cookie.Name == "access_token" || cookie.Name == "refresh_token" {
+			assert.Equal(t, "", cookie.Value)
+			assert.Equal(t, -1, cookie.MaxAge)
+			authCookiesCleared++
+		}
+	}
+	assert.Equal(t, 2, authCookiesCleared)
+}
+
+func TestLogout_DifferentHTTPMethods(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	setupTestEnvironment()
+
+	_, cleanup := setupMockDB(t)
+	defer cleanup()
+
+	methods := []string{"GET", "PUT", "DELETE", "PATCH"}
+
+	for _, method := range methods {
+		t.Run(fmt.Sprintf("Method_%s", method), func(t *testing.T) {
+			w := httptest.NewRecorder()
+			c, _ := gin.CreateTestContext(w)
+
+			req, _ := http.NewRequest(method, "/logout", nil)
+			req.AddCookie(&http.Cookie{
+				Name:  "refresh_token",
+				Value: "test-token",
+			})
+			c.Request = req
+
+			originalDeleteRefreshToken := utils.DeleteRefreshTokenFunc
+			utils.DeleteRefreshTokenFunc = func(token string) error {
+				return nil
+			}
+			defer func() {
+				utils.DeleteRefreshTokenFunc = originalDeleteRefreshToken
+			}()
+
+			controllers.Logout(c)
+
+			assert.Equal(t, http.StatusOK, w.Code)
+
+			var response map[string]interface{}
+			err := json.Unmarshal(w.Body.Bytes(), &response)
+			assert.NoError(t, err)
+			assert.Equal(t, "Logged out successfully", response["message"])
+		})
+	}
+}
+
+func TestLogout_CookieAttributes(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	setupTestEnvironment()
+
+	_, cleanup := setupMockDB(t)
+	defer cleanup()
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	req, _ := http.NewRequest("POST", "/logout", nil)
+	req.AddCookie(&http.Cookie{
+		Name:  "refresh_token",
+		Value: "test-token",
+	})
+	c.Request = req
+
+	originalDeleteRefreshToken := utils.DeleteRefreshTokenFunc
+	utils.DeleteRefreshTokenFunc = func(token string) error {
+		return nil
+	}
+	defer func() {
+		utils.DeleteRefreshTokenFunc = originalDeleteRefreshToken
+	}()
+
+	controllers.Logout(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	cookies := w.Result().Cookies()
+	for _, cookie := range cookies {
+		if cookie.Name == "access_token" || cookie.Name == "refresh_token" {
+			assert.Equal(t, "", cookie.Value)
+			assert.Equal(t, -1, cookie.MaxAge)
+			assert.Equal(t, "/", cookie.Path)
+			assert.Equal(t, "", cookie.Domain)
+			assert.Equal(t, false, cookie.Secure)
+			assert.Equal(t, true, cookie.HttpOnly)
+		}
+	}
+}
+
+func TestLogout_All(t *testing.T) {
+	t.Run("SuccessWithRefreshToken", TestLogout_Success_WithRefreshToken)
+	t.Run("SuccessWithoutRefreshToken", TestLogout_Success_WithoutRefreshToken)
+	t.Run("SuccessEmptyRefreshToken", TestLogout_Success_EmptyRefreshToken)
+	t.Run("DeleteRefreshTokenFailure", TestLogout_DeleteRefreshTokenFailure)
+	t.Run("WithMultipleCookies", TestLogout_WithMultipleCookies)
+	t.Run("DifferentHTTPMethods", TestLogout_DifferentHTTPMethods)
+	t.Run("CookieAttributes", TestLogout_CookieAttributes)
 }

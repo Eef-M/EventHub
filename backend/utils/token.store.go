@@ -71,3 +71,5 @@ func DeleteRefreshToken(token string) error {
 
 	return config.Redis.Del(ctx, tokenKey).Err()
 }
+
+var DeleteRefreshTokenFunc = DeleteRefreshToken
