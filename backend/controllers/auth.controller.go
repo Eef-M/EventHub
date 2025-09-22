@@ -119,7 +119,7 @@ func Login(c *gin.Context) {
 func Logout(c *gin.Context) {
 	refreshToken, _ := c.Cookie("refresh_token")
 	if refreshToken != "" {
-		_ = utils.DeleteRefreshToken(refreshToken)
+		_ = utils.DeleteRefreshTokenFunc(refreshToken)
 	}
 
 	c.SetCookie("access_token", "", -1, "/", "", false, true)
