@@ -18,8 +18,12 @@
             <h2 class="text-xl font-semibold text-gray-900 mb-6">Profile Photo</h2>
             <div class="flex items-center gap-6">
               <div class="relative">
-                <img :src="avatarPreview || form.avatar_url" :alt="form.username + ' avatar'"
-                  class="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg">
+                <Avatar class="h-32 w-32">
+                  <AvatarImage :src="avatarPreview || form.avatar_url" :alt="form.username || 'User'" />
+                  <AvatarFallback class="text-5xl font-medium bg-purple-100 text-purple-700">
+                    {{ getUserInitials(form) }}
+                  </AvatarFallback>
+                </Avatar>
                 <Button type="button" variant="outline" size="icon" @click="triggerFileInput"
                   class="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-white border-2 border-gray-300 hover:bg-gray-50">
                   <Camera class="w-4 h-4" />
@@ -145,6 +149,7 @@ import { ArrowLeft, Camera, Upload, AlertCircle, CheckCircle } from 'lucide-vue-
 import ParticipantLayout from '@/layouts/ParticipantLayout.vue'
 import { useUserStore } from '@/stores/userStore'
 import type { UserInterface } from '@/types/user'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 
 const userStore = useUserStore()
 const fileInput = ref<HTMLInputElement>()
@@ -320,5 +325,23 @@ const handleSubmit = async () => {
   } catch (error) {
     console.error('Failed to update profile:', error)
   }
+}
+
+const getUserInitials = (user: any) => {
+  if (!user) return 'U'
+
+  if (user.name) {
+    const names = user.name.split(' ')
+    if (names.length >= 2) {
+      return `${names[0][0]}${names[1][0]}`.toUpperCase()
+    }
+    return names[0][0].toUpperCase()
+  }
+
+  if (user.email) {
+    return user.email[0].toUpperCase()
+  }
+
+  return 'U'
 }
 </script>
