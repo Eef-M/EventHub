@@ -6,8 +6,12 @@
           <div class="py-8">
             <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
               <div class="relative">
-                <img :src="user?.avatar_url" alt="user avatar"
-                  class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg">
+                <Avatar class="h-32 w-32">
+                  <AvatarImage :src="user?.avatar_url || ''" :alt="user?.username || 'User'" />
+                  <AvatarFallback class="text-5xl font-medium bg-purple-100 text-purple-700">
+                    {{ getUserInitials(user) }}
+                  </AvatarFallback>
+                </Avatar>
                 <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 border-2 border-white rounded-full"></div>
               </div>
 
@@ -212,6 +216,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Ticket, QrCode, Calendar, MapPin, Clock, Edit } from 'lucide-vue-next'
 import ParticipantLayout from '@/layouts/ParticipantLayout.vue'
@@ -284,5 +289,23 @@ const goToManageEvents = () => {
 
 const goToEventDetail = (eventID: string) => {
   router.push(`/events/${eventID}/detail`)
+}
+
+const getUserInitials = (user: any) => {
+  if (!user) return 'U'
+
+  if (user.name) {
+    const names = user.name.split(' ')
+    if (names.length >= 2) {
+      return `${names[0][0]}${names[1][0]}`.toUpperCase()
+    }
+    return names[0][0].toUpperCase()
+  }
+
+  if (user.email) {
+    return user.email[0].toUpperCase()
+  }
+
+  return 'U'
 }
 </script>
