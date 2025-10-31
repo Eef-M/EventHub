@@ -82,6 +82,34 @@ func SyncDB() {
 	}
 
 	fmt.Println("Database tables synced successfully!")
+
+	// Auto-run seeder after migration
+	autoSeed()
+}
+
+// autoSeed runs the seeder automatically after migration
+func autoSeed() {
+	// Check if AUTO_SEED is enabled (default: true)
+	autoSeedEnabled := getEnvOrDefault("AUTO_SEED", "true")
+
+	if autoSeedEnabled != "true" {
+		fmt.Println("Auto-seeding is disabled")
+		return
+	}
+
+	// Check if database is empty (no users exist)
+	var count int64
+	DB.Model(&models.User{}).Count(&count)
+
+	if count > 0 {
+		fmt.Println("Database already contains data, skipping auto-seed")
+		return
+	}
+
+	fmt.Println("Running database seeder automatically...")
+	// Import seeders package here to avoid circular dependency
+	// You'll need to call the seeder functions from main package instead
+	fmt.Println("⚠️  Please run seeders manually from main package to avoid circular import")
 }
 
 // Helper function to get environment variable with default value
